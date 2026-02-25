@@ -1,0 +1,240 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-brand-blue: var(--brand-blue);
+  --color-accent: var(--accent);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+}
+
+/* ─── Dark Theme (default) ─── */
+:root {
+  --radius: 0.625rem;
+
+  --background: #06060A;
+  --surface: #0A0A12;
+  --surface-elevated: #12121E;
+  --brand-blue: #0172BD;
+  --accent: #0080FF;
+  --text-primary: #F4F4F5;
+  --text-secondary: #A1A1AA;
+
+  --foreground: #F4F4F5;
+  --card: #0A0A12;
+  --card-foreground: #F4F4F5;
+  --popover: #0A0A12;
+  --popover-foreground: #F4F4F5;
+  --primary: #0172BD;
+  --primary-foreground: #FFFFFF;
+  --secondary: #12121E;
+  --secondary-foreground: #F4F4F5;
+  --muted: #12121E;
+  --muted-foreground: #A1A1AA;
+  --accent-foreground: #FFFFFF;
+  --destructive: #EF4444;
+  --border: rgba(255, 255, 255, 0.06);
+  --input: rgba(255, 255, 255, 0.10);
+  --ring: #0080FF;
+
+  --noise-opacity: 0.07;
+  --glow-opacity: 0.06;
+
+  --particle-color: rgba(255, 255, 255, 0.5);
+  --particle-line-color: rgba(255, 255, 255, 0.08);
+
+  --spotlight-color: rgba(1, 114, 189, 0.12);
+  --card-shadow: none;
+  --card-shadow-hover: 0 0 40px -12px rgba(1, 114, 189, 0.15);
+}
+
+/* ─── Light Theme ─── */
+.light {
+  --background: #FAFBFC;
+  --surface: #FFFFFF;
+  --surface-elevated: #F4F5F7;
+  --brand-blue: #0172BD;
+  --accent: #005DA6;
+  --text-primary: #111827;
+  --text-secondary: #4B5563;
+
+  --foreground: #111827;
+  --card: #FFFFFF;
+  --card-foreground: #111827;
+  --popover: #FFFFFF;
+  --popover-foreground: #111827;
+  --primary: #0172BD;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F4F5F7;
+  --secondary-foreground: #111827;
+  --muted: #F4F5F7;
+  --muted-foreground: #4B5563;
+  --accent-foreground: #FFFFFF;
+  --destructive: #DC2626;
+  --border: rgba(0, 0, 0, 0.12);
+  --input: rgba(0, 0, 0, 0.12);
+  --ring: #005DA6;
+
+  --noise-opacity: 0.025;
+  --glow-opacity: 0.06;
+
+  --particle-color: rgba(0, 0, 0, 0.25);
+  --particle-line-color: rgba(0, 0, 0, 0.06);
+
+  --spotlight-color: rgba(1, 114, 189, 0.08);
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 16px rgba(0, 0, 0, 0.04);
+  --card-shadow-hover: 0 4px 20px rgba(1, 114, 189, 0.1), 0 8px 32px rgba(0, 0, 0, 0.06);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* ─── Reduced Motion ─── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ─── Gradient Text Shimmer ─── */
+@keyframes gradient-shimmer {
+  0% { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+
+.gradient-text-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--brand-blue) 0%,
+    var(--accent) 30%,
+    #A3E0F7 50%,
+    var(--accent) 70%,
+    var(--brand-blue) 100%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-shimmer 4s linear infinite;
+}
+
+/* Light mode card styling */
+.light .card-surface {
+  background: var(--surface) !important;
+  box-shadow: var(--card-shadow);
+}
+.light .card-surface:hover {
+  box-shadow: var(--card-shadow-hover);
+}
+
+/* ─── Conic Gradient Border ─── */
+@property --border-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes rotate-border {
+  to { --border-angle: 360deg; }
+}
+
+
+/* ─── Analytics Card Animations ─── */
+@keyframes grow-bar {
+  to { transform: scaleY(1); }
+}
+@keyframes pulse-ring {
+  0%, 100% { stroke-width: 3; opacity: 0.7; }
+  50% { stroke-width: 3.5; opacity: 0.9; }
+}
+@keyframes breathe-bar {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(1.04); }
+}
+@keyframes curve-shimmer {
+  0%, 100% { stroke-opacity: 0.8; stroke-width: 1; }
+  50% { stroke-opacity: 1; stroke-width: 1.5; }
+}
+
+/* Pipeline flow animations */
+@keyframes flow-dash {
+  to { stroke-dashoffset: -24; }
+}
+@keyframes node-pulse {
+  0%, 100% { opacity: 0.15; r: 10; }
+  50% { opacity: 0.5; r: 14; }
+}
+
+/* ─── Custom cursor (desktop only) ─── */
+@media (pointer: fine) {
+  .cursor-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--brand-blue);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.15s ease;
+  }
+  .cursor-ring {
+    width: 40px;
+    height: 40px;
+    border: 1.5px solid var(--accent);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9998;
+    opacity: 0.5;
+    transition: opacity 0.3s ease, border-color 0.3s ease;
+  }
+  .cursor-ring.hovering {
+    opacity: 0.8;
+    border-color: var(--brand-blue);
+  }
+}
