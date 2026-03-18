@@ -739,14 +739,14 @@ Reveal.initialize({
 
 // Theme toggle
 const ptBtn = document.getElementById('pres-theme-toggle');
+const bgSlides = document.querySelectorAll('section[data-background-color="#050a15"]');
 ptBtn.addEventListener('click', () => {
   const html = document.documentElement;
   const cur = html.getAttribute('data-pres-theme');
   const next = cur === 'light' ? 'dark' : 'light';
   html.setAttribute('data-pres-theme', next);
   ptBtn.innerHTML = next === 'light' ? '&#9789;' : '&#9788;';
-  // Update background color for slides that set it explicitly
-  document.querySelectorAll('section[data-background-color="#050a15"]').forEach(s => {
+  bgSlides.forEach(s => {
     s.setAttribute('data-background-color', next === 'light' ? '#f0f4f8' : '#050a15');
   });
   Reveal.sync();
