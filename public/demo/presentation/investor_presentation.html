@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monachil Credit Platform — Investor Presentation</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/black.css" id="theme">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --r-background-color: #050a15;
+  --r-main-font: 'Inter', sans-serif;
+  --r-main-font-size: 32px;
+  --r-main-color: #c8d6e5;
+  --r-heading-font: 'Inter', sans-serif;
+  --r-heading-color: #f1f5f9;
+  --r-heading-letter-spacing: -0.02em;
+  --r-heading-text-transform: none;
+  --r-heading1-size: 2.2em;
+  --r-heading2-size: 1.6em;
+  --r-heading3-size: 1.2em;
+  --r-link-color: #60a5fa;
+  --r-link-color-hover: #93c5fd;
+  --r-selection-background-color: rgba(99,102,241,0.3);
+  --accent: #6366f1;
+  --teal: #14b8a6;
+  --amber: #f59e0b;
+  --muted: #64748b;
+  --subtle: #334155;
+}
+.reveal { font-weight: 400; }
+.reveal h1, .reveal h2, .reveal h3 { font-weight: 700; }
+.reveal h1 { font-weight: 800; }
+
+/* Background grid */
+.reveal .slides { background:
+  radial-gradient(ellipse at 20% 20%, rgba(59,130,246,0.06) 0%, transparent 50%),
+  radial-gradient(ellipse at 80% 70%, rgba(139,92,246,0.05) 0%, transparent 50%);
+}
+
+/* Title slide gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #60a5fa, #a78bfa, #2dd4bf);
+  background-size: 200% 200%;
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 4s ease-in-out infinite;
+}
+@keyframes shimmer { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
+
+/* Subtitle styling */
+.subtitle { color: var(--muted); font-size: 0.55em; font-weight: 400; margin-top: 0.5em; letter-spacing: 0.05em; }
+
+/* Logo */
+.logo { height: 60px; margin-bottom: 1em; filter: drop-shadow(0 0 20px rgba(99,102,241,0.2)); }
+
+/* Bullet points */
+.reveal ul { list-style: none; padding-left: 0; }
+.reveal ul li { position: relative; padding-left: 1.5em; margin-bottom: 0.5em; font-size: 0.75em; color: #94a3b8; }
+.reveal ul li::before { content: ''; position: absolute; left: 0; top: 0.55em; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.reveal ul li strong { color: #e2e8f0; }
+
+/* Icon bullets with colored dots */
+.reveal ul.accent-teal li::before { background: var(--teal); }
+.reveal ul.accent-amber li::before { background: var(--amber); }
+
+/* Two column layout */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 2em; text-align: left; }
+.two-col .col-header { font-size: 0.7em; font-weight: 700; color: var(--accent); margin-bottom: 0.5em; text-transform: uppercase; letter-spacing: 0.1em; }
+
+/* Key metric cards */
+.metric-row { display: flex; gap: 1em; justify-content: center; margin: 1em 0; }
+.metric-card { background: rgba(30,41,59,0.5); border: 1px solid rgba(100,160,255,0.15); border-radius: 12px; padding: 0.8em 1.2em; text-align: center; min-width: 140px; }
+.metric-card .num { font-size: 1.4em; font-weight: 800; color: #f1f5f9; font-family: 'Inter', monospace; }
+.metric-card .label { font-size: 0.45em; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 0.3em; }
+
+/* Source grid */
+.source-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8em; margin: 1em auto; max-width: 800px; }
+.source-item { background: rgba(30,41,59,0.4); border: 1px solid rgba(100,160,255,0.1); border-radius: 10px; padding: 0.6em 0.8em; text-align: left; }
+.source-item .src-title { font-size: 0.55em; font-weight: 600; color: #e2e8f0; }
+.source-item .src-desc { font-size: 0.4em; color: var(--muted); margin-top: 0.2em; }
+
+/* Demo slide navigation */
+.demo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6em; margin: 0.8em auto; max-width: 900px; }
+.demo-card { background: rgba(30,41,59,0.5); border: 1px solid rgba(100,160,255,0.12); border-radius: 10px; padding: 0.7em; text-align: left; cursor: pointer; transition: border-color 0.3s, transform 0.2s; }
+.demo-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.demo-card .demo-name { font-size: 0.55em; font-weight: 700; color: #f1f5f9; }
+.demo-card .demo-type { font-size: 0.38em; color: var(--teal); font-weight: 500; margin-top: 0.15em; }
+.demo-card .demo-desc { font-size: 0.35em; color: var(--muted); margin-top: 0.3em; line-height: 1.4; }
+
+/* Timeline */
+.timeline { display: flex; align-items: flex-start; gap: 0; margin: 1.5em auto; max-width: 900px; position: relative; }
+.timeline::before { content:''; position:absolute; top:18px; left:0; right:0; height:2px; background: linear-gradient(90deg, var(--accent), var(--teal)); opacity:0.3; }
+.tl-step { flex:1; text-align:center; position:relative; z-index:1; }
+.tl-dot { width:12px; height:12px; border-radius:50%; background:var(--accent); margin:12px auto 8px; border:2px solid var(--r-background-color); }
+.tl-step:nth-child(2) .tl-dot { background: #818cf8; }
+.tl-step:nth-child(3) .tl-dot { background: #a78bfa; }
+.tl-step:nth-child(4) .tl-dot { background: var(--teal); }
+.tl-step:nth-child(5) .tl-dot { background: #2dd4bf; }
+.tl-title { font-size:0.4em; font-weight:700; color:#e2e8f0; }
+.tl-desc { font-size:0.32em; color:var(--muted); margin-top:0.3em; line-height:1.4; max-width:150px; margin-left:auto; margin-right:auto; }
+
+/* Verification visual */
+.verify-box { display:grid; grid-template-columns:1fr auto 1fr; gap:0.5em; align-items:center; margin:1em auto; max-width:700px; }
+.v-panel { background:rgba(30,41,59,0.5); border-radius:10px; padding:0.8em; text-align:center; }
+.v-panel.servicer { border:1px solid rgba(239,68,68,0.3); }
+.v-panel.ours { border:1px solid rgba(34,211,166,0.3); }
+.v-label { font-size:0.4em; font-weight:600; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.4em; }
+.v-panel.servicer .v-label { color:#f87171; }
+.v-panel.ours .v-label { color:#34d399; }
+.v-metric { font-size:0.9em; font-weight:800; color:#f1f5f9; }
+.v-detail { font-size:0.35em; color:var(--muted); margin-top:0.3em; }
+.v-arrow { font-size:1.2em; color:var(--accent); }
+
+/* Medallion badge row */
+.medal-row { display:flex; justify-content:center; gap:0.3em; align-items:center; margin:0.5em 0; }
+.medal { font-size:0.5em; font-weight:700; padding:0.3em 0.8em; border-radius:20px; }
+.medal.bronze { background:rgba(205,127,50,0.15); color:#cd7f32; border:1px solid rgba(205,127,50,0.3); }
+.medal.silver { background:rgba(168,168,192,0.15); color:#a8a8c0; border:1px solid rgba(168,168,192,0.3); }
+.medal.gold { background:rgba(255,215,0,0.15); color:#ffd700; border:1px solid rgba(255,215,0,0.3); }
+.medal-arrow { color:var(--muted); font-size:0.5em; }
+
+/* Impact grid */
+.impact-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:0.8em; margin:1em auto; max-width:850px; }
+.impact-item { background:rgba(30,41,59,0.4); border-left:3px solid var(--accent); border-radius:0 8px 8px 0; padding:0.6em 0.8em; text-align:left; }
+.impact-item:nth-child(2) { border-left-color: var(--teal); }
+.impact-item:nth-child(3) { border-left-color: var(--amber); }
+.impact-item .imp-title { font-size:0.5em; font-weight:700; color:#e2e8f0; }
+.impact-item .imp-desc { font-size:0.35em; color:var(--muted); margin-top:0.2em; line-height:1.4; }
+
+/* Iframe slides */
+.reveal .iframe-slide iframe { border: 1px solid rgba(100,160,255,0.15); border-radius: 8px; background: #0a0e17; }
+
+/* Footer */
+.slide-footer { position:fixed; bottom:12px; left:24px; font-size:11px; color:rgba(100,116,139,0.5); z-index:10; font-family:'Inter',sans-serif; }
+
+/* Hide notes from display */
+aside.notes { display: none; }
+
+/* Fragment custom animations */
+.reveal .slides section .fragment.fade-up { transform: translateY(20px); }
+.reveal .slides section .fragment.fade-up.visible { transform: translateY(0); }
+</style>
+</head>
+<body>
+<div class="slide-footer">Monachil Credit Partners</div>
+<div class="reveal">
+<div class="slides">
+
+<!-- ============================================================ -->
+<!-- SLIDE 1: TITLE -->
+<!-- ============================================================ -->
+<section data-background-color="#050a15">
+  <img src="MCP_Logo_TRANSPARENT.png" class="logo" alt="Monachil">
+  <h1 class="gradient-text" style="font-size:1.8em;">Data-Driven Asset Management</h1>
+  <p class="subtitle">Proprietary Infrastructure for Risk Control, Capital Efficiency & Scalability</p>
+  <aside class="notes">
+    Welcome. Today we'll walk you through how Monachil uses data — not just for reporting, but as the foundational infrastructure behind every investment decision we make.
+
+    We built a proprietary platform that ingests data from every source in our deals, independently verifies it, and surfaces insights in real time. We'll show you the architecture, then walk through some of the dashboards we use internally. Some of the slides are fairly dense — that's by design, not by accident. We won't go through every detail, but it's all there if you want to dig in later.
+  </aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- SLIDE 2: INDUSTRY PROBLEM -->
+<!-- ============================================================ -->
+<section data-auto-animate>
+  <h2 style="font-size:1.3em;" data-id="main-heading">Why Most Asset Managers <span style="color:#f87171;">Fly Blind</span></h2>
+  <ul style="margin-top:1em;">
+    <li class="fragment"><strong>Fragmented data</strong> scattered across servicers, banks, and counterparties</li>
+    <li class="fragment"><strong>Delayed visibility</strong> — risk reports arrive days or weeks after the damage</li>
+    <li class="fragment"><strong>Manual reconciliation</strong> creates bottlenecks that don't scale</li>
+    <li class="fragment"><strong>No independent verification</strong> — servicer data taken at face value</li>
+  </ul>
+  <aside class="notes">
+    Most asset managers in our space depend on monthly servicer reports they can't independently validate. Data sits in different systems — loan tapes from the servicer, bank statements from the custodian, legal docs from counsel — and reconciling them is manual, slow, and error-prone.
+
+    By the time a monthly report shows a problem, you've already lost weeks of response time.
+  </aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- SLIDE 3: PHILOSOPHY + FULL PIPELINE -->
+<!-- ============================================================ -->
+<section data-auto-animate>
+  <h2 style="font-size:1.2em;" data-id="main-heading">Data is the Foundation — <span style="color:#60a5fa;">Not a Byproduct</span></h2>
+  <ul style="margin-top:0.5em;">
+    <li class="fragment"><strong>One platform</strong> — Investment, Legal, Ops, Finance, IR all connected</li>
+    <li class="fragment"><strong>Not siloed</strong> — cross-functional by design, evolves with every deal</li>
+    <li class="fragment"><strong>Data team embedded</strong> from origination through portfolio life</li>
+  </ul>
+  <div class="fragment" style="margin-top:0.8em; padding:0.5em; background:rgba(30,41,59,0.3); border-radius:10px; border:1px solid rgba(100,160,255,0.1);">
+    <p style="font-size:0.4em; color:var(--muted); margin-bottom:0.3em;">OUR COMPLETE OPERATIONS PIPELINE</p>
+    <p style="font-size:0.35em; color:#60a5fa;">Press <kbd style="background:rgba(100,160,255,0.2); padding:2px 6px; border-radius:4px;">&#x2192;</kbd> to explore the full interactive pipeline</p>
+  </div>
+  <aside class="notes">
+    Every team at Monachil touches the same data platform. Investment uses it for deal evaluation. Legal for covenant tracking. Ops for daily monitoring. Finance for fund accounting. IR for investor reporting.
+
+    The next slide shows the full operations pipeline we are building and maintaining. It already has a lot of components in production and it's progressing toward being the holistic system for our entire operation. For today, we'll focus on origination and monitoring, but the important thing is this is one connected system — not separate tools duct-taped together.
+  </aside>
+</section>
+
+<!-- SLIDE 3b: FULL PIPELINE IFRAME -->
+<section data-background-iframe="investment_fund_operations_v4.html" data-background-interactive data-preload>
+  <div style="position:absolute; bottom:8px; right:12px; background:rgba(5,10,21,0.7); padding:4px 10px; border-radius:6px; border:1px solid rgba(100,160,255,0.12); opacity:0.6; pointer-events:none; z-index:10;">
+    <span style="font-size:0.3em; color:#64748b;">Interactive: click any section for details</span>
+  </div>
+  <aside class="notes">
+    This is the full pipeline we are building and maintaining. On the left, data sources — LMS systems, bank and payment processors, collateral docs, facility documents. We also fetch and store market data — FX rates, SOFR, benchmark rates — automatically on a daily basis.
+
+    Each source feeds into its own validated data store. Then enrichment — cross-dataset joins, business logic, collection analysis, covenant compliance. And finally, reporting — dashboards, alerts, investor reports.
+
+    You can click on any section to explore the details. Notice the data flows from left to right — raw ingestion, validation, enrichment, then consumption. The dashboards I'll show you in a few minutes sit on the right side of this diagram, powered by everything upstream.
+  </aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- SLIDE 4: DAY ZERO + VERIFICATION -->
+<!-- ============================================================ -->
+<section>
+  <h2 style="font-size:1.1em;">In the Room from <span style="color:#a78bfa;">Day Zero</span> — and We <span style="color:#34d399;">Verify Everything</span></h2>
+
+  <div class="timeline fragment">
+    <div class="tl-step">
+      <div class="tl-dot"></div>
+      <div class="tl-title">Deal Sourcing</div>
+      <div class="tl-desc">Preliminary data analytics to assess quality</div>
+    </div>
+    <div class="tl-step">
+      <div class="tl-dot"></div>
+      <div class="tl-title">Due Diligence</div>
+      <div class="tl-desc">Full data integration & stress testing</div>
+    </div>
+    <div class="tl-step">
+      <div class="tl-dot"></div>
+      <div class="tl-title">Pre-Closing</div>
+      <div class="tl-desc">Model facility terms, covenants in code</div>
+    </div>
+    <div class="tl-step">
+      <div class="tl-dot"></div>
+      <div class="tl-title">Go-Live</div>
+      <div class="tl-desc">Automated ingestion from day one</div>
+    </div>
+    <div class="tl-step">
+      <div class="tl-dot"></div>
+      <div class="tl-title">Monitoring</div>
+      <div class="tl-desc">Daily verification & alerts</div>
+    </div>
+  </div>
+
+  <div class="verify-box fragment">
+    <div class="v-panel servicer">
+      <div class="v-label">Servicer Reports</div>
+      <div class="v-metric">DPD: 45</div>
+      <div class="v-detail">Reported delinquency from LMS</div>
+    </div>
+    <div class="v-arrow">&#x21C4;</div>
+    <div class="v-panel ours">
+      <div class="v-label">Our Calculation</div>
+      <div class="v-metric">DPD: 52</div>
+      <div class="v-detail">Re-derived from raw payment data</div>
+    </div>
+  </div>
+  <p class="fragment" style="font-size:0.4em; color:#f87171; margin-top:0.3em;">&#9888; Mismatch detected — triggers immediate investigation</p>
+
+  <aside class="notes">
+    Two things we want to highlight here. First, we don't wait for data after closing. During deal negotiations, our team runs preliminary analytics on the data we receive — loan tapes, payment tapes, bank statements, collateral records. During diligence, we do full data integration. The aim is that by closing, we have the monitoring infrastructure and data integration as ready as possible. After signing there are still things that need to dynamically change and be implemented, but the foundation is in place.
+
+    Second, we don't take servicer data at face value. We rebuild core business logic — payment waterfalls, DPD calculations, outstanding principal, interest accrual, borrowing base — independently from the raw data. Then we compare our numbers to the servicer's.
+
+    See this example? The servicer says 45 days past due, but when we re-derive from actual payment records, it's 52. That 7-day discrepancy triggers an alert and we investigate immediately — not at the next quarterly review.
+  </aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- SLIDE 5: MEDALLION ARCHITECTURE -->
+<!-- ============================================================ -->
+<section>
+  <h2 style="font-size:1.2em;">How We Organize Data</h2>
+  <div class="medal-row fragment">
+    <span class="medal bronze">BRONZE</span>
+    <span class="medal-arrow">&#x2192;</span>
+    <span class="medal silver">SILVER</span>
+    <span class="medal-arrow">&#x2192;</span>
+    <span class="medal gold">GOLD</span>
+  </div>
+  <ul style="margin-top:0.5em;">
+    <li class="fragment"><strong>Bronze</strong> — Raw data exactly as received. Immutable, checksummed, auditable</li>
+    <li class="fragment"><strong>Silver</strong> — Cleansed, validated, deduplicated, PII-masked</li>
+    <li class="fragment"><strong>Gold &#x2260; Dashboards</strong> — Gold is <em>enriched data</em>: DPD calculations, borrowing base logic, covenant checks, cross-dataset joins</li>
+    <li class="fragment">Everything is <strong>regenerable from raw</strong> — we can always go back to source</li>
+  </ul>
+  <div class="fragment" style="margin-top:0.6em; padding:0.4em; background:rgba(30,41,59,0.3); border-radius:10px; border:1px solid rgba(100,160,255,0.1);">
+    <p style="font-size:0.35em; color:#60a5fa;">Press <kbd style="background:rgba(100,160,255,0.2); padding:2px 6px; border-radius:4px;">&#x2192;</kbd> to explore the interactive architecture diagram</p>
+  </div>
+  <aside class="notes">
+    This is the Medallion Architecture — Bronze, Silver, Gold. Industry standard pattern, but our implementation is specific to private credit.
+
+    When we say Gold, we don't mean a dashboard. Gold is the enriched, verified dataset where our proprietary business logic lives — DPD calculations, borrowing base formulas, covenant compliance checks, cross-dataset joins between loan tapes, bank statements, and legal documents.
+
+    Dashboards are just one consumption layer on top. The real value isn't the chart — it's the verified, enriched data underneath. And everything is fully regenerable from the raw Bronze data at any time.
+  </aside>
+</section>
+
+<!-- SLIDE 5b: ARCHITECTURE IFRAME -->
+<section data-background-iframe="data_architecture_medallion.html" data-background-interactive data-preload>
+  <div style="position:absolute; bottom:8px; right:12px; background:rgba(5,10,21,0.7); padding:4px 10px; border-radius:6px; border:1px solid rgba(100,160,255,0.12); opacity:0.6; pointer-events:none; z-index:10;">
+    <span style="font-size:0.3em; color:#64748b;">Medallion Architecture — hover over stages for details</span>
+  </div>
+  <aside class="notes">
+    Here's the full architecture. Sources on the left — loan management systems, banks, payment processors, legal docs — flowing in through various formats and integrations.
+
+    Bronze is raw capture — the data exactly as we received it, stored permanently so we always have a record. Silver is where we clean and standardize — making sure data types are consistent, removing duplicates, protecting sensitive information. Think of it as making sure all the data speaks the same language regardless of where it came from.
+
+    Then enrichment — this is where our proprietary logic lives. DPD calculations, outstanding principal, borrowing base, cross-dataset joins between different sources.
+
+    Gold is the curated layer — ready for analysis, powering dashboards and investor reports. Notice the quarantine boxes — nothing is silently dropped. If data doesn't pass validation, it gets flagged for human review.
+
+    And at the bottom — fully regenerable from raw. If we ever question a number, we trace it back to the source.
+  </aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- SLIDE 6: DATA COVERAGE -->
+<!-- ============================================================ -->
+<section>
+  <h2 style="font-size:1.2em;">Comprehensive, <span style="color:#14b8a6;">Multi-Source</span> Coverage</h2>
+  <div class="source-grid fragment">
+    <div class="source-item">
+      <div class="src-title">&#x1F4CA; Loan & Payment Data</div>
+      <div class="src-desc">Servicer loan tapes, payment schedules, collection records</div>
+    </div>
+    <div class="source-item">
+      <div class="src-title">&#x1F3E6; Bank Transactions</div>
+      <div class="src-desc">BAI2, ACH, wire reconciliation — multiple banks per deal</div>
+    </div>
+    <div class="source-item">
+      <div class="src-title">&#x1F4C4; Loan Documents</div>
+      <div class="src-desc">PDF parsing of contracts, amendments — cross-referenced with LMS</div>
+    </div>
+    <div class="source-item">
+      <div class="src-title">&#x1F4C8; Market & Rate Data</div>
+      <div class="src-desc">SOFR, FX, benchmark rates — daily automated feeds</div>
+    </div>
+    <div class="source-item">
+      <div class="src-title">&#x2696;&#xFE0F; Legal & Facility Docs</div>
+      <div class="src-desc">Covenant definitions, borrowing base rules, advance rates</div>
+    </div>
+    <div class="source-item">
+      <div class="src-title">&#x1F50D; Validation & Recon</div>
+      <div class="src-desc">Cross-source verification, DPD comparison, balance matching</div>
+    </div>
+  </div>
+  <aside class="notes">
+    We capture data across every dimension of an investment — not just tapes from the LMS (loan tapes, payment tapes, transaction records), but bank transactions across multiple banks per deal, actual loan documents that we parse and cross-reference, daily market rates, and legal facility terms.
+
+    And critically — we cross-validate between sources. If the payment tape says one thing and the bank statement or payment processor says something else, we catch it.
+
+    Now let's look at what all of this infrastructure actually produces. I'm going to walk you through some of the dashboards we use internally across our portfolios.
+  </aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- SLIDE 7: DEMO INTRO -->
+<!-- ============================================================ -->
+<section>
+  <h2 style="font-size:1.2em;">Live Portfolio <span class="gradient-text">Analytics</span></h2>
+  <p style="font-size:0.5em; color:var(--muted); margin-bottom:0.8em;">Example dashboards we use internally — across asset classes and geographies</p>
+  <div class="demo-grid">
+    <div class="demo-card" onclick="Reveal.slide(9)" style="cursor:pointer">
+      <div class="demo-name">MCA Portfolio</div>
+      <div class="demo-type">Merchant Cash Advance</div>
+      <div class="demo-desc">139 advances, $6.7M PO, $6.2M VOR. DPD analysis, vintage curves, industry concentration, loan explorer.</div>
+    </div>
+    <div class="demo-card" onclick="Reveal.slide(10)" style="cursor:pointer">
+      <div class="demo-name">Streaming Auto</div>
+      <div class="demo-type">US Auto Loans</div>
+      <div class="demo-desc">45 loans, $259K VOR, $254K BB. Dealer lots, collections tracking, BB waterfall, DPD analysis.</div>
+    </div>
+    <div class="demo-card" onclick="Reveal.slide(11)" style="cursor:pointer">
+      <div class="demo-name">Vehicle Leasing</div>
+      <div class="demo-type">Motorcycle &amp; Car Leases — Peru</div>
+      <div class="demo-desc">4,439 leases, BB S/. 42.0M. Dual asset class — bikes vs cars, lessee rank tracking, factor analysis.</div>
+    </div>
+    <div class="demo-card" onclick="Reveal.slide(12)" style="cursor:pointer">
+      <div class="demo-name">Consumer Lending</div>
+      <div class="demo-type">Personal &amp; POS Loans — Peru</div>
+      <div class="demo-desc">273K loans, BB S/. 10.5M. Personal vs POS segmentation, vintage collectability, refi distribution.</div>
+    </div>
+    <div class="demo-card" onclick="Reveal.slide(13)" style="cursor:pointer">
+      <div class="demo-name">Consumer Lending</div>
+      <div class="demo-type">Personal Loans — US</div>
+      <div class="demo-desc">BB $15.5M. DPD comparison (servicer vs ours), multi-bank recon, loan doc verification.</div>
+    </div>
+    <div class="demo-card" onclick="Reveal.slide(14)" style="cursor:pointer">
+      <div class="demo-name">Micro-Credit</div>
+      <div class="demo-type">SME Lending — Colombia</div>
+      <div class="demo-desc">BB COP 24.6B / $6.7M. Multiple payment channels, endorsement tracking, XIRR 18-42%.</div>
+    </div>
+    <div class="demo-card" onclick="Reveal.slide(15)" style="cursor:pointer">
+      <div class="demo-name">Consumer Microloans</div>
+      <div class="demo-type">Employment Loans — US</div>
+      <div class="demo-desc">859 loans, $385K VOR, $211K BB. KPI tracker, channel acquisition, covenant monitoring.</div>
+    </div>
+    <div class="demo-card" onclick="Reveal.slide(16)" style="cursor:pointer">
+      <div class="demo-name">Auto Loan Purchasing</div>
+      <div class="demo-type">Debt Purchase — US (Joint Venture)</div>
+      <div class="demo-desc">729 loans, $8.1M balance. Dealer analysis, DPD reconciliation, charge-off tracking.</div>
+    </div>
+    <div class="demo-card" onclick="Reveal.slide(17)" style="cursor:pointer">
+      <div class="demo-name">Flight School Lending</div>
+      <div class="demo-type">Student Pilot Loans — US (Put Option)</div>
+      <div class="demo-desc">331 loans, $17M VOR. Put option economics, flight school concentration, FICO analysis.</div>
+    </div>
+  </div>
+  <aside class="notes">
+    Nine different portfolios here — multiple asset classes across three countries. Fair warning, there's a lot of detail on these. The goal was to have it available, not to test your eyesight. I'll hit the highlights on a few, and the rest are yours to explore. Let me start with MCA.
+  </aside>
+</section>
+
+<!-- SLIDE 7a: MCA DASHBOARD -->
+<section data-background-iframe="mca_portfolio_analytics.html" data-background-interactive data-preload>
+  <div style="position:absolute; bottom:8px; right:12px; background:rgba(5,10,21,0.7); padding:4px 10px; border-radius:6px; border:1px solid rgba(100,160,255,0.12); opacity:0.6; pointer-events:none; z-index:10;">
+    <span style="font-size:0.3em; color:#64748b;">MCA Portfolio Analytics — fully interactive</span>
+  </div>
+  <aside class="notes">
+    This is our MCA portfolio — 139 merchant cash advances with six point two million in value of receivables.
+
+    On the overview, you can see the portfolio health, DPD distribution, and waterfall. The DPD buckets here are computed by our enrichment layer, not pulled from the servicer report.
+
+    The delinquency tab breaks down dollar amounts by DPD tier and shows VOR haircuts — we adjust advance rates based on delinquency. The vintage tab shows cohort analysis by origination month — older vintages should converge, and if they don't, that's a signal we investigate.
+
+    We also monitor industry and single-name concentration continuously — in MCA, you don't want too much exposure to any one sector or merchant.
+  </aside>
+</section>
+
+<!-- SLIDE 7b: STREAMING AUTO DASHBOARD -->
+<section data-background-iframe="streaming_auto_portfolio.html" data-background-interactive data-preload>
+  <div style="position:absolute; bottom:8px; right:12px; background:rgba(5,10,21,0.7); padding:4px 10px; border-radius:6px; border:1px solid rgba(100,160,255,0.12); opacity:0.6; pointer-events:none; z-index:10;">
+    <span style="font-size:0.3em; color:#64748b;">Streaming Auto Loans — fully interactive</span>
+  </div>
+  <aside class="notes">
+    Now a completely different asset class running on the same infrastructure — streaming auto loans. Forty-five loans, two hundred fifty-nine thousand in VOR — this is an early-stage streaming facility.
+
+    Four dealer lots, originated between November 2025 and March 2026. You can see on the dealers tab the concentration by dealer — this is actually a covenant check. Since this deal is early stage, we're not enforcing concentration limits yet, but we monitor them closely so we know when a dealer is approaching thresholds.
+
+    The key point here is that this facility has only 45 loans, but it runs on the exact same infrastructure as portfolios with thousands. Same delinquency tracking, same advance rate logic, same alerting. That's the power of a shared platform.
+  </aside>
+</section>
+
+<!-- SLIDE 7c: LIMABIKES DASHBOARD -->
+<section data-background-iframe="limabikes_portfolio_analytics.html" data-background-interactive data-preload>
+  <div style="position:absolute; bottom:8px; right:12px; background:rgba(5,10,21,0.7); padding:4px 10px; border-radius:6px; border:1px solid rgba(100,160,255,0.12); opacity:0.6; pointer-events:none; z-index:10;">
+    <span style="font-size:0.3em; color:#64748b;">Vehicle Lease Portfolio — fully interactive</span>
+  </div>
+  <aside class="notes">
+    This is a vehicle leasing portfolio in Peru — motorcycles and cars in the same facility. Let me show you the asset breakdown tab — you can see how we track performance separately for bikes versus cars. The cars make up the majority of the borrowing base at S/. 40 million, while bikes contribute about S/. 2 million.
+
+    The borrowing base uses a factor that's the minimum of linear time decay and actual payment progress. Lessee rank matters too — first-time lessees get an 80% advance rate, second-time 70%, third and beyond 60%.
+
+    This is a Peru-based deal with PEN-denominated assets and dual-currency reporting. The platform handles the FX conversion, the two asset classes with different risk profiles, and the lessee-rank-based advance rates — all in the same facility view.
+  </aside>
+</section>
+
+<!-- SLIDE 7d: APURATA DASHBOARD -->
+<section data-background-iframe="apurata_portfolio_analytics.html" data-background-interactive data-preload>
+  <div style="position:absolute; bottom:8px; right:12px; background:rgba(5,10,21,0.7); padding:4px 10px; border-radius:6px; border:1px solid rgba(100,160,255,0.12); opacity:0.6; pointer-events:none; z-index:10;">
+    <span style="font-size:0.3em; color:#64748b;">Consumer Lending (Peru) — fully interactive</span>
+  </div>
+  <aside class="notes">
+    Our consumer lending portfolio in Peru — personal loans and point-of-sale merchant financing in one facility. This is actually our largest portfolio by loan count — over 270 thousand loans. The platform handles that volume with the same daily cadence as a 45-loan portfolio.
+
+    What's distinctive here is how we stratify collectability by refinance count. Original loans versus once-refinanced versus twice-refinanced — the curves diverge significantly. This feeds directly into our advance rate decisions. Loans refinanced more than twice are excluded from the borrowing base entirely.
+
+    We also track first payment default rates by origination month — one of the earliest signals of origination quality problems.
+  </aside>
+</section>
+
+<!-- SLIDE 7e: RICE LAKE DASHBOARD -->
+<section data-background-iframe="ricelake_portfolio_analytics.html" data-background-interactive data-preload>
+  <div style="position:absolute; bottom:8px; right:12px; background:rgba(5,10,21,0.7); padding:4px 10px; border-radius:6px; border:1px solid rgba(100,160,255,0.12); opacity:0.6; pointer-events:none; z-index:10;">
+    <span style="font-size:0.3em; color:#64748b;">Consumer Lending (US) — fully interactive</span>
+  </div>
+  <aside class="notes">
+    This is our US consumer lending portfolio. Let me go straight to the DPD comparison tab — this is the proof point for our independent verification approach. You can see side-by-side the servicer-reported DPD versus what we calculate independently from the raw payment data. When these numbers diverge, we investigate immediately.
+
+    This deal has three banks with eleven accounts. We reconcile collection receipts across all of them daily. If money shows up in one account but isn't reflected in the payment tape, we catch it. We also parse actual loan contracts — the PDF documents — and cross-reference the terms against what the LMS reports.
+  </aside>
+</section>
+
+<!-- SLIDE 7f: CREDIMINUTO DASHBOARD -->
+<section data-background-iframe="crediminuto_portfolio_analytics.html" data-background-interactive data-preload>
+  <div style="position:absolute; bottom:8px; right:12px; background:rgba(5,10,21,0.7); padding:4px 10px; border-radius:6px; border:1px solid rgba(100,160,255,0.12); opacity:0.6; pointer-events:none; z-index:10;">
+    <span style="font-size:0.3em; color:#64748b;">Micro-Credit Colombia — fully interactive</span>
+  </div>
+  <aside class="notes">
+    Colombian SME micro-credit. Let me jump to the collectability tab — this is one of the most valuable views we have. You can see XIRR returns of 18 to 42 percent by vintage, with collection multiples of 1.15 to 1.65 times origination. The vintage curves show how each cohort's collections build over twelve months.
+
+    This deal also has multiple payment channels — Efecty, which is a cash payment network handling 55% of collections, PSE for online at 30%, and direct at 15%. We reconcile across all three systems daily.
+
+    The borrowing base has complex exclusion logic — too large, too delinquent, matured, extended — plus term concentration limits to prevent over-exposure to longer-dated loans.
+  </aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- SLIDE 7g: BUCKSS DASHBOARD -->
+<section data-background-iframe="buckss_portfolio_analytics.html" data-background-interactive data-preload>
+  <div style="position:absolute; bottom:8px; right:12px; background:rgba(5,10,21,0.7); padding:4px 10px; border-radius:6px; border:1px solid rgba(100,160,255,0.12); opacity:0.6; pointer-events:none; z-index:10;">
+    <span style="font-size:0.3em; color:#64748b;">Consumer Microloans — fully interactive</span>
+  </div>
+  <aside class="notes">
+    Employment-based microloans — one-thousand-dollar average loan, five to six payments. Eight hundred fifty-nine loans, three hundred eighty-five thousand VOR.
+
+    Let me show you the KPI tracker — we want our deals to grow and reach their true potential, so here we monitor their lead-to-loan conversion across fifteen-plus acquisition channels. We give them weekly feedback and suggestions so they can improve their business. You can see the channel breakdown, conversion rates, and week-over-week trends.
+
+    And on the covenant monitoring tab — while human verification and checks are always necessary for covenant compliance, and full automation can cause issues, here is an example of one we monitor systematically. You can see all covenants tracked with current values versus limits and status.
+  </aside>
+</section>
+
+<!-- SLIDE 7h: CAPM DASHBOARD -->
+<section data-background-iframe="capm_portfolio_analytics.html" data-background-interactive data-preload>
+  <div style="position:absolute; bottom:8px; right:12px; background:rgba(5,10,21,0.7); padding:4px 10px; border-radius:6px; border:1px solid rgba(100,160,255,0.12); opacity:0.6; pointer-events:none; z-index:10;">
+    <span style="font-size:0.3em; color:#64748b;">Auto Loan Purchasing (CAPM) — fully interactive</span>
+  </div>
+  <aside class="notes">
+    Auto loan purchasing — a joint venture, Monachil 90%, Capsource 10%. Seven hundred twenty-nine loans, eight point one million in balance. Let me briefly show the dealer tab — you can see performance tracked by originating dealer.
+
+    Now look at the delinquency — we intentionally include this to show something important. What you're seeing here was actually a recent data issue that we detected early through our monitoring. The numbers looked off, and our system flagged it before it became a reporting problem.
+
+    Let me go to the data quality tab — this is an example of the typical data quality checks and dashboards we build across all our data models. We flag deferments, unreasonable dates, gaps between posting and loan dates. Eight percent of this portfolio has deferments that we identified and track separately. This kind of data hygiene is something we do systematically across every deal.
+  </aside>
+</section>
+
+<!-- SLIDE 7i: STRATUS DASHBOARD -->
+<section data-background-iframe="stratus_portfolio_analytics.html" data-background-interactive data-preload>
+  <div style="position:absolute; bottom:8px; right:12px; background:rgba(5,10,21,0.7); padding:4px 10px; border-radius:6px; border:1px solid rgba(100,160,255,0.12); opacity:0.6; pointer-events:none; z-index:10;">
+    <span style="font-size:0.3em; color:#64748b;">Flight School Lending — fully interactive</span>
+  </div>
+  <aside class="notes">
+    This is our flight school student lending portfolio — a put option structure. We own 331 loans across two funds with a purchase price of sixteen point two million and VOR at seventeen million.
+
+    What makes this unique is the put option — we purchase loans at a discount and have a put back to the originator if a loan defaults. The put margin requirement of three point eight million is the originator's skin in the game, protecting our downside.
+
+    On credit quality, the average FICO is 756 — these are prime borrowers. And diversification is strong — 259 different flight schools, with the top school representing only seven percent of exposure.
+  </aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- SLIDE 8: EARLY WARNING -->
+<!-- ============================================================ -->
+<section>
+  <h2 style="font-size:1.2em;">Catching Problems <span style="color:#f87171;">Before</span> They Become Losses</h2>
+  <ul style="margin-top:0.8em;">
+    <li class="fragment"><strong>Collection shortfalls</strong> surface days before servicer reports arrive</li>
+    <li class="fragment"><strong>DPD migration</strong> patterns detected through daily monitoring — buckets shifting right is a signal</li>
+    <li class="fragment"><strong>Cash velocity</strong> changes flag operational issues at the servicer level</li>
+    <li class="fragment"><strong>Automated alerts</strong> trigger when metrics breach configurable thresholds</li>
+  </ul>
+  <div class="fragment" style="margin-top:1em; padding:0.6em; background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.2); border-radius:10px;">
+    <p style="font-size:0.5em; color:#f87171; font-weight:600;">&#x1F534; Example: 2% collection shortfall in week 2</p>
+    <p style="font-size:0.38em; color:#94a3b8; margin-top:0.3em;">By the time the monthly servicer report confirms it, we've already investigated, identified the root cause, and engaged the servicer with specific delinquent accounts.</p>
+  </div>
+  <aside class="notes">
+    This is where all the infrastructure earns its keep. Because we process data daily, we detect issues days or weeks before the monthly servicer report arrives.
+
+    The example on screen — a two percent collection shortfall in week two. Most managers wouldn't know until the monthly report. We see it in real time.
+
+    Let me show you what this looks like in practice.
+  </aside>
+</section>
+
+<!-- SLIDE 8b: EARLY WARNING DASHBOARD -->
+<section data-background-iframe="early_warning_dashboard.html" data-background-interactive data-preload>
+  <div style="position:absolute; bottom:8px; right:12px; background:rgba(5,10,21,0.7); padding:4px 10px; border-radius:6px; border:1px solid rgba(100,160,255,0.12); opacity:0.6; pointer-events:none; z-index:10;">
+    <span style="font-size:0.3em; color:#64748b;">Early Warning System — use the timeline scrubber to see degradation</span>
+  </div>
+  <aside class="notes">
+    This dashboard tells the story visually. Start at January on the left — everything looks healthy. Collections tracking scheduled, DPD buckets stable, borrowing base steady.
+
+    Move to mid-February — the collection line starts falling behind. It's subtle, maybe one to two percent, but the system sees it. Continue to late February — cash velocity drops, DPD buckets start shifting.
+
+    By early March it's clear — collections five percent behind, borrowing base declining. And look at the alert timeline at the bottom — our system started flagging this on February 16th.
+
+    The difference between seeing this on February 16th and waiting until the March 31st servicer report is six weeks. In private credit, six weeks of advance warning is the difference between adjusting an advance rate and taking a loss.
+  </aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- SLIDE 9: COMPOUND EFFECT -->
+<!-- ============================================================ -->
+<section>
+  <h2 style="font-size:1.2em;">Every Deal Makes the Platform <span class="gradient-text">Stronger</span></h2>
+  <div class="impact-grid fragment">
+    <div class="impact-item">
+      <div class="imp-title">Capital Protection</div>
+      <div class="imp-desc">Early detection prevents losses, not just measures them. Days matter.</div>
+    </div>
+    <div class="impact-item">
+      <div class="imp-title">Capital Efficiency</div>
+      <div class="imp-desc">Precise risk measurement enables tighter advance rates without increased risk.</div>
+    </div>
+    <div class="impact-item">
+      <div class="imp-title">Operational Leverage</div>
+      <div class="imp-desc">Sub-linear headcount growth. Infrastructure scales — people focus on decisions.</div>
+    </div>
+  </div>
+  <div class="metric-row fragment">
+    <div class="metric-card">
+      <div class="num">9+</div>
+      <div class="label">Asset Classes</div>
+    </div>
+    <div class="metric-card">
+      <div class="num">4+</div>
+      <div class="label">Countries</div>
+    </div>
+    <div class="metric-card">
+      <div class="num">1</div>
+      <div class="label">Platform</div>
+    </div>
+  </div>
+  <p class="fragment" style="font-size:0.42em; color:var(--muted); margin-top:0.5em;">MCA &middot; Auto Loans &middot; Auto Purchasing &middot; Vehicle Leasing &middot; Consumer Lending &middot; POS Merchant &middot; Micro-Credit &middot; Microloans &middot; Flight School Lending<br>US &middot; Peru &middot; Colombia — same architecture, different business logic</p>
+  <aside class="notes">
+    Three impact areas. First, capital protection — we don't just measure losses after the fact. We detect early signals and act on them. Days of advance warning matter.
+
+    Second, capital efficiency — because our risk measurement is precise and daily, we can run tighter advance rates with confidence. We're not adding extra cushion because we don't trust our numbers.
+
+    Third, operational leverage — each new deal leverages existing infrastructure. A new asset class requires new business logic, but the ingestion, validation, and monitoring framework is already in place. We add deals without proportionally adding headcount.
+
+    We've worked with many more asset classes and countries over the years, and with each iteration we've refined, standardized, and unified the platform. What you see today is the result of that compounding experience — same architecture, the business logic adapts.
+  </aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- SLIDE 10: CLOSING -->
+<!-- ============================================================ -->
+<section data-background-color="#050a15">
+  <img src="MCP_Logo_TRANSPARENT.png" class="logo" alt="Monachil" style="height:50px;">
+  <h2 style="font-size:1.3em;">Data as a <span class="gradient-text">Compounding Strategic Asset</span></h2>
+  <ul style="margin-top:1em;">
+    <li class="fragment"><strong>Proprietary</strong> — built in-house, not licensed</li>
+    <li class="fragment"><strong>Integral</strong> — embedded in every stage of the investment lifecycle</li>
+    <li class="fragment"><strong>Compounding</strong> — every deal adds data, every data point improves our models</li>
+  </ul>
+  <p class="fragment" style="font-size:0.5em; color:var(--muted); margin-top:1.5em;">
+    We're happy to dive deeper into any dashboard or metric.<br>
+    <span style="color:#60a5fa; font-weight:600;">Questions?</span>
+  </p>
+  <aside class="notes">
+    We believe data infrastructure is a compounding advantage. Every deal adds data. Every data point sharpens our risk assessment. Every improvement makes the next deal faster and safer to execute.
+
+    This isn't a cost center — it's a strategic asset. And the gap between us and managers without this infrastructure widens every month.
+
+    We're happy to dive deeper into any of the dashboards, walk through specific metrics, or show you additional portfolios. What questions do you have?
+  </aside>
+</section>
+
+</div><!-- /slides -->
+</div><!-- /reveal -->
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+<script>
+Reveal.initialize({
+  hash: true,
+  slideNumber: 'c/t',
+  showSlideNumber: 'speaker',
+  width: 1280,
+  height: 720,
+  margin: 0.05,
+  center: true,
+  transition: 'fade',
+  transitionSpeed: 'default',
+  backgroundTransition: 'fade',
+  viewDistance: 3,
+  preloadIframes: true,
+  totalTime: 1500, // 25 minutes pacing
+  progress: true, // subtle progress bar at bottom
+  jumpToSlide: true, // press G to jump to slide number during Q&A
+  overview: true, // press O for bird's-eye grid view
+  pause: true, // press B to blackout screen during Q&A
+  controlsTutorial: false, // no bounce animation on controls
+  autoAnimateEasing: 'ease-out',
+  autoAnimateDuration: 0.8,
+  plugins: [RevealNotes],
+  // Custom keyboard bindings for quick dashboard access during Q&A
+  keyboard: {
+    49: function() { Reveal.slide(9) },  // 1 = MCA dashboard
+    50: function() { Reveal.slide(10) }, // 2 = Streaming Auto
+    51: function() { Reveal.slide(11) }, // 3 = Vehicle Leasing
+    52: function() { Reveal.slide(12) }, // 4 = Consumer Peru
+    53: function() { Reveal.slide(13) }, // 5 = Consumer US
+    54: function() { Reveal.slide(14) }, // 6 = Micro-Credit Colombia
+    55: function() { Reveal.slide(15) }, // 7 = Consumer Microloans
+    56: function() { Reveal.slide(16) }, // 8 = Auto Purchasing
+    57: function() { Reveal.slide(17) }, // 9 = Flight School Lending
+  }
+});
+</script>
+</body>
+</html>

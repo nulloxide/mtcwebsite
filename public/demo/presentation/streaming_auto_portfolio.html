@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Streaming Auto Loans | Portfolio Analytics</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#06090f;--c1:#0d1420;--c2:#131c2e;--c3:#1a2540;--brd:#1e2d4a;--t1:#e8edf5;--t2:#8899b4;--t3:#556a8a;--ac:#818cf8;--tl:#2dd4bf;--am:#fbbf24;--co:#fb923c;--rd:#f87171;--gn:#4ade80;--bl:#60a5fa;--pk:#f472b6;--r:10px}
+body{background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;overflow-x:hidden}
+.w{max-width:1440px;margin:0 auto;padding:20px 28px}
+h1{font-size:26px;font-weight:700;letter-spacing:-.4px}
+.hdr{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:4px;padding-bottom:16px;border-bottom:1px solid var(--brd)}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:600}
+.tabs{display:flex;gap:4px;margin:16px 0;flex-wrap:wrap}
+.tab{padding:7px 16px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--brd);color:var(--t3);background:transparent;transition:all .2s;font-family:inherit}
+.tab:hover{border-color:var(--ac);color:var(--t1)}.tab.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.g{display:grid;gap:14px;margin-bottom:20px}
+.g5{grid-template-columns:repeat(5,1fr)}.g4{grid-template-columns:repeat(4,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:1000px){.g5,.g4{grid-template-columns:repeat(2,1fr)}}
+.m{background:var(--c1);border:1px solid var(--brd);border-radius:var(--r);padding:16px 18px;position:relative;overflow:hidden;transition:transform .2s,border-color .3s}
+.m:hover{transform:translateY(-1px);border-color:var(--ac)}
+.m .lb{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px}
+.m .vl{font-size:24px;font-weight:700;font-family:'JetBrains Mono',monospace;letter-spacing:-.5px}
+.m .s2{font-size:11px;color:var(--t3);margin-top:3px}
+.cd{background:var(--c1);border:1px solid var(--brd);border-radius:var(--r);padding:18px 22px}
+.cd h3{font-size:14px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.ch{position:relative;width:100%;height:280px}
+.lg{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:10px;font-size:11px;color:var(--t2)}
+.lg span{display:flex;align-items:center;gap:4px}
+.dt{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+.pr{height:8px;border-radius:4px;background:var(--brd);overflow:hidden;margin:4px 0}
+.pf{height:100%;border-radius:4px;transition:width 1.2s cubic-bezier(.22,1,.36,1)}
+.sec{display:none}.sec.on{display:block}
+.sb{display:flex;height:28px;border-radius:6px;overflow:hidden;margin:6px 0}
+.sg{display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:600;transition:all .3s;cursor:pointer;min-width:2px}
+.sg:hover{filter:brightness(1.25)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:8px 6px;border-bottom:1px solid var(--brd);color:var(--t3);font-weight:500;font-size:11px;cursor:pointer}
+td{padding:8px 6px;border-bottom:1px solid rgba(30,45,74,.4)}
+tr:hover td{background:rgba(129,140,248,.03)}
+.pl{display:inline-block;padding:2px 9px;border-radius:16px;font-size:10px;font-weight:600}
+.pl-g{background:rgba(45,212,191,.1);color:var(--tl)}.pl-r{background:rgba(248,113,113,.1);color:var(--rd)}.pl-y{background:rgba(251,191,36,.1);color:var(--am)}
+.dp{height:5px;border-radius:3px;background:var(--brd);overflow:hidden;width:50px;display:inline-block;vertical-align:middle;margin-right:5px}
+.dpf{height:100%;border-radius:3px}
+@keyframes su{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fi{from{opacity:0}to{opacity:1}}
+.su{animation:su .5s ease-out both}.fi{animation:fi .6s ease-out both}
+.pulse{animation:pulse 2.5s infinite}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.glow{position:absolute;top:-1px;left:0;right:0;height:2px;border-radius:2px;opacity:0;transition:opacity .3s}
+.m:hover .glow{opacity:1}
+.fbtn{padding:4px 12px;border-radius:16px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--brd);color:var(--t3);background:transparent;transition:all .2s;font-family:inherit}
+.fbtn:hover{border-color:var(--ac);color:var(--t1)}
+.fbtn.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.theme-btn{padding:4px 10px;border-radius:8px;font-size:14px;cursor:pointer;border:1px solid var(--brd);background:var(--c1);transition:all .2s;line-height:1}
+.theme-btn:hover{border-color:var(--ac)}
+[data-theme="light"]{--bg:#f8fafc;--c1:#ffffff;--c2:#f1f5f9;--c3:#e2e8f0;--brd:#e2e8f0;--t1:#0f172a;--t2:#475569;--t3:#94a3b8}
+[data-theme="light"] .sg{color:#fff}
+[data-theme="light"] tr:hover td{background:rgba(129,140,248,.06)}
+</style></head><body>
+<div class="w">
+<div class="hdr">
+<div><h1 style="background:linear-gradient(135deg,#818cf8,#2dd4bf);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Streaming Auto Loans</h1><p style="color:var(--t3);font-size:12px;margin-top:3px">Portfolio Snapshot &middot; March 16, 2026 &middot; STRM Owner</p></div>
+<div style="display:flex;align-items:center;gap:12px"><div id="health"></div><button class="theme-btn" id="themeToggle" title="Toggle theme">&#9728;&#65039;</button></div>
+</div>
+<div class="tabs" id="tabs">
+<button class="tab on" data-v="overview">Overview</button>
+<button class="tab" data-v="collections">Collections</button>
+<button class="tab" data-v="vintage">Vintage curves</button>
+<button class="tab" data-v="cashflows">Cashflows</button>
+<button class="tab" data-v="dealers">Dealers</button>
+<button class="tab" data-v="loans">Loan explorer</button>
+</div>
+
+<div id="overview" class="sec on">
+<div class="g g5" id="mets"></div>
+<div class="g g2">
+<div class="cd"><h3>Delinquency breakdown</h3><div class="sb" id="dpdBar"></div><div class="lg" id="dpdLeg"></div><div class="ch"><canvas id="dpdChart"></canvas></div></div>
+<div class="cd"><h3>Scheduled vs actual collections (12.2% rate)</h3><div class="ch"><canvas id="svaChart"></canvas></div></div>
+</div>
+<div class="g g2" style="margin-top:14px">
+<div class="cd"><h3>Dealer concentration</h3><div class="ch"><canvas id="dlChart"></canvas></div></div>
+<div class="cd"><h3>Borrowing base waterfall</h3><div id="waterfall"></div></div>
+</div>
+</div>
+
+<div id="collections" class="sec">
+<div class="g g2">
+<div class="cd"><h3>Principal vs interest collected</h3><div class="ch"><canvas id="piChart"></canvas></div></div>
+<div class="cd"><h3>Monthly collection rate</h3><div class="ch"><canvas id="rateChart"></canvas></div></div>
+</div>
+<div class="cd" style="margin-top:14px"><h3>Cumulative collections growth</h3><div class="ch" style="height:300px"><canvas id="cumChart"></canvas></div></div>
+</div>
+
+<div id="vintage" class="sec">
+<div class="cd"><h3><span class="dt" style="background:var(--ac)"></span>Vintage collection rate curves (actual / scheduled %)</h3>
+<div class="lg" id="vintLeg"></div><div class="ch" style="height:360px"><canvas id="vintChart"></canvas></div></div>
+<div class="g g2" style="margin-top:14px">
+<div class="cd"><h3>Vintage size &amp; performance</h3><div class="ch" style="height:300px"><canvas id="vintBar"></canvas></div></div>
+<div class="cd"><h3>Vintage cumulative $ collected</h3><div class="ch" style="height:300px"><canvas id="vintAbs"></canvas></div></div>
+</div>
+</div>
+
+<div id="cashflows" class="sec">
+<div class="cd"><h3>Projected scheduled cashflows (18 months)</h3><div class="ch" style="height:320px"><canvas id="projChart"></canvas></div></div>
+<div class="g g3" style="margin-top:14px" id="projMets"></div>
+</div>
+
+<div id="dealers" class="sec">
+<div class="g g4" id="dlCards"></div>
+<div class="cd" style="margin-top:14px"><h3>Dealer comparison radar</h3><div class="ch" style="height:340px"><canvas id="dlRadar"></canvas></div></div>
+</div>
+
+<div id="loans" class="sec">
+<div class="cd">
+<div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap">
+  <input type="text" id="loanSearch" placeholder="Search loans..." style="padding:6px 12px;border-radius:8px;border:1px solid var(--brd);background:var(--c1);color:var(--t1);font-family:inherit;font-size:12px;width:200px;outline:none" />
+  <span style="font-size:11px;color:var(--t3)">DPD:</span>
+  <button class="fbtn" data-fg="dpd" data-fv="0">Current</button>
+  <button class="fbtn" data-fg="dpd" data-fv="1-30">1-30d</button>
+  <button class="fbtn" data-fg="dpd" data-fv="31-60">31-60d</button>
+  <button class="fbtn" data-fg="dpd" data-fv="60+">60+</button>
+  <span style="font-size:11px;color:var(--t3);margin-left:4px">Dealer:</span>
+  <button class="fbtn" data-fg="dealer" data-fv="STREAM1125">1125</button>
+  <button class="fbtn" data-fg="dealer" data-fv="STREAM0226">0226</button>
+  <button class="fbtn" data-fg="dealer" data-fv="STREAM0326">0326</button>
+  <button class="fbtn" data-fg="dealer" data-fv="STREAM0126">0126</button>
+  <span style="color:var(--t3);font-size:11px;margin-left:8px" id="loanCount"></span>
+</div>
+<div style="overflow-x:auto"><table><thead id="lHead"></thead><tbody id="lBody"></tbody></table></div></div>
+<div id="lDetail"></div>
+</div>
+</div>
+
+<script>
+const D={"loans": [{"id": 71024, "dpd": 0, "npp": 5954, "cv": 4331, "bb": 4331, "dl": "STREAM1125", "dlPct": 36.3, "apr": 27.0, "bal": 9918, "prin": 9918, "amtFin": 10951, "fc": 5142, "pmt": 447.01, "numPay": 36, "covRatio": 98.2, "proRata": 0.74, "factor": 1.0, "orig": "2025-10-08", "mat": "2028-10-07", "posted": "2025-11-05", "sTotal": 16092, "aTotal": 2194, "sCnt": 36, "aCnt": 6, "sp": false, "mc": false, "conc": true, "extra": false}, {"id": 71025, "dpd": 0, "npp": 8647, "cv": 7209, "bb": 7209, "dl": "STREAM1125", "dlPct": 36.3, "apr": 27.0, "bal": 15195, "prin": 15195, "amtFin": 15903, "fc": 7467, "pmt": 649.15, "numPay": 36, "covRatio": 74.8, "proRata": 0.74, "factor": 1.0, "orig": "2025-11-12", "mat": "2028-11-12", "posted": "2025-11-21", "sTotal": 23369, "aTotal": 2386, "sCnt": 36, "aCnt": 4, "sp": false, "mc": false, "conc": true, "extra": false}, {"id": 71041, "dpd": 34, "npp": 6882, "cv": 5320, "bb": 0, "dl": "STREAM1125", "dlPct": 36.3, "apr": 28.0, "bal": 14611, "prin": 14611, "amtFin": 15106, "fc": 7113, "pmt": 310.0, "numPay": 71, "covRatio": 75.7, "proRata": 0.74, "factor": 0.0, "orig": "2025-10-03", "mat": "2028-08-04", "posted": "2025-11-26", "sTotal": 22184, "aTotal": 2111, "sCnt": 72, "aCnt": 7, "sp": false, "mc": false, "conc": true, "extra": true}, {"id": 71094, "dpd": 0, "npp": 7599, "cv": 7177, "bb": 7177, "dl": "STREAM0326", "dlPct": 22.2, "apr": 28.0, "bal": 33008, "prin": 21086, "amtFin": 22025, "fc": 14821, "pmt": 767.62, "numPay": 48, "covRatio": 100.0, "proRata": 0.55, "factor": 1.0, "orig": "2025-10-04", "mat": "2029-10-04", "posted": "2026-03-06", "sTotal": 36846, "aTotal": 3838, "sCnt": 48, "aCnt": 7, "sp": false, "mc": false, "conc": false, "extra": false}, {"id": 71095, "dpd": 0, "npp": 3362, "cv": 3362, "bb": 3362, "dl": "STREAM0326", "dlPct": 22.2, "apr": 28.0, "bal": 18273, "prin": 11239, "amtFin": 11239, "fc": 7034, "pmt": 406.07, "numPay": 45, "covRatio": 0.0, "proRata": 0.46, "factor": 1.0, "orig": "2026-02-12", "mat": "2029-11-12", "posted": "2026-03-06", "sTotal": 18273, "aTotal": 0, "sCnt": 45, "aCnt": 0, "sp": false, "mc": false, "conc": false, "extra": false}, {"id": 71096, "dpd": 0, "npp": 5540, "cv": 5540, "bb": 5540, "dl": "STREAM0326", "dlPct": 22.2, "apr": 54.0, "bal": 25614, "prin": 17045, "amtFin": 18564, "fc": 12751, "pmt": 570.0, "numPay": 54, "covRatio": 100.0, "proRata": 0.54, "factor": 1.0, "orig": "2025-04-19", "mat": "2029-11-19", "posted": "2026-03-06", "sTotal": 31314, "aTotal": 5700, "sCnt": 55, "aCnt": 10, "sp": false, "mc": false, "conc": false, "extra": true}, {"id": 71083, "dpd": 0, "npp": 9703, "cv": 9164, "bb": 9164, "dl": "STREAM0226", "dlPct": 30.1, "apr": 28.0, "bal": 17287, "prin": 17287, "amtFin": 17598, "fc": 8627, "pmt": 728.48, "numPay": 36, "covRatio": 100.0, "proRata": 0.74, "factor": 1.0, "orig": "2026-01-30", "mat": "2029-01-28", "posted": "2026-02-10", "sTotal": 26225, "aTotal": 729, "sCnt": 36, "aCnt": 1, "sp": false, "mc": false, "conc": true, "extra": false}, {"id": 71004, "dpd": 0, "npp": 6995, "cv": 5829, "bb": 5829, "dl": "STREAM1125", "dlPct": 36.3, "apr": 30.0, "bal": 13366, "prin": 13366, "amtFin": 14588, "fc": 10620, "pmt": 525.17, "numPay": 48, "covRatio": 100.0, "proRata": 0.74, "factor": 1.0, "orig": "2025-06-20", "mat": "2029-06-20", "posted": "2025-11-21", "sTotal": 25228, "aTotal": 4201, "sCnt": 49, "aCnt": 8, "sp": false, "mc": false, "conc": false, "extra": true}, {"id": 71032, "dpd": 0, "npp": 5104, "cv": 3942, "bb": 3942, "dl": "STREAM1125", "dlPct": 36.3, "apr": 21.0, "bal": 9307, "prin": 9307, "amtFin": 10171, "fc": 3624, "pmt": 383.2, "numPay": 36, "covRatio": 100.0, "proRata": 0.74, "factor": 1.0, "orig": "2025-10-30", "mat": "2028-10-29", "posted": "2025-11-26", "sTotal": 13795, "aTotal": 1571, "sCnt": 36, "aCnt": 4, "sp": false, "mc": false, "conc": true, "extra": false}, {"id": 71033, "dpd": 0, "npp": 3329, "cv": 2219, "bb": 2219, "dl": "STREAM1125", "dlPct": 36.3, "apr": 23.0, "bal": 6913, "prin": 6913, "amtFin": 8064, "fc": 2432, "pmt": 374.85, "numPay": 28, "covRatio": 100.0, "proRata": 0.74, "factor": 1.0, "orig": "2025-09-30", "mat": "2028-01-30", "posted": "2025-11-26", "sTotal": 10496, "aTotal": 2109, "sCnt": 28, "aCnt": 6, "sp": false, "mc": false, "conc": true, "extra": false}, {"id": 71100, "dpd": 0, "npp": 5024, "cv": 5024, "bb": 5024, "dl": "STREAM0326", "dlPct": 22.2, "apr": 23.0, "bal": 9744, "prin": 9744, "amtFin": 9744, "fc": 3834, "pmt": 377.18, "numPay": 36, "covRatio": 0.0, "proRata": 0.74, "factor": 1.0, "orig": "2026-02-26", "mat": "2029-02-26", "posted": "2026-03-06", "sTotal": 13578, "aTotal": 0, "sCnt": 36, "aCnt": 0, "sp": false, "mc": false, "conc": true, "extra": false}, {"id": 71086, "dpd": 0, "npp": 5069, "cv": 4787, "bb": 4787, "dl": "STREAM0226", "dlPct": 30.1, "apr": 36.0, "bal": 9064, "prin": 9064, "amtFin": 9200, "fc": 4499, "pmt": 380.54, "numPay": 36, "covRatio": 100.0, "proRata": 0.74, "factor": 1.0, "orig": "2026-02-06", "mat": "2029-02-06", "posted": "2026-02-10", "sTotal": 16596, "aTotal": 381, "sCnt": 44, "aCnt": 1, "sp": false, "mc": false, "conc": true, "extra": true}, {"id": 71081, "dpd": 0, "npp": 2413, "cv": 2252, "bb": 2252, "dl": "STREAM0226", "dlPct": 30.1, "apr": 28.0, "bal": 4547, "prin": 4547, "amtFin": 4650, "fc": 1873, "pmt": 217.42, "numPay": 30, "covRatio": 100.0, "proRata": 0.74, "factor": 1.0, "orig": "2026-01-30", "mat": "2028-07-28", "posted": "2026-02-10", "sTotal": 6523, "aTotal": 217, "sCnt": 30, "aCnt": 1, "sp": false, "mc": false, "conc": true, "extra": false}, {"id": 71037, "dpd": 12, "npp": 4706, "cv": 3487, "bb": 3487, "dl": "STREAM1125", "dlPct": 36.3, "apr": 28.0, "bal": 9155, "prin": 9155, "amtFin": 15667, "fc": 9382, "pmt": 265.0, "numPay": 94, "covRatio": 98.1, "proRata": 0.74, "factor": 1.0, "orig": "2024-02-17", "mat": "2027-10-09", "posted": "2025-11-26", "sTotal": 24999, "aTotal": 13973, "sCnt": 95, "aCnt": 52, "sp": false, "mc": false, "conc": false, "extra": true}, {"id": 71039, "dpd": 0, "npp": 5994, "cv": 4390, "bb": 4390, "dl": "STREAM1125", "dlPct": 36.3, "apr": 28.0, "bal": 11884, "prin": 11884, "amtFin": 16453, "fc": 11469, "pmt": 270.0, "numPay": 103, "covRatio": 97.8, "proRata": 0.74, "factor": 1.0, "orig": "2024-05-03", "mat": "2028-05-25", "posted": "2025-11-26", "sTotal": 27844, "aTotal": 12150, "sCnt": 104, "aCnt": 49, "sp": false, "mc": false, "conc": false, "extra": true}, {"id": 71028, "dpd": 0, "npp": 3552, "cv": 2368, "bb": 2368, "dl": "STREAM1125", "dlPct": 36.3, "apr": 28.0, "bal": 9534, "prin": 7504, "amtFin": 9664, "fc": 4479, "pmt": 200.0, "numPay": 70, "covRatio": 100.0, "proRata": 0.74, "factor": 1.0, "orig": "2025-03-23", "mat": "2028-01-08", "posted": "2025-11-21", "sTotal": 14143, "aTotal": 4609, "sCnt": 71, "aCnt": 21, "sp": false, "mc": false, "conc": false, "extra": true}, {"id": 71073, "dpd": 0, "npp": 6105, "cv": 5324, "bb": 5324, "dl": "STREAM0126", "dlPct": 11.4, "apr": 28.0, "bal": 16395, "prin": 11522, "amtFin": 11937, "fc": 5514, "pmt": 250.0, "numPay": 69, "covRatio": 100.0, "proRata": 0.74, "factor": 1.0, "orig": "2025-12-17", "mat": "2028-09-23", "posted": "2026-01-29", "sTotal": 17450, "aTotal": 1055, "sCnt": 70, "aCnt": 5, "sp": false, "mc": false, "conc": false, "extra": true}, {"id": 71085, "dpd": 0, "npp": 6985, "cv": 6597, "bb": 6597, "dl": "STREAM0226", "dlPct": 30.1, "apr": 28.0, "bal": 12656, "prin": 12656, "amtFin": 12852, "fc": 6286, "pmt": 531.6, "numPay": 36, "covRatio": 100.0, "proRata": 0.73, "factor": 1.0, "orig": "2026-01-27", "mat": "2029-01-27", "posted": "2026-02-10", "sTotal": 19138, "aTotal": 532, "sCnt": 36, "aCnt": 1, "sp": false, "mc": false, "conc": false, "extra": false}, {"id": 71007, "dpd": 0, "npp": 5600, "cv": 4733, "bb": 4733, "dl": "STREAM1125", "dlPct": 36.3, "apr": 26.7, "bal": 8996, "prin": 8996, "amtFin": 10344, "fc": 4791, "pmt": 420.41, "numPay": 36, "covRatio": 100.0, "proRata": 0.74, "factor": 1.0, "orig": "2025-07-15", "mat": "2028-07-14", "posted": "2025-11-05", "sTotal": 15135, "aTotal": 3514, "sCnt": 36, "aCnt": 8, "sp": false, "mc": false, "conc": false, "extra": false}, {"id": 71062, "dpd": 0, "npp": 10276, "cv": 8292, "bb": 8292, "dl": "STREAM0126", "dlPct": 11.4, "apr": 28.0, "bal": 32701, "prin": 21391, "amtFin": 22137, "fc": 13245, "pmt": 385.75, "numPay": 91, "covRatio": 100.0, "proRata": 0.74, "factor": 1.0, "orig": "2025-11-22", "mat": "2029-06-18", "posted": "2026-01-07", "sTotal": 35382, "aTotal": 2681, "sCnt": 92, "aCnt": 3, "sp": false, "mc": false, "conc": false, "extra": true}, {"id": 71031, "dpd": 17, "npp": 4028, "cv": 3220, "bb": 3220, "dl": "STREAM1125", "dlPct": 36.3, "apr": 21.0, "bal": 8873, "prin": 8873, "amtFin": 9630, "fc": 3431, "pmt": 362.8, "numPay": 36, "covRatio": 80.2, "proRata": 0.74, "factor": 1.0, "orig": "2025-09-23", "mat": "2028-09-23", "posted": "2025-11-26", "sTotal": 13061, "aTotal": 1455, "sCnt": 36, "aCnt": 4, "sp": false, "mc": false, "conc": true, "extra": false}, {"id": 71034, "dpd": 0, "npp": 3486, "cv": 2319, "bb": 2319, "dl": "STREAM1125", "dlPct": 36.3, "apr": 25.0, "bal": 7080, "prin": 7080, "amtFin": 8266, "fc": 2727, "pmt": 392.61, "numPay": 28, "covRatio": 100.0, "proRata": 0.74, "factor": 1.0, "orig": "2025-10-13", "mat": "2028-02-12", "posted": "2025-11-26", "sTotal": 10993, "aTotal": 1970, "sCnt": 28, "aCnt": 5, "sp": false, "mc": false, "conc": true, "extra": false}, {"id": 71054, "dpd": 0, "npp": 5744, "cv": 5106, "bb": 5106, "dl": "STREAM0126", "dlPct": 11.4, "apr": 27.0, "bal": 10841, "prin": 10841, "amtFin": 11298, "fc": 5953, "pmt": 431.26, "numPay": 40, "covRatio": 100.0, "proRata": 0.74, "factor": 1.0, "orig": "2025-11-25", "mat": "2029-03-25", "posted": "2026-01-02", "sTotal": 17250, "aTotal": 1294, "sCnt": 40, "aCnt": 3, "sp": false, "mc": false, "conc": false, "extra": false}, {"id": 71084, "dpd": 10, "npp": 8860, "cv": 8499, "bb": 8499, "dl": "STREAM0226", "dlPct": 30.1, "apr": 28.0, "bal": 15666, "prin": 15666, "amtFin": 16044, "fc": 7903, "pmt": 665.19, "numPay": 36, "covRatio": 73.5, "proRata": 0.74, "factor": 1.0, "orig": "2026-01-30", "mat": "2029-02-02", "posted": "2026-02-10", "sTotal": 23947, "aTotal": 489, "sCnt": 36, "aCnt": 1, "sp": false, "mc": false, "conc": true, "extra": false}, {"id": 71089, "dpd": 0, "npp": 7592, "cv": 7085, "bb": 7085, "dl": "STREAM0226", "dlPct": 30.1, "apr": 28.0, "bal": 22569, "prin": 15758, "amtFin": 16535, "fc": 8087, "pmt": 683.95, "numPay": 36, "covRatio": 100.0, "proRata": 0.74, "factor": 1.0, "orig": "2025-11-15", "mat": "2028-11-15", "posted": "2026-02-11", "sTotal": 24622, "aTotal": 2053, "sCnt": 36, "aCnt": 3, "sp": false, "mc": false, "conc": false, "extra": false}, {"id": 71016, "dpd": 10, "npp": 3633, "cv": 2921, "bb": 2921, "dl": "STREAM1125", "dlPct": 36.3, "apr": 27.0, "bal": 7295, "prin": 7295, "amtFin": 8018, "fc": 3765, "pmt": 327.29, "numPay": 36, "covRatio": 85.0, "proRata": 0.74, "factor": 1.0, "orig": "2025-09-02", "mat": "2028-09-02", "posted": "2025-11-21", "sTotal": 11782, "aTotal": 2366, "sCnt": 36, "aCnt": 8, "sp": false, "mc": false, "conc": true, "extra": false}, {"id": 71013, "dpd": 0, "npp": 6588, "cv": 5489, "bb": 5489, "dl": "STREAM1125", "dlPct": 36.3, "apr": 15.0, "bal": 15915, "prin": 15915, "amtFin": 17673, "fc": 6069, "pmt": 494.62, "numPay": 48, "covRatio": 100.0, "proRata": 0.74, "factor": 1.0, "orig": "2025-07-30", "mat": "2029-08-13", "posted": "2025-11-21", "sTotal": 23742, "aTotal": 3185, "sCnt": 48, "aCnt": 6, "sp": false, "mc": false, "conc": true, "extra": false}, {"id": 71093, "dpd": 0, "npp": 14929, "cv": 14929, "bb": 14929, "dl": "STREAM0326", "dlPct": 22.2, "apr": 28.0, "bal": 31149, "prin": 31149, "amtFin": 32034, "fc": 21556, "pmt": 1116.44, "numPay": 48, "covRatio": 100.0, "proRata": 0.743, "factor": 1.0, "orig": "2025-11-21", "mat": "2029-11-21", "posted": "2026-03-06", "sTotal": 53589, "aTotal": 3362, "sCnt": 48, "aCnt": 6, "sp": false, "mc": false, "conc": false, "extra": false}, {"id": 71074, "dpd": 13, "npp": 10881, "cv": 10881, "bb": 10881, "dl": "STREAM0126", "dlPct": 11.4, "apr": 28.0, "bal": 38190, "prin": 22637, "amtFin": 22637, "fc": 15553, "pmt": 377.04, "numPay": 101, "covRatio": 0.0, "proRata": 0.74, "factor": 1.0, "orig": "2026-01-13", "mat": "2030-01-11", "posted": "2026-01-29", "sTotal": 38190, "aTotal": 0, "sCnt": 102, "aCnt": 0, "sp": false, "mc": false, "conc": false, "extra": true}, {"id": 71092, "dpd": 0, "npp": 9548, "cv": 8755, "bb": 8755, "dl": "STREAM0226", "dlPct": 30.1, "apr": 28.0, "bal": 30364, "prin": 19869, "amtFin": 20567, "fc": 12306, "pmt": 358.39, "numPay": 91, "covRatio": 100.0, "proRata": 0.74, "factor": 1.0, "orig": "2025-11-01", "mat": "2029-05-28", "posted": "2026-02-13", "sTotal": 32872, "aTotal": 2509, "sCnt": 92, "aCnt": 8, "sp": false, "mc": false, "conc": false, "extra": true}, {"id": 71097, "dpd": 2, "npp": 5051, "cv": 5051, "bb": 5051, "dl": "STREAM0326", "dlPct": 22.2, "apr": 27.9, "bal": 14520, "prin": 11596, "amtFin": 14660, "fc": 5811, "pmt": 350.0, "numPay": 58, "covRatio": 94.4, "proRata": 0.76, "factor": 1.0, "orig": "2025-05-23", "mat": "2027-10-05", "posted": "2026-03-06", "sTotal": 20470, "aTotal": 5950, "sCnt": 59, "aCnt": 15, "sp": false, "mc": false, "conc": false, "extra": true}, {"id": 71101, "dpd": 0, "npp": 4344, "cv": 4344, "bb": 4344, "dl": "STREAM0326", "dlPct": 22.2, "apr": 28.0, "bal": 13936, "prin": 13936, "amtFin": 13936, "fc": 6323, "pmt": 275.0, "numPay": 73, "covRatio": 0.0, "proRata": 0.831, "factor": 1.0, "orig": "2026-03-03", "mat": "2029-01-02", "posted": "2026-03-06", "sTotal": 20230, "aTotal": 0, "sCnt": 74, "aCnt": 0, "sp": false, "mc": false, "conc": true, "extra": true}, {"id": 71087, "dpd": 8, "npp": 4571, "cv": 4254, "bb": 4254, "dl": "STREAM0226", "dlPct": 30.1, "apr": 27.9, "bal": 17412, "prin": 12318, "amtFin": 13164, "fc": 6425, "pmt": 544.13, "numPay": 36, "covRatio": 80.0, "proRata": 0.56, "factor": 1.0, "orig": "2025-10-04", "mat": "2028-10-04", "posted": "2026-02-11", "sTotal": 19589, "aTotal": 2177, "sCnt": 36, "aCnt": 5, "sp": false, "mc": false, "conc": false, "extra": false}, {"id": 71090, "dpd": 11, "npp": 6409, "cv": 6163, "bb": 6163, "dl": "STREAM0226", "dlPct": 30.1, "apr": 28.0, "bal": 25351, "prin": 17585, "amtFin": 20033, "fc": 13481, "pmt": 698.2, "numPay": 48, "covRatio": 97.4, "proRata": 0.51, "factor": 1.0, "orig": "2025-03-01", "mat": "2029-03-01", "posted": "2026-02-11", "sTotal": 33514, "aTotal": 8163, "sCnt": 48, "aCnt": 12, "sp": false, "mc": false, "conc": false, "extra": false}, {"id": 71038, "dpd": 2, "npp": 8658, "cv": 6876, "bb": 6876, "dl": "STREAM1125", "dlPct": 36.3, "apr": 28.0, "bal": 15878, "prin": 15878, "amtFin": 17283, "fc": 8639, "pmt": 325.0, "numPay": 79, "covRatio": 92.5, "proRata": 0.74, "factor": 1.0, "orig": "2025-09-19", "mat": "2028-10-17", "posted": "2025-11-26", "sTotal": 25880, "aTotal": 3833, "sCnt": 80, "aCnt": 13, "sp": false, "mc": false, "conc": true, "extra": true}, {"id": 71008, "dpd": 0, "npp": 22991, "cv": 17882, "bb": 17882, "dl": "STREAM1125", "dlPct": 36.3, "apr": 27.0, "bal": 36509, "prin": 36509, "amtFin": 42284, "fc": 19853, "pmt": 1726.02, "numPay": 36, "covRatio": 100.0, "proRata": 0.74, "factor": 1.0, "orig": "2025-07-23", "mat": "2028-07-22", "posted": "2025-11-05", "sTotal": 62137, "aTotal": 12082, "sCnt": 36, "aCnt": 7, "sp": false, "mc": false, "conc": false, "extra": false}, {"id": 71075, "dpd": 0, "npp": 3376, "cv": 3151, "bb": 3151, "dl": "STREAM0226", "dlPct": 30.1, "apr": 28.0, "bal": 6346, "prin": 6346, "amtFin": 6510, "fc": 2615, "pmt": 304.16, "numPay": 30, "covRatio": 100.0, "proRata": 0.74, "factor": 1.0, "orig": "2026-02-05", "mat": "2028-08-03", "posted": "2026-02-05", "sTotal": 9125, "aTotal": 424, "sCnt": 30, "aCnt": 3, "sp": false, "mc": false, "conc": true, "extra": false}, {"id": 71082, "dpd": 6, "npp": 6363, "cv": 6363, "bb": 6363, "dl": "STREAM0226", "dlPct": 30.1, "apr": 28.0, "bal": 12180, "prin": 12180, "amtFin": 12180, "fc": 5999, "pmt": 504.98, "numPay": 36, "covRatio": 0.0, "proRata": 0.7, "factor": 1.0, "orig": "2026-02-03", "mat": "2029-02-06", "posted": "2026-02-10", "sTotal": 18179, "aTotal": 0, "sCnt": 36, "aCnt": 0, "sp": false, "mc": false, "conc": true, "extra": false}, {"id": 71088, "dpd": 18, "npp": 6702, "cv": 6702, "bb": 6702, "dl": "STREAM0226", "dlPct": 30.1, "apr": 21.9, "bal": 31916, "prin": 22078, "amtFin": 23664, "fc": 12812, "pmt": 759.91, "numPay": 48, "covRatio": 85.7, "proRata": 0.49, "factor": 1.0, "orig": "2025-06-19", "mat": "2029-07-22", "posted": "2026-02-11", "sTotal": 36476, "aTotal": 4559, "sCnt": 48, "aCnt": 11, "sp": false, "mc": false, "conc": false, "extra": false}, {"id": 71026, "dpd": 1, "npp": 9645, "cv": 8029, "bb": 8029, "dl": "STREAM1125", "dlPct": 36.3, "apr": 28.0, "bal": 23159, "prin": 16378, "amtFin": 17505, "fc": 8561, "pmt": 724.07, "numPay": 36, "covRatio": 80.3, "proRata": 0.74, "factor": 1.0, "orig": "2025-10-11", "mat": "2028-10-11", "posted": "2025-11-21", "sTotal": 26067, "aTotal": 3400, "sCnt": 36, "aCnt": 7, "sp": false, "mc": false, "conc": true, "extra": false}, {"id": 71030, "dpd": 0, "npp": 5352, "cv": 3925, "bb": 3925, "dl": "STREAM1125", "dlPct": 36.3, "apr": 22.0, "bal": 11468, "prin": 11468, "amtFin": 14037, "fc": 6213, "pmt": 482.14, "numPay": 42, "covRatio": 100.0, "proRata": 0.74, "factor": 1.0, "orig": "2025-03-21", "mat": "2028-09-20", "posted": "2025-11-26", "sTotal": 20252, "aTotal": 5304, "sCnt": 43, "aCnt": 9, "sp": false, "mc": false, "conc": false, "extra": true}, {"id": 71099, "dpd": 0, "npp": 3404, "cv": 3404, "bb": 3404, "dl": "STREAM0326", "dlPct": 22.2, "apr": 28.0, "bal": 11162, "prin": 9030, "amtFin": 9030, "fc": 2132, "pmt": 620.12, "numPay": 18, "covRatio": 0.0, "proRata": 0.61, "factor": 1.0, "orig": "2026-02-19", "mat": "2027-08-19", "posted": "2026-03-06", "sTotal": 11162, "aTotal": 0, "sCnt": 18, "aCnt": 0, "sp": false, "mc": false, "conc": false, "extra": false}, {"id": 71098, "dpd": 0, "npp": 5358, "cv": 5358, "bb": 5358, "dl": "STREAM0326", "dlPct": 22.2, "apr": 27.9, "bal": 15988, "prin": 12776, "amtFin": 14664, "fc": 4644, "pmt": 804.48, "numPay": 24, "covRatio": 100.0, "proRata": 0.74, "factor": 1.0, "orig": "2025-11-04", "mat": "2027-11-04", "posted": "2026-03-06", "sTotal": 19308, "aTotal": 3320, "sCnt": 24, "aCnt": 4, "sp": false, "mc": false, "conc": false, "extra": false}, {"id": 71091, "dpd": 0, "npp": 5076, "cv": 4653, "bb": 4653, "dl": "STREAM0226", "dlPct": 30.1, "apr": 28.0, "bal": 24299, "prin": 17980, "amtFin": 21264, "fc": 11134, "pmt": 899.97, "numPay": 36, "covRatio": 100.0, "proRata": 0.47, "factor": 1.0, "orig": "2025-04-13", "mat": "2028-05-13", "posted": "2026-02-11", "sTotal": 32399, "aTotal": 8100, "sCnt": 36, "aCnt": 9, "sp": false, "mc": false, "conc": false, "extra": false}, {"id": 71105, "dpd": 0, "npp": 3459, "cv": 3459, "bb": 3459, "dl": "STREAM0326", "dlPct": 22.2, "apr": 28.0, "bal": 8500, "prin": 8500, "amtFin": 8500, "fc": 2881, "pmt": 218.98, "numPay": 51, "covRatio": 0.0, "proRata": 0.304, "factor": 1.0, "orig": "2026-03-05", "mat": "2028-03-30", "posted": "2026-03-12", "sTotal": 11369, "aTotal": 0, "sCnt": 52, "aCnt": 0, "sp": false, "mc": false, "conc": true, "extra": true}], "curves": {"2024-02": {"loans": 1, "npp": 4706, "sched": [0, 795, 1325, 1855, 2385, 2915, 3710, 4240, 4770, 5300, 5830, 6360, 6890, 7685, 8215, 8745, 9275, 9805, 10600, 11130, 11660, 12190, 12720, 13515], "actual": [0, 531, 1060, 1590, 2120, 2650, 3447, 3961, 4505, 5424, 5778, 6295, 6825, 7642, 8150, 8680, 9210, 9740, 10535, 11065, 11595, 12125, 12646, 13442], "rate": [0, 66.8, 80.0, 85.7, 88.9, 90.9, 92.9, 93.4, 94.4, 102.3, 99.1, 99.0, 99.1, 99.4, 99.2, 99.3, 99.3, 99.3, 99.4, 99.4, 99.4, 99.5, 99.4, 99.5]}, "2024-05": {"loans": 1, "npp": 5994, "sched": [0, 540, 1080, 1620, 2160, 2970, 3510, 4050, 4590, 5130, 5670, 6210, 7020, 7560, 8100, 8640, 9180, 9990, 10530, 11070, 11610, 12150, 12690, 13500], "actual": [0, 282, 978, 1376, 1829, 2694, 3409, 3679, 4320, 4772, 5400, 5940, 6742, 7284, 7830, 8364, 8815, 9712, 10341, 10864, 11557, 12116, 12150, 12150], "rate": [0, 52.1, 90.6, 85.0, 84.7, 90.7, 97.1, 90.8, 94.1, 93.0, 95.2, 95.6, 96.0, 96.3, 96.7, 96.8, 96.0, 97.2, 98.2, 98.1, 99.5, 99.7, 95.7, 90.0]}, "2025-03": {"loans": 3, "npp": 15313, "sched": [0, 1180, 2961, 4541, 6121, 7702, 9282, 10862, 12643, 14223, 15803, 17384, 18964, 20544, 22325, 23905, 25485, 27066, 28646, 30426, 32007, 33587, 35167, 36748], "actual": [0, 0, 1560, 3185, 4769, 5868, 6966, 9482, 11271, 12852, 14432, 16012, 18075, 18075, 18075, 18075, 18075, 18075, 18075, 18075, 18075, 18075, 18075, 18075], "rate": [0, 0.0, 52.7, 70.1, 77.9, 76.2, 75.0, 87.3, 89.2, 90.4, 91.3, 92.1, 95.3, 88.0, 81.0, 75.6, 70.9, 66.8, 63.1, 59.4, 56.5, 53.8, 51.4, 49.2]}, "2025-04": {"loans": 2, "npp": 10616, "sched": [0, 570, 2040, 3510, 4980, 6450, 7920, 9390, 10860, 12330, 13800, 15270, 16740, 18210, 19680, 21150, 22620, 24090, 25559, 27029, 28499, 29969, 31439, 32909], "actual": [0, 0, 570, 2040, 3510, 4989, 6459, 7920, 9390, 10860, 12330, 13800, 13800, 13800, 13800, 13800, 13800, 13800, 13800, 13800, 13800, 13800, 13800, 13800], "rate": [0, 0.0, 27.9, 58.1, 70.5, 77.4, 81.6, 84.3, 86.5, 88.1, 89.3, 90.4, 82.4, 75.8, 70.1, 65.2, 61.0, 57.3, 54.0, 51.1, 48.4, 46.0, 43.9, 41.9]}, "2025-05": {"loans": 1, "npp": 5051, "sched": [0, 0, 700, 1400, 2100, 2800, 3500, 4550, 5250, 5950, 6650, 7350, 8050, 9100, 9800, 10500, 11200, 11900, 12600, 13650, 14350, 15050, 15750, 16450], "actual": [0, 0, 1, 1050, 1750, 2450, 3150, 3850, 4900, 5600, 5950, 5950, 5950, 5950, 5950, 5950, 5950, 5950, 5950, 5950, 5950, 5950, 5950, 5950], "rate": [0, 0, 0.1, 75.0, 83.3, 87.5, 90.0, 84.6, 93.3, 94.1, 89.5, 81.0, 73.9, 65.4, 60.7, 56.7, 53.1, 50.0, 47.2, 43.6, 41.5, 39.5, 37.8, 36.2]}, "2025-06": {"loans": 2, "npp": 13698, "sched": [0, 525, 1810, 3095, 4380, 5665, 6951, 8236, 9521, 10806, 12091, 13376, 14661, 15946, 17231, 18516, 19801, 21086, 22372, 23657, 24942, 26227, 27512, 28797], "actual": [0, 0, 1004, 1945, 3449, 4760, 5966, 7301, 8236, 8761, 8761, 8761, 8761, 8761, 8761, 8761, 8761, 8761, 8761, 8761, 8761, 8761, 8761, 8761], "rate": [0, 0.0, 55.5, 62.8, 78.7, 84.0, 85.8, 88.6, 86.5, 81.1, 72.5, 65.5, 59.8, 54.9, 50.8, 47.3, 44.2, 41.5, 39.2, 37.0, 35.1, 33.4, 31.8, 30.4]}, "2025-07": {"loans": 3, "npp": 35179, "sched": [0, 2146, 4787, 7429, 10070, 12711, 15352, 17993, 20634, 23275, 25916, 28557, 31198, 33839, 36480, 39121, 41762, 44403, 47044, 49685, 52326, 54967, 57608, 60250], "actual": [0, 0, 2146, 4793, 8080, 10946, 13498, 16140, 18781, 18781, 18781, 18781, 18781, 18781, 18781, 18781, 18781, 18781, 18781, 18781, 18781, 18781, 18781, 18781], "rate": [0, 0.0, 44.8, 64.5, 80.2, 86.1, 87.9, 89.7, 91.0, 80.7, 72.5, 65.8, 60.2, 55.5, 51.5, 48.0, 45.0, 42.3, 39.9, 37.8, 35.9, 34.2, 32.6, 31.2]}, "2025-09": {"loans": 4, "npp": 19647, "sched": [0, 1715, 3430, 5470, 7185, 8900, 10615, 12330, 14045, 16084, 17799, 19514, 21229, 22944, 24659, 26699, 28414, 30129, 31844, 33559, 35274, 37314, 39029, 40744], "actual": [0, 775, 2937, 5050, 6562, 8736, 9763, 9763, 9763, 9763, 9763, 9763, 9763, 9763, 9763, 9763, 9763, 9763, 9763, 9763, 9763, 9763, 9763, 9763], "rate": [0, 45.2, 85.6, 92.3, 91.3, 98.2, 92.0, 79.2, 69.5, 60.7, 54.9, 50.0, 46.0, 42.6, 39.6, 36.6, 34.4, 32.4, 30.7, 29.1, 27.7, 26.2, 25.0, 24.0]}, "2025-10": {"loans": 7, "npp": 43242, "sched": [0, 3879, 7757, 11636, 15515, 19393, 23272, 27460, 31339, 35218, 39096, 42975, 47164, 51042, 54921, 58800, 62678, 66557, 70746, 74624, 78503, 82381, 86260, 90139], "actual": [0, 710, 5716, 9476, 12974, 15649, 17262, 17262, 17262, 17262, 17262, 17262, 17262, 17262, 17262, 17262, 17262, 17262, 17262, 17262, 17262, 17262, 17262, 17262], "rate": [0, 18.3, 73.7, 81.4, 83.6, 80.7, 74.2, 62.9, 55.1, 49.0, 44.2, 40.2, 36.6, 33.8, 31.4, 29.4, 27.5, 25.9, 24.4, 23.1, 22.0, 21.0, 20.0, 19.2]}, "2025-11": {"loans": 7, "npp": 62093, "sched": [0, 5146, 10320, 15493, 21053, 26226, 31400, 36932, 42105, 47665, 52838, 58012, 63544, 68717, 73891, 79064, 84624, 89797, 95329, 100503, 105676, 111236, 116409, 121583], "actual": [0, 1682, 6165, 10850, 16804, 17604, 17604, 17604, 17604, 17604, 17604, 17604, 17604, 17604, 17604, 17604, 17604, 17604, 17604, 17604, 17604, 17604, 17604, 17604], "rate": [0, 32.7, 59.7, 70.0, 79.8, 67.1, 56.1, 47.7, 41.8, 36.9, 33.3, 30.3, 27.7, 25.6, 23.8, 22.3, 20.8, 19.6, 18.5, 17.5, 16.7, 15.8, 15.1, 14.5]}, "2025-12": {"loans": 1, "npp": 6105, "sched": [0, 250, 750, 1250, 1750, 2250, 2750, 3250, 4000, 4500, 5000, 5500, 6000, 6750, 7250, 7750, 8250, 8750, 9250, 10000, 10500, 11000, 11500, 12000], "actual": [0, 0, 555, 1055, 1055, 1055, 1055, 1055, 1055, 1055, 1055, 1055, 1055, 1055, 1055, 1055, 1055, 1055, 1055, 1055, 1055, 1055, 1055, 1055], "rate": [0, 0.0, 74.1, 84.4, 60.3, 46.9, 38.4, 32.5, 26.4, 23.5, 21.1, 19.2, 17.6, 15.6, 14.6, 13.6, 12.8, 12.1, 11.4, 10.6, 10.1, 9.6, 9.2, 8.8]}, "2026-01": {"loans": 5, "npp": 38844, "sched": [0, 1855, 4751, 7648, 10545, 13442, 16715, 19612, 22509, 25406, 28303, 31199, 34473, 37370, 40267, 43163, 46060, 48957, 52231, 55128, 58024, 60921, 63818, 67092], "actual": [0, 0, 1967, 1967, 1967, 1967, 1967, 1967, 1967, 1967, 1967, 1967, 1967, 1967, 1967, 1967, 1967, 1967, 1967, 1967, 1967, 1967, 1967, 1967], "rate": [0, 0.0, 41.4, 25.7, 18.7, 14.6, 11.8, 10.0, 8.7, 7.7, 6.9, 6.3, 5.7, 5.3, 4.9, 4.6, 4.3, 4.0, 3.8, 3.6, 3.4, 3.2, 3.1, 2.9]}, "2026-02": {"loans": 6, "npp": 26598, "sched": [0, 2593, 5186, 7779, 10372, 12965, 15558, 18151, 20744, 23337, 25930, 28524, 31117, 33710, 36303, 38896, 41489, 44082, 46675, 48648, 50621, 52594, 54567, 56540], "actual": [0, 120, 805, 805, 805, 805, 805, 805, 805, 805, 805, 805, 805, 805, 805, 805, 805, 805, 805, 805, 805, 805, 805, 805], "rate": [0, 4.6, 15.5, 10.3, 7.8, 6.2, 5.2, 4.4, 3.9, 3.4, 3.1, 2.8, 2.6, 2.4, 2.2, 2.1, 1.9, 1.8, 1.7, 1.7, 1.6, 1.5, 1.5, 1.4]}, "2026-03": {"loans": 2, "npp": 7804, "sched": [550, 1538, 2526, 3514, 4502, 5490, 6753, 7960, 8948, 9936, 10924, 11912, 13174, 14381, 15369, 16357, 17345, 18608, 19815, 20803, 21791, 22779, 23767, 25030], "actual": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], "rate": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}}, "sva": [{"m": "2025-06", "s": 4120, "a": 3268}, {"m": "2025-07", "s": 5345, "a": 4131}, {"m": "2025-08", "s": 8517, "a": 5950}, {"m": "2025-09", "s": 8746, "a": 7345}, {"m": "2025-10", "s": 10731, "a": 11039}, {"m": "2025-11", "s": 14540, "a": 12579}, {"m": "2025-12", "s": 20161, "a": 17667}, {"m": "2026-01", "s": 20029, "a": 19232}, {"m": "2026-02", "s": 21868, "a": 19330}, {"m": "2026-03", "s": 26439, "a": 19326}], "pi": [{"m": "2025-06", "p": 922, "i": 2346}, {"m": "2025-07", "p": 1203, "i": 2744}, {"m": "2025-08", "p": 2248, "i": 3684}, {"m": "2025-09", "p": 2854, "i": 4491}, {"m": "2025-10", "p": 4687, "i": 6299}, {"m": "2025-11", "p": 5232, "i": 7253}, {"m": "2025-12", "p": 6713, "i": 10692}, {"m": "2026-01", "p": 8160, "i": 10575}, {"m": "2026-02", "p": 8746, "i": 9952}, {"m": "2026-03", "p": 8755, "i": 10539}], "proj": [{"m": "2026-03", "a": 16625, "p": 8019, "i": 8605}, {"m": "2026-04", "a": 26761, "p": 12437, "i": 14325}, {"m": "2026-05", "a": 27001, "p": 13282, "i": 13719}, {"m": "2026-06", "a": 27525, "p": 13748, "i": 13777}, {"m": "2026-07", "a": 26868, "p": 13849, "i": 13020}, {"m": "2026-08", "a": 27392, "p": 14432, "i": 12960}, {"m": "2026-09", "a": 26766, "p": 14508, "i": 12258}, {"m": "2026-10", "a": 27490, "p": 15542, "i": 11949}, {"m": "2026-11", "a": 26850, "p": 15316, "i": 11534}, {"m": "2026-12", "a": 27166, "p": 16156, "i": 11010}, {"m": "2027-01", "a": 27383, "p": 16453, "i": 10931}, {"m": "2027-02", "a": 26491, "p": 16390, "i": 10102}, {"m": "2027-03", "a": 27152, "p": 17528, "i": 9624}, {"m": "2027-04", "a": 27290, "p": 17778, "i": 9512}, {"m": "2027-05", "a": 27050, "p": 18108, "i": 8942}, {"m": "2027-06", "a": 27166, "p": 18598, "i": 8568}, {"m": "2027-07", "a": 27383, "p": 19201, "i": 8182}, {"m": "2027-08", "a": 27152, "p": 19342, "i": 7810}], "dpd": [{"l": "Current", "cnt": 27, "npp": 176934, "cv": 155387, "bb": 155387}, {"l": "1-30d", "cnt": 17, "npp": 111075, "cv": 98271, "bb": 98271}, {"l": "31-60d", "cnt": 1, "npp": 6882, "cv": 5320, "bb": 0}, {"l": "60+", "cnt": 0, "npp": 0, "cv": 0, "bb": 0}], "dealers": [{"id": "STREAM1125", "cnt": 18, "npp": 121144, "cv": 93750, "bb": 88430, "pct": 36.3, "avgDpd": 4.2, "avgApr": 25.5, "avgCov": 93.5}, {"id": "STREAM0326", "cnt": 10, "npp": 58072, "cv": 57650, "bb": 57650, "pct": 22.2, "avgDpd": 0.2, "avgApr": 30.1, "avgCov": 49.4}, {"id": "STREAM0226", "cnt": 13, "npp": 82668, "cv": 77974, "bb": 77974, "pct": 30.1, "avgDpd": 4.1, "avgApr": 28.1, "avgCov": 87.4}, {"id": "STREAM0126", "cnt": 4, "npp": 33007, "cv": 29604, "bb": 29604, "pct": 11.4, "avgDpd": 3.2, "avgApr": 27.7, "avgCov": 75.0}], "totals": {"count": 45, "npp": 294891, "cv": 258978, "bb": 253659, "totalSched": 422226, "totalPaid": 35912, "avgApr": 27.5, "avgDpd": 3.2, "avgCov": 80.3, "amtFin": 678268, "finChg": 349875}};
+const fmt=n=>{if(Math.abs(n)>=1e6)return'$'+(n/1e6).toFixed(1)+'M';if(Math.abs(n)>=1e3)return'$'+Math.round(n/1e3)+'K';return'$'+Math.round(n)};
+const pct=n=>Math.round(n)+'%';
+const C={ac:'#818cf8',tl:'#2dd4bf',am:'#fbbf24',co:'#fb923c',rd:'#f87171',gn:'#4ade80',bl:'#60a5fa',pk:'#f472b6'};
+const DPD_C=[C.tl,C.bl,C.am,C.co,C.rd];
+
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+document.querySelectorAll('.sec').forEach(x=>x.classList.remove('on'));
+t.classList.add('on');document.getElementById(t.dataset.v).classList.add('on');
+}));
+
+const T=D.totals;
+const h=document.getElementById('health');
+const dr=D.dpd.filter(d=>d.l!=='Current').reduce((s,d)=>s+d.cnt,0)/T.count*100;
+h.innerHTML='<div class="badge" style="background:'+(dr<20?'rgba(45,212,191,.12)':'rgba(251,191,36,.12)')+';color:'+(dr<20?C.tl:C.am)+'"><span class="pulse" style="width:8px;height:8px;border-radius:50%;background:'+(dr<20?C.tl:C.am)+'"></span>'+(dr<20?'Healthy':'Watch')+'</div>';
+
+// Metrics
+const mb=document.getElementById('mets');
+[{l:'Loans',v:T.count,s:D.loans.filter(l=>l.dpd===0).length+' current'},{l:'Current balance',v:'$743,378',s:fmt(T.npp)+' net purchase price'},{l:'Value of receivable',v:fmt(T.cv),s:pct(T.cv/T.npp*100)+' of NPP'},{l:'Borrowing base',v:fmt(T.bb),s:pct(T.bb/T.cv*100)+' of VOR'},{l:'Collection rate',v:'12.2%',s:'$'+Math.round(T.totalPaid/1000)+'K collected / $'+Math.round(T.totalSched/1000)+'K scheduled'}
+].forEach((m,i)=>{
+const d=document.createElement('div');d.className='m su';d.style.animationDelay=(i*.07)+'s';
+d.innerHTML='<div class="glow" style="background:linear-gradient(90deg,'+C.ac+','+C.tl+')"></div><div class="lb">'+m.l+'</div><div class="vl">'+m.v+'</div><div class="s2">'+m.s+'</div>';
+mb.appendChild(d);
+});
+
+// DPD
+const dBar=document.getElementById('dpdBar');const dLeg=document.getElementById('dpdLeg');
+const totalCV=T.cv||1;
+D.dpd.forEach((b,i)=>{
+if(b.cv>0){const s=document.createElement('div');s.className='sg';s.style.width=(b.cv/totalCV*100)+'%';s.style.background=DPD_C[i];s.title=b.l+': '+fmt(b.cv);if(b.cv/totalCV*100>8)s.textContent=fmt(b.cv);dBar.appendChild(s)}
+dLeg.innerHTML+='<span><span class="dt" style="background:'+DPD_C[i]+'"></span>'+b.l+' ('+b.cnt+')</span>';
+});
+
+new Chart(document.getElementById('dpdChart'),{type:'doughnut',data:{labels:D.dpd.map(d=>d.l),datasets:[{data:D.dpd.map(d=>d.cnt),backgroundColor:DPD_C,borderWidth:2,borderColor:'#0d1420'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{display:false}}}});
+
+// Scheduled vs Actual
+const svaL=D.sva.map(x=>{const[y,m]=x.m.split('-');return['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+m]+" '"+y.slice(2)});
+new Chart(document.getElementById('svaChart'),{type:'bar',data:{labels:svaL,datasets:[{label:'Scheduled',data:D.sva.map(x=>x.s),backgroundColor:C.ac+'77',borderRadius:5},{label:'Actual',data:D.sva.map(x=>x.a),backgroundColor:C.tl+'cc',borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect',padding:10}}},scales:{x:{ticks:{color:'#556a8a',font:{size:10},autoSkip:false,maxRotation:45},grid:{color:'rgba(30,45,74,.3)'}},y:{ticks:{color:'#556a8a',callback:v=>fmt(v)},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// Dealer chart
+new Chart(document.getElementById('dlChart'),{type:'bar',data:{labels:D.dealers.map(d=>d.id.replace('STREAM','')),datasets:[{label:'NPP',data:D.dealers.map(d=>d.npp),backgroundColor:C.ac+'88',borderRadius:5},{label:'BB Contribution',data:D.dealers.map(d=>d.bb),backgroundColor:C.tl+'cc',borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#8899b4'},grid:{color:'rgba(30,45,74,.3)'}},y:{ticks:{color:'#556a8a',callback:v=>fmt(v)},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// Waterfall
+const wf=document.getElementById('waterfall');
+const wfD=[{l:'Net purchase price',v:T.npp,c:C.bl},{l:'Adjustments',v:T.cv-T.npp,c:C.rd},{l:'Value of receivable (VOR)',v:T.cv,c:C.ac},{l:'Factor / concentration adj.',v:T.bb-T.cv,c:T.bb-T.cv>=0?C.gn:C.rd},{l:'Borrowing base',v:T.bb,c:C.tl}];
+wfD.forEach((item,i)=>{
+wf.innerHTML+='<div class="su" style="margin-bottom:10px;animation-delay:'+(i*.1)+'s"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:12px;color:var(--t2)">'+item.l+'</span><span style="font-size:13px;font-weight:600;font-family:JetBrains Mono;color:'+(item.v<0?C.rd:C.tl)+'">'+fmt(item.v)+'</span></div><div class="pr"><div class="pf" style="background:'+item.c+';width:'+Math.abs(item.v)/T.npp*100+'%"></div></div></div>';
+});
+
+// === COLLECTIONS TAB ===
+const piL=D.pi.map(x=>{const[y,m]=x.m.split('-');return['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+m]+" '"+y.slice(2)});
+new Chart(document.getElementById('piChart'),{type:'bar',data:{labels:piL,datasets:[{label:'Principal',data:D.pi.map(x=>x.p),backgroundColor:C.ac+'aa',borderRadius:5,stack:'s'},{label:'Interest',data:D.pi.map(x=>x.i),backgroundColor:C.tl+'aa',borderRadius:5,stack:'s'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{stacked:true,ticks:{color:'#556a8a',font:{size:10},autoSkip:false,maxRotation:45},grid:{color:'rgba(30,45,74,.3)'}},y:{stacked:true,ticks:{color:'#556a8a',callback:v=>fmt(v)},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// Collection rate
+new Chart(document.getElementById('rateChart'),{type:'line',data:{labels:svaL,datasets:[{label:'Collection rate',data:D.sva.map(x=>x.s>0?Math.round(x.a/x.s*100):0),borderColor:C.ac,backgroundColor:C.ac+'22',fill:true,pointRadius:5,pointBackgroundColor:C.ac,borderWidth:2,tension:.3},{data:D.sva.map(()=>100),borderColor:'#556a8a',borderDash:[4,4],borderWidth:1,pointRadius:0,label:'Target'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#556a8a',font:{size:10},autoSkip:false,maxRotation:45},grid:{color:'rgba(30,45,74,.3)'}},y:{min:0,max:120,ticks:{color:'#556a8a',callback:v=>v+'%'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// Cumulative
+let cumS=0,cumA=0;const cumData=D.sva.map(x=>{cumS+=x.s;cumA+=x.a;return{s:cumS,a:cumA}});
+new Chart(document.getElementById('cumChart'),{type:'line',data:{labels:svaL,datasets:[{label:'Cumulative scheduled',data:cumData.map(x=>x.s),borderColor:C.ac,borderWidth:2,pointRadius:4,pointBackgroundColor:C.ac,tension:.3},{label:'Cumulative actual',data:cumData.map(x=>x.a),borderColor:C.tl,borderWidth:2,pointRadius:4,pointBackgroundColor:C.tl,tension:.3,fill:{target:0,above:C.tl+'15'}}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#556a8a',autoSkip:false,maxRotation:45},grid:{color:'rgba(30,45,74,.3)'}},y:{ticks:{color:'#556a8a',callback:v=>fmt(v)},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// === VINTAGE TAB ===
+const vKeys=Object.keys(D.curves).sort().filter(k=>D.curves[k].rate.length>=3);
+const vColors=[C.rd,C.co,C.am,C.ac,C.bl,C.tl,C.gn,C.pk,'#a78bfa','#38bdf8','#fb7185','#a3e635'];
+const vLeg=document.getElementById('vintLeg');
+const vDS=vKeys.map((k,i)=>{const c=D.curves[k];const col=vColors[i%vColors.length];
+vLeg.innerHTML+='<span><span class="dt" style="background:'+col+'"></span>'+k+' ('+c.loans+')</span>';
+return{label:k,data:c.rate,borderColor:col,backgroundColor:col+'15',borderWidth:2,pointRadius:3,pointBackgroundColor:col,tension:.3,fill:false}});
+
+new Chart(document.getElementById('vintChart'),{type:'line',data:{labels:Array.from({length:24},(_,i)=>'M'+i),datasets:[...vDS,{data:Array(24).fill(100),borderColor:'#334155',borderDash:[4,4],borderWidth:1,pointRadius:0,label:'100% target'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:'Months since origination',color:'#556a8a',font:{size:11}},ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.2)'}},y:{min:0,max:120,title:{display:true,text:'Collection rate %',color:'#556a8a',font:{size:11}},ticks:{color:'#556a8a',callback:v=>v+'%'},grid:{color:'rgba(30,45,74,.2)'}}}}});
+
+// Vintage bar
+const vbKeys=Object.keys(D.curves).sort().filter(k=>D.curves[k].loans>=2);
+new Chart(document.getElementById('vintBar'),{type:'bar',data:{labels:vbKeys,datasets:[{label:'NPP',data:vbKeys.map(k=>D.curves[k].npp),backgroundColor:C.ac+'88',borderRadius:4},{label:'Loans',data:vbKeys.map(k=>D.curves[k].loans),type:'line',borderColor:C.tl,pointBackgroundColor:C.tl,pointRadius:5,borderWidth:2,yAxisID:'y1'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#556a8a',maxRotation:45,autoSkip:false,font:{size:10}},grid:{color:'rgba(30,45,74,.3)'}},y:{ticks:{color:'#556a8a',callback:v=>fmt(v)},grid:{color:'rgba(30,45,74,.25)'}},y1:{position:'right',grid:{drawOnChartArea:false},ticks:{color:'#556a8a'}}}}});
+
+// Vintage absolute cumulative
+const vabsDS=vKeys.slice(-6).map((k,i)=>{const c=D.curves[k];const col=vColors[(vKeys.length-6+i)%vColors.length];
+return{label:k,data:c.actual,borderColor:col,borderWidth:2,pointRadius:2,tension:.3,fill:false}});
+new Chart(document.getElementById('vintAbs'),{type:'line',data:{labels:Array.from({length:24},(_,i)=>'M'+i),datasets:vabsDS},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.2)'}},y:{ticks:{color:'#556a8a',callback:v=>fmt(v)},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// === CASHFLOWS TAB ===
+const prL=D.proj.map(x=>{const[y,m]=x.m.split('-');return['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+m]+" '"+y.slice(2)});
+new Chart(document.getElementById('projChart'),{type:'bar',data:{labels:prL,datasets:[{label:'Principal',data:D.proj.map(x=>x.p),backgroundColor:C.ac+'88',borderRadius:4,stack:'s'},{label:'Interest',data:D.proj.map(x=>x.i),backgroundColor:C.tl+'88',borderRadius:4,stack:'s'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{stacked:true,ticks:{color:'#556a8a',maxRotation:45,autoSkip:false,font:{size:10}},grid:{color:'rgba(30,45,74,.3)'}},y:{stacked:true,ticks:{color:'#556a8a',callback:v=>fmt(v)},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+const pm=document.getElementById('projMets');
+const totProj=D.proj.reduce((s,x)=>s+x.a,0);const totPrin=D.proj.reduce((s,x)=>s+x.p,0);const totInt=D.proj.reduce((s,x)=>s+x.i,0);
+[{l:'Total projected (18m)',v:fmt(totProj)},{l:'Projected principal',v:fmt(totPrin)},{l:'Projected interest',v:fmt(totInt)}].forEach((x,i)=>{
+pm.innerHTML+='<div class="m su" style="animation-delay:'+(i*.08)+'s"><div class="lb">'+x.l+'</div><div class="vl">'+x.v+'</div></div>';
+});
+
+// === DEALERS TAB ===
+const dc=document.getElementById('dlCards');
+D.dealers.forEach((d,i)=>{
+const concCol=d.pct>17.5?C.rd:C.gn;
+dc.innerHTML+='<div class="cd su" style="animation-delay:'+(i*.08)+'s"><h3>'+d.id.replace('STREAM','')+'</h3><div class="g" style="grid-template-columns:1fr 1fr;gap:8px;font-size:12px">'
++[{l:'Loans',v:d.cnt},{l:'NPP',v:fmt(d.npp)},{l:'BB',v:fmt(d.bb)},{l:'Conc.',v:'<span style="color:'+concCol+'">'+d.pct+'%</span>'},{l:'Avg DPD',v:d.avgDpd},{l:'Avg APR',v:d.avgApr+'%'},{l:'Avg Coverage',v:d.avgCov+'%'},{l:'VOR',v:fmt(d.cv)}].map(x=>'<div><span style="color:var(--t3)">'+x.l+'</span><div style="font-weight:600;font-family:JetBrains Mono;font-size:13px">'+x.v+'</div></div>').join('')
++'</div></div>';
+});
+
+new Chart(document.getElementById('dlRadar'),{type:'radar',data:{labels:['Coverage','Loan count','NPP','BB','Current %'],datasets:D.dealers.map((d,i)=>({label:d.id.replace('STREAM',''),data:[Math.round(d.avgCov),Math.round(d.cnt/20*100),Math.round(d.npp/65000*100),Math.round(d.bb/90000*100),Math.round((d.cnt-Math.round(d.avgDpd))/d.cnt*100)],borderColor:vColors[i],backgroundColor:vColors[i]+'22',borderWidth:2,pointRadius:3}))},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect',padding:14}}},scales:{r:{beginAtZero:true,max:100,ticks:{display:false},grid:{color:'rgba(30,45,74,.3)'},pointLabels:{color:'#8899b4',font:{size:11}}}}}});
+
+// === LOANS TAB ===
+let sk='npp',sd=-1;
+const activeFilters={dpd:null,dealer:null};
+
+document.querySelectorAll('.fbtn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const grp=btn.dataset.fg,val=btn.dataset.fv;
+    if(activeFilters[grp]===val){activeFilters[grp]=null;btn.classList.remove('on')}
+    else{document.querySelectorAll('.fbtn[data-fg="'+grp+'"]').forEach(b=>b.classList.remove('on'));activeFilters[grp]=val;btn.classList.add('on')}
+    renderLoans();
+  });
+});
+
+function filterLoans(){
+  let ls=[...D.loans];
+  const st=(document.getElementById('loanSearch').value||'').toLowerCase();
+  if(st) ls=ls.filter(l=>String(l.id).includes(st)||l.dl.toLowerCase().includes(st)||String(l.dpd).includes(st)||String(l.apr).includes(st));
+  if(activeFilters.dpd){
+    const d=activeFilters.dpd;
+    if(d==='0') ls=ls.filter(l=>l.dpd===0);
+    else if(d==='1-30') ls=ls.filter(l=>l.dpd>=1&&l.dpd<=30);
+    else if(d==='31-60') ls=ls.filter(l=>l.dpd>=31&&l.dpd<=60);
+    else if(d==='60+') ls=ls.filter(l=>l.dpd>60);
+  }
+  if(activeFilters.dealer) ls=ls.filter(l=>l.dl===activeFilters.dealer);
+  return ls;
+}
+
+function renderLoans(){
+const filtered=filterLoans();
+document.getElementById('loanCount').textContent=filtered.length+' of '+D.loans.length+' loans';
+let ls=filtered.sort((a,b)=>{
+  const av=a[sk],bv=b[sk];
+  if(typeof av==='string')return sd*(av.localeCompare(bv));
+  return sd*(av-bv);
+});
+const cols=[{k:'id',l:'ID',w:60},{k:'dpd',l:'DPD',w:80},{k:'npp',l:'NPP',w:90},{k:'cv',l:'VOR',w:90},{k:'bb',l:'BB',w:80},{k:'apr',l:'APR',w:60},{k:'covRatio',l:'Coverage',w:70},{k:'pmt',l:'Payment',w:80},{k:'dl',l:'Dealer',w:90}];
+document.getElementById('lHead').innerHTML='<tr>'+cols.map(c=>'<th style="width:'+c.w+'px" data-k="'+c.k+'">'+c.l+(sk===c.k?(sd<0?' ↓':' ↑'):'')+'</th>').join('')+'</tr>';
+document.getElementById('lHead').querySelectorAll('th').forEach(th=>{th.onclick=()=>{const k=th.dataset.k;if(sk===k)sd*=-1;else{sk=k;sd=-1}renderLoans()}});
+const maxD=Math.max(...D.loans.map(l=>l.dpd),1);
+document.getElementById('lBody').innerHTML=ls.map((l,i)=>{
+const dc=l.dpd>20?C.rd:l.dpd>10?C.am:l.dpd>0?C.bl:C.tl;
+return'<tr style="cursor:pointer;animation:fi .3s ease-out '+Math.min(i*.02,.5)+'s both" onclick="showLoan('+l.id+')"><td style="font-family:JetBrains Mono;font-size:11px">'+l.id+'</td><td><div class="dp"><div class="dpf" style="width:'+Math.max(4,l.dpd/maxD*100)+'%;background:'+dc+'"></div></div><span style="color:'+dc+';font-weight:600;font-size:11px">'+l.dpd+'</span></td><td>'+fmt(l.npp)+'</td><td>'+fmt(l.cv)+'</td><td>'+fmt(l.bb)+'</td><td>'+l.apr+'%</td><td><span style="color:'+(l.covRatio>=90?C.tl:l.covRatio>=70?C.am:C.rd)+'">'+l.covRatio+'%</span></td><td>$'+l.pmt+'</td><td style="font-size:11px">'+l.dl.replace('STREAM','')+'</td></tr>'}).join('');
+}
+document.getElementById('loanSearch').addEventListener('input',()=>renderLoans());
+renderLoans();
+
+window.showLoan=function(id){
+const l=D.loans.find(x=>x.id===id);if(!l)return;
+const cp=l.sTotal>0?Math.min(100,l.aTotal/l.sTotal*100):0;
+document.getElementById('lDetail').innerHTML='<div class="cd su" style="margin-top:12px"><div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:12px"><div><div style="font-size:16px;font-weight:600">Loan #'+l.id+'</div><div style="font-size:12px;color:var(--t3)">'+l.dl+' &middot; APR '+l.apr+'% &middot; '+l.numPay+' payments &middot; $'+l.pmt+'/mo</div></div><span class="pl '+(l.dpd===0?'pl-g':l.dpd>10?'pl-r':'pl-y')+'">DPD: '+l.dpd+'</span></div><div class="g g4" style="margin-bottom:12px">'+[{l:'NPP',v:fmt(l.npp)},{l:'VOR',v:fmt(l.cv)},{l:'BB contribution',v:fmt(l.bb)},{l:'Amount financed',v:fmt(l.amtFin)},{l:'Scheduled total',v:fmt(l.sTotal)},{l:'Collected',v:fmt(l.aTotal)},{l:'Pro rata',v:(l.proRata*100).toFixed(1)+'%'},{l:'Coverage',v:'<span style="color:'+(l.covRatio>=90?C.tl:l.covRatio>=70?C.am:C.rd)+'">'+l.covRatio+'%</span>'}].map(m=>'<div style="background:var(--bg);border-radius:8px;padding:10px"><div style="font-size:11px;color:var(--t3)">'+m.l+'</div><div style="font-size:14px;font-weight:600;font-family:JetBrains Mono">'+m.v+'</div></div>').join('')+'</div><div style="font-size:12px;color:var(--t2);margin-bottom:4px">Collection progress: '+Math.round(cp)+'%</div><div class="pr"><div class="pf" style="background:'+(cp>80?C.tl:cp>50?C.bl:C.am)+';width:'+cp+'%"></div></div><div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">'+(l.conc?'<span class="pl pl-r">Concentration excess</span>':'')+(l.extra?'<span class="pl pl-y">Extra payments</span>':'')+(l.factor===0?'<span class="pl pl-r">Factor = 0</span>':'')+'</div></div>';
+};
+
+// ===== THEME TOGGLE =====
+document.getElementById('themeToggle').addEventListener('click',()=>{
+  const html=document.documentElement;
+  const next=html.getAttribute('data-theme')==='light'?'dark':'light';
+  html.setAttribute('data-theme',next);
+  document.getElementById('themeToggle').innerHTML=next==='light'?'&#127769;':'&#9728;&#65039;';
+  Chart.defaults.color=next==='light'?'#475569':'#8899b4';
+  Chart.helpers.each(Chart.instances,(c)=>{
+    if(c.options.scales){
+      Object.values(c.options.scales).forEach(s=>{if(s.ticks)s.ticks.color=next==='light'?'#475569':'#556a8a';if(s.grid)s.grid.color=next==='light'?'rgba(0,0,0,.08)':'rgba(30,45,74,.25)';});
+    }
+    c.update('none');
+  });
+});
+</script></body></html>

@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MCA Portfolio Analytics | March 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0e17;--card:#111827;--card2:#1a2332;--border:#1e293b;--t1:#f1f5f9;--t2:#94a3b8;--t3:#64748b;--accent:#6366f1;--teal:#14b8a6;--amber:#f59e0b;--coral:#f97316;--red:#ef4444;--green:#22c55e;--blue:#3b82f6;--pink:#ec4899;--r:12px}
+body{background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+.wrap{max-width:1400px;margin:0 auto;padding:24px 32px}
+h1{font-size:28px;font-weight:700;letter-spacing:-0.5px;background:linear-gradient(135deg,#6366f1,#14b8a6);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sub{color:var(--t3);font-size:13px;margin-top:4px}
+.tabs{display:flex;gap:6px;margin:24px 0 20px;flex-wrap:wrap}
+.tab{padding:8px 18px;border-radius:20px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border);color:var(--t2);background:transparent;transition:all .25s}
+.tab:hover{border-color:var(--accent);color:var(--t1)}
+.tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.grid{display:grid;gap:16px;margin-bottom:24px}
+.g4{grid-template-columns:repeat(4,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:900px){.g4,.g3{grid-template-columns:repeat(2,1fr)}.g2{grid-template-columns:1fr}}
+.metric{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;position:relative;overflow:hidden}
+.metric::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--teal));opacity:0;transition:opacity .4s}.metric:hover::before{opacity:1}
+.metric .label{font-size:12px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.metric .val{font-size:26px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.metric .sub2{font-size:12px;color:var(--t3);margin-top:4px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px 24px}
+.card h3{font-size:15px;font-weight:600;margin-bottom:16px;color:var(--t1)}
+.chart-wrap{position:relative;width:100%;height:300px}
+.filters{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.fbtn{padding:4px 12px;border-radius:14px;font-size:11px;cursor:pointer;border:1px solid var(--border);color:var(--t3);background:transparent;transition:all .2s;font-family:inherit}
+.fbtn:hover,.fbtn.on{border-color:var(--teal);color:var(--teal);background:rgba(20,184,166,.08)}
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:12px;font-size:12px;color:var(--t2)}
+.legend span{display:flex;align-items:center;gap:5px}
+.dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:10px 8px;border-bottom:1px solid var(--border);color:var(--t3);font-weight:500;cursor:pointer;user-select:none;white-space:nowrap}
+th:hover{color:var(--accent)}
+td{padding:10px 8px;border-bottom:1px solid rgba(30,41,59,.5)}
+tr:hover td{background:rgba(99,102,241,.04)}
+.pill{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:500}
+.pill-g{background:rgba(20,184,166,.12);color:var(--teal)}
+.pill-r{background:rgba(239,68,68,.12);color:var(--red)}
+.pill-y{background:rgba(245,158,11,.12);color:var(--amber)}
+.dpd-bar{height:6px;border-radius:3px;background:var(--border);overflow:hidden;width:60px;display:inline-block;vertical-align:middle;margin-right:6px}
+.dpd-fill{height:100%;border-radius:3px;transition:width .8s cubic-bezier(.22,1,.36,1)}
+.progress{height:10px;border-radius:5px;background:var(--border);overflow:hidden;margin:6px 0}
+.progress-fill{height:100%;border-radius:5px;transition:width 1.2s cubic-bezier(.22,1,.36,1)}
+.fade-in{animation:fadeIn .6s ease-out both}
+.slide-up{animation:slideUp .5s ease-out both}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes countUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+.stacked-bar{display:flex;height:32px;border-radius:8px;overflow:hidden;margin:8px 0}
+.stacked-seg{display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;font-weight:500;transition:all .3s;cursor:pointer;min-width:2px}
+.stacked-seg:hover{filter:brightness(1.2);transform:scaleY(1.08)}
+.risk-dot{width:10px;height:10px;border-radius:50%;display:inline-block;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.waterfall-bar{transition:all .6s cubic-bezier(.22,1,.36,1)}
+.detail-panel{background:var(--card2);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-top:12px;animation:slideUp .3s ease-out}
+.section{display:none}.section.active{display:block}
+.glow{box-shadow:0 0 20px rgba(99,102,241,.1)}
+[data-theme="light"]{--bg:#f8fafc;--card:#ffffff;--card2:#f1f5f9;--border:#e2e8f0;--t1:#0f172a;--t2:#475569;--t3:#94a3b8;--accent:#6366f1;--teal:#14b8a6;--amber:#f59e0b}
+[data-theme="light"] h1{-webkit-text-fill-color:transparent}
+.theme-toggle{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--card);color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all .25s;flex-shrink:0}
+.theme-toggle:hover{border-color:var(--accent);color:var(--accent);background:var(--card2)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:8px">
+<div><h1>MCA Portfolio Analytics</h1><p class="sub">Enhanced Loan Tape &middot; As of March 16, 2026 &middot; 139 Advances</p></div>
+<div style="display:flex;align-items:center;gap:12px"><div style="text-align:right"><div style="font-size:11px;color:var(--t3)">Portfolio health</div><div id="healthDot" style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:13px;font-weight:600"></div></div><button class="theme-toggle" id="themeToggle" title="Toggle light/dark theme">&#9790;</button></div>
+</header>
+
+<div class="tabs" id="tabs">
+<button class="tab active" data-v="overview">Overview</button>
+<button class="tab" data-v="delinquency">Delinquency</button>
+<button class="tab" data-v="vintage">Vintage</button>
+<button class="tab" data-v="industry">Industry</button>
+<button class="tab" data-v="geography">Geography</button>
+<button class="tab" data-v="loans">Loan Explorer</button>
+</div>
+
+<div id="overview" class="section active">
+<div class="grid g4" id="metrics"></div>
+<div class="grid g2">
+<div class="card"><h3>Delinquency distribution (by $ outstanding)</h3><div class="stacked-bar" id="dpdStack"></div><div class="legend" id="dpdLegend"></div><div class="chart-wrap"><canvas id="dpdDonut"></canvas></div></div>
+<div class="card"><h3>Collection funnel</h3><div id="funnelBars"></div></div>
+</div>
+<div class="grid g2" style="margin-top:16px">
+<div class="card"><h3>Origination volume</h3><div class="chart-wrap"><canvas id="origChart"></canvas></div></div>
+<div class="card"><h3>Advance size distribution</h3><div class="chart-wrap"><canvas id="sizeChart"></canvas></div></div>
+</div>
+</div>
+
+<div id="delinquency" class="section">
+<div class="grid g2">
+<div class="card"><h3>DPD bucket analysis</h3><div id="dpdBuckets"></div></div>
+<div class="card"><h3>VOR haircut by DPD tier</h3><div class="chart-wrap"><canvas id="haircutChart"></canvas></div></div>
+</div>
+<div class="card" style="margin-top:16px"><h3>Watchlist &mdash; loans 10+ DPD</h3><div id="watchlist"></div></div>
+</div>
+
+<div id="vintage" class="section">
+<div class="grid g2">
+<div class="card"><h3>Vintage performance (avg DPD)</h3><div class="chart-wrap"><canvas id="vintPerf"></canvas></div></div>
+<div class="card"><h3>Vintage collections pace</h3><div class="chart-wrap"><canvas id="vintColl"></canvas></div></div>
+</div>
+</div>
+
+<div id="industry" class="section">
+<div class="card"><h3>Industry concentration</h3><div class="chart-wrap" style="height:400px"><canvas id="indChart"></canvas></div></div>
+<div class="card" style="margin-top:16px"><h3>PO vs VOR by industry</h3><div class="chart-wrap"><canvas id="poVorChart"></canvas></div></div>
+</div>
+
+<div id="geography" class="section">
+<div class="grid g2">
+<div class="card"><h3>Top states by advance</h3><div class="chart-wrap" style="height:380px"><canvas id="stateChart"></canvas></div></div>
+<div class="card"><h3>State DPD heatmap</h3><div id="stateHeat"></div></div>
+</div>
+</div>
+
+<div id="loans" class="section">
+<div class="filters" id="loanFilters"></div>
+<div class="card"><div style="overflow-x:auto"><table id="loanTable"><thead id="loanHead"></thead><tbody id="loanBody"></tbody></table></div></div>
+<div id="loanDetail"></div>
+</div>
+</div>
+
+<script>
+const D=[{"id":1,"n":"test","s":"Active","am":"Performing","a":10,"po":0,"v":0,"d":0,"f":null,"st":"NY","fr":"weekly","t":78.0,"sy":0,"nc":0,"o":"2025-08-11","ft":"New","nf":10,"ex":13,"p":0,"sp":true,"mc":true,"ac":true},{"id":4,"n":"OCAK LLC","s":"Active","am":"Performing","a":190000,"po":19570,"v":15580,"d":5,"f":503,"st":"DE","fr":"daily","t":295.0,"sy":0,"nc":72,"o":"2025-09-15","ft":"New","nf":81275,"ex":266000,"p":99225,"sp":false,"mc":false,"ac":false},{"id":5,"n":"HECTOR M ZARATE-LOZOYA","s":"Closed","am":"Performing","a":50000,"po":0,"v":0,"d":0,"f":684,"st":"CO","fr":"weekly","t":150.0,"sy":0,"nc":23,"o":"2025-09-16","ft":"New","nf":47500,"ex":72000,"p":0,"sp":false,"mc":false,"ac":false},{"id":6,"n":"P&THE MANUFACTURING MICHIGAN L","s":"Active","am":"Performing","a":450000,"po":74150,"v":74150,"d":0,"f":717,"st":"MI","fr":"weekly","t":284.0,"sy":0,"nc":33,"o":"2025-09-18","ft":"New","nf":280575,"ex":639000,"p":149175,"sp":true,"mc":true,"ac":true},{"id":8,"n":"DC TRUCKING INC","s":"Active","am":"Performing","a":100000,"po":0,"v":0,"d":0,"f":712,"st":"CA","fr":"weekly","t":227.0,"sy":0,"nc":48,"o":"2025-09-29","ft":"New","nf":96000,"ex":138000,"p":0,"sp":false,"mc":false,"ac":false},{"id":9,"n":"BEARTOWN METAL ROOFING SUPPLY ","s":"Active","am":"Performing","a":300000,"po":99923,"v":99923,"d":0,"f":616,"st":"PA","fr":"weekly","t":373.0,"sy":0,"nc":42,"o":"2025-09-30","ft":"New","nf":215650,"ex":432000,"p":75350,"sp":false,"mc":false,"ac":false},{"id":10,"n":"HELIX WIRELESS INC","s":"Active","am":"Performing","a":350000,"po":0,"v":0,"d":0,"f":708,"st":"NJ","fr":"weekly","t":198.0,"sy":0,"nc":51,"o":"2025-10-01","ft":"New","nf":332500,"ex":490000,"p":0,"sp":true,"mc":true,"ac":false},{"id":11,"n":"FORTUNE VENTURA INC.","s":"Active","am":"Performing","a":275000,"po":123979,"v":109083,"d":21,"f":null,"st":"NY","fr":"daily","t":354.0,"sy":0,"nc":42,"o":"2025-10-03","ft":"New","nf":264000,"ex":357500,"p":0,"sp":true,"mc":true,"ac":false},{"id":12,"n":"STAR TOBACCO AND VAPE LLC","s":"Active","am":"Performing","a":300000,"po":60300,"v":49950,"d":4,"f":499,"st":"GA","fr":"weekly","t":288.0,"sy":0,"nc":45,"o":"2025-10-06","ft":"New","nf":288000,"ex":414000,"p":0,"sp":false,"mc":false,"ac":false},{"id":13,"n":"WADIBIA HOSPITALITY GROUP, INC","s":"Active","am":"Performing","a":475000,"po":148946,"v":142838,"d":4,"f":654,"st":"NY","fr":"daily","t":308.0,"sy":0,"nc":72,"o":"2025-10-17","ft":"New","nf":302362,"ex":641250,"p":148888,"sp":false,"mc":false,"ac":false},{"id":14,"n":"SPANKY'S CHICKEN AND SEAFOOD L","s":"Closed","am":"Performing","a":42000,"po":0,"v":0,"d":0,"f":712,"st":"GA","fr":"weekly","t":237.0,"sy":0,"nc":72,"o":"2025-10-24","ft":"New","nf":40320,"ex":60900,"p":0,"sp":false,"mc":false,"ac":false},{"id":15,"n":"ALLIANCE HOME CARE AGENCY LLC","s":"Active","am":"Performing","a":20000,"po":0,"v":0,"d":6,"f":476,"st":"NC","fr":"daily","t":185.0,"sy":0,"nc":62,"o":"2025-10-27","ft":"New","nf":19000,"ex":29000,"p":0,"sp":false,"mc":false,"ac":false},{"id":17,"n":"CONNECTOR ATL LLC","s":"Active","am":"Performing","a":100000,"po":27000,"v":23222,"d":5,"f":538,"st":"GA","fr":"weekly","t":259.0,"sy":0,"nc":56,"o":"2025-11-03","ft":"New","nf":95000,"ex":136000,"p":0,"sp":false,"mc":false,"ac":false},{"id":20,"n":"CHANGING TURN COMMUNITY HEALTH","s":"Closed","am":"Performing","a":325000,"po":0,"v":0,"d":0,"f":652,"st":"MD","fr":"weekly","t":230.0,"sy":0,"nc":62,"o":"2025-11-05","ft":"New","nf":60550,"ex":474500,"p":248200,"sp":false,"mc":false,"ac":false},{"id":21,"n":"INNAYAH SERVICES, INC.","s":"Closed","am":"Performing","a":100000,"po":0,"v":0,"d":0,"f":664,"st":"NY","fr":"weekly","t":180.0,"sy":0,"nc":23,"o":"2025-11-06","ft":"New","nf":96000,"ex":139000,"p":0,"sp":false,"mc":false,"ac":false},{"id":18,"n":"NORTHERN HYDRAULICS & FLEET SE","s":"Active","am":"Legal","a":50000,"po":35105,"v":0,"d":77,"f":603,"st":"NH","fr":"weekly","t":270.0,"sy":0,"nc":81,"o":"2025-11-07","ft":"New","nf":48000,"ex":70000,"p":0,"sp":true,"mc":true,"ac":true},{"id":27,"n":"FLUSH PLUMBING GROUP LLC","s":"Active","am":"Legal","a":85000,"po":62280,"v":0,"d":68,"f":624,"st":"GA","fr":"weekly","t":338.0,"sy":0,"nc":23,"o":"2025-11-12","ft":"New","nf":80750,"ex":126650,"p":0,"sp":false,"mc":false,"ac":false},{"id":31,"n":"PRADO CF TRANSPORTATION LLC","s":"Active","am":"Performing","a":65000,"po":22354,"v":22354,"d":0,"f":642,"st":"FL","fr":"daily","t":237.0,"sy":0,"nc":48,"o":"2025-11-12","ft":"New","nf":21786,"ex":97500,"p":38664,"sp":true,"mc":true,"ac":true},{"id":29,"n":"FREIGHT MANAGEMENT LLC","s":"Closed","am":"Performing","a":100000,"po":0,"v":0,"d":0,"f":742,"st":"CA","fr":"weekly","t":200.0,"sy":0,"nc":48,"o":"2025-11-13","ft":"New","nf":96000,"ex":138000,"p":0,"sp":false,"mc":false,"ac":false},{"id":33,"n":"CENTRAL BACKUP LLC","s":"Active","am":"Performing","a":440000,"po":215059,"v":96800,"d":49,"f":709,"st":"FL","fr":"daily","t":242.0,"sy":0,"nc":23,"o":"2025-11-13","ft":"New","nf":162500,"ex":642400,"p":255500,"sp":true,"mc":true,"ac":true},{"id":37,"n":"HALL'S ON THE RIVER","s":"Active","am":"Performing","a":135000,"po":18437,"v":15621,"d":4,"f":610,"st":"KY","fr":"daily","t":206.0,"sy":0,"nc":72,"o":"2025-11-18","ft":"New","nf":41693,"ex":197100,"p":86557,"sp":false,"mc":false,"ac":false},{"id":40,"n":"J. W. LOGISTICS, LLC","s":"Closed","am":"Performing","a":600000,"po":0,"v":0,"d":0,"f":659,"st":"TX","fr":"weekly","t":215.0,"sy":0,"nc":48,"o":"2025-11-21","ft":"New","nf":200665,"ex":840000,"p":375335,"sp":false,"mc":false,"ac":false},{"id":43,"n":"BRICK TAVERN GROCERY INC","s":"Closed","am":"Performing","a":25000,"po":0,"v":0,"d":0,"f":545,"st":"NY","fr":"weekly","t":173.0,"sy":0,"nc":44,"o":"2025-11-21","ft":"New","nf":23750,"ex":35000,"p":0,"sp":false,"mc":false,"ac":false},{"id":45,"n":"E & M Services LLC","s":"Active","am":"Legal","a":475000,"po":315590,"v":291365,"d":41,"f":790,"st":"ND","fr":"weekly","t":562.0,"sy":0,"nc":42,"o":"2025-11-25","ft":"New","nf":451250,"ex":646000,"p":0,"sp":true,"mc":true,"ac":true},{"id":44,"n":"PACIFIC NETWORK MEDIA LLC","s":"Active","am":"Performing","a":40000,"po":18500,"v":18500,"d":0,"f":641,"st":"IL","fr":"weekly","t":282.0,"sy":0,"nc":45,"o":"2025-11-26","ft":"New","nf":39200,"ex":55200,"p":0,"sp":false,"mc":false,"ac":false},{"id":48,"n":"RUCKLE CONSTRUCTION & REALTY I","s":"Active","am":"Performing","a":200000,"po":118750,"v":112500,"d":26,"f":686,"st":"NC","fr":"weekly","t":338.0,"sy":0,"nc":23,"o":"2025-11-26","ft":"New","nf":190000,"ex":300000,"p":0,"sp":true,"mc":true,"ac":false},{"id":49,"n":"JAMES M SMITH","s":"Active","am":"Performing","a":160000,"po":58933,"v":58933,"d":0,"f":647,"st":"MO","fr":"weekly","t":254.0,"sy":0,"nc":42,"o":"2025-11-26","ft":"New","nf":153600,"ex":227200,"p":0,"sp":false,"mc":false,"ac":false},{"id":51,"n":"BLUE SKY SOLUTIONS GROUP, LLC","s":"Active","am":"Performing","a":59100,"po":0,"v":0,"d":0,"f":686,"st":"GA","fr":"weekly","t":275.0,"sy":0,"nc":56,"o":"2025-12-01","ft":"New","nf":56145,"ex":84513,"p":0,"sp":false,"mc":false,"ac":false},{"id":52,"n":"Shark Infinity LLC","s":"Active","am":"Legal","a":30000,"po":27600,"v":0,"d":95,"f":669,"st":"NV","fr":"weekly","t":212.0,"sy":0,"nc":72,"o":"2025-12-01","ft":"New","nf":29100,"ex":45000,"p":0,"sp":false,"mc":false,"ac":false},{"id":53,"n":"LAURYS BAKERY AND CAKE INC","s":"Active","am":"Performing","a":40000,"po":15127,"v":14055,"d":5,"f":513,"st":"IL","fr":"daily","t":220.0,"sy":0,"nc":31,"o":"2025-12-01","ft":"New","nf":23786,"ex":53600,"p":14214,"sp":false,"mc":true,"ac":true},{"id":60,"n":"EXECUTIVE TRANSPORTATION INC","s":"Active","am":"Performing","a":75000,"po":29488,"v":27556,"d":5,"f":553,"st":"DE","fr":"daily","t":251.0,"sy":0,"nc":48,"o":"2025-12-03","ft":"New","nf":43601,"ex":109500,"p":28399,"sp":false,"mc":false,"ac":false},{"id":58,"n":"VMP CONCRETE INC","s":"Active","am":"Performing","a":250000,"po":149135,"v":149135,"d":0,"f":633,"st":"CA","fr":"weekly","t":366.0,"sy":0,"nc":23,"o":"2025-12-03","ft":"New","nf":240000,"ex":337500,"p":0,"sp":false,"mc":false,"ac":false},{"id":61,"n":"SPANKY'S CHICKEN AND SEAFOOD L","s":"Active","am":"Performing","a":140000,"po":69197,"v":65738,"d":5,"f":712,"st":"GA","fr":"daily","t":250.0,"sy":0,"nc":72,"o":"2025-12-03","ft":"Renewal","nf":36199,"ex":196000,"p":98201,"sp":false,"mc":true,"ac":true},{"id":55,"n":"KIMBERLYS KIDS LLC","s":"Active","am":"Performing","a":15000,"po":0,"v":0,"d":4,"f":600,"st":"GA","fr":"weekly","t":142.0,"sy":0,"nc":72,"o":"2025-12-03","ft":"New","nf":14250,"ex":22200,"p":0,"sp":false,"mc":false,"ac":false},{"id":56,"n":"CLEAN FIRST CLASS, LLC","s":"Active","am":"Performing","a":25000,"po":11335,"v":11335,"d":0,"f":583,"st":"NY","fr":"weekly","t":240.0,"sy":0,"nc":56,"o":"2025-12-03","ft":"New","nf":24250,"ex":35500,"p":0,"sp":true,"mc":true,"ac":false},{"id":54,"n":"RENOVATIONS STATION INC","s":"Active","am":"Performing","a":60000,"po":24141,"v":21794,"d":4,"f":719,"st":"MA","fr":"weekly","t":240.0,"sy":0,"nc":23,"o":"2025-12-03","ft":"New","nf":57000,"ex":79800,"p":0,"sp":false,"mc":false,"ac":false},{"id":63,"n":"MOBILTYMATTERS LLC","s":"Active","am":"Legal","a":261600,"po":150420,"v":139520,"d":12,"f":700,"st":"GA","fr":"weekly","t":256.0,"sy":0,"nc":54,"o":"2025-12-04","ft":"New","nf":248520,"ex":392400,"p":0,"sp":true,"mc":true,"ac":true},{"id":64,"n":"RVA REINFORCING STEEL LLC","s":"Active","am":"Slow Pay","a":60000,"po":36780,"v":28380,"d":25,"f":648,"st":"AZ","fr":"daily","t":284.0,"sy":0,"nc":42,"o":"2025-12-05","ft":"New","nf":58200,"ex":84000,"p":0,"sp":false,"mc":true,"ac":true},{"id":68,"n":"AMERICAN SANITARY PRODUCTS, IN","s":"Active","am":"Performing","a":400000,"po":162800,"v":162800,"d":0,"f":null,"st":"AZ","fr":"weekly","t":247.0,"sy":0,"nc":42,"o":"2025-12-09","ft":"New","nf":321559,"ex":548000,"p":60441,"sp":false,"mc":false,"ac":false},{"id":74,"n":"FCS AG CORP","s":"Active","am":"Performing","a":200000,"po":114500,"v":108250,"d":5,"f":758,"st":"CA","fr":"weekly","t":338.0,"sy":0,"nc":56,"o":"2025-12-10","ft":"New","nf":192000,"ex":300000,"p":0,"sp":false,"mc":false,"ac":false},{"id":75,"n":"CHANGING TURN COMMUNITY HEALTH","s":"Active","am":"Performing","a":580000,"po":74334,"v":74334,"d":0,"f":655,"st":"MD","fr":"weekly","t":235.0,"sy":0,"nc":62,"o":"2025-12-11","ft":"Renewal","nf":150641,"ex":841000,"p":400359,"sp":true,"mc":true,"ac":false},{"id":76,"n":"PARKWAY PAVING, LLC","s":"Active","am":"Performing","a":210000,"po":97731,"v":89654,"d":1,"f":667,"st":"NJ","fr":"weekly","t":277.0,"sy":0,"nc":23,"o":"2025-12-11","ft":"New","nf":199500,"ex":315000,"p":0,"sp":false,"mc":true,"ac":false},{"id":79,"n":"PINE CREEK SEED FARM LLC","s":"Active","am":"Performing","a":150000,"po":73000,"v":67208,"d":1,"f":730,"st":"PA","fr":"weekly","t":254.0,"sy":0,"nc":11,"o":"2025-12-15","ft":"New","nf":142500,"ex":208500,"p":0,"sp":false,"mc":false,"ac":false},{"id":80,"n":"FORTUNE VENTURA INC.","s":"Active","am":"Performing","a":180000,"po":77400,"v":61800,"d":19,"f":529,"st":"NY","fr":"daily","t":177.0,"sy":0,"nc":42,"o":"2025-12-15","ft":"New","nf":171000,"ex":234000,"p":0,"sp":true,"mc":true,"ac":false},{"id":70,"n":"HECTOR M ZARATE-LOZOYA","s":"Active","am":"Performing","a":90000,"po":31500,"v":21780,"d":15,"f":684,"st":"CO","fr":"daily","t":177.0,"sy":0,"nc":23,"o":"2025-12-16","ft":"Renewal","nf":55150,"ex":129600,"p":30350,"sp":true,"mc":true,"ac":false},{"id":86,"n":"Olive Branch Consulting Ltd","s":"Active","am":"Performing","a":25000,"po":4502,"v":1150,"d":12,"f":671,"st":"NY","fr":"daily","t":144.0,"sy":0,"nc":54,"o":"2025-12-19","ft":"New","nf":23500,"ex":37250,"p":0,"sp":false,"mc":true,"ac":true},{"id":87,"n":"L & K CONSTRUCTION LLC","s":"Active","am":"Slow Pay","a":100000,"po":50600,"v":44118,"d":12,"f":643,"st":"AL","fr":"weekly","t":242.0,"sy":0,"nc":23,"o":"2025-12-19","ft":"New","nf":95000,"ex":148000,"p":0,"sp":false,"mc":true,"ac":true},{"id":93,"n":"SPORT CASUALS INTERNATIONAL LL","s":"Active","am":"Performing","a":520000,"po":294667,"v":275600,"d":5,"f":755,"st":"KY","fr":"weekly","t":254.0,"sy":0,"nc":33,"o":"2025-12-23","ft":"New","nf":504400,"ex":686400,"p":0,"sp":false,"mc":false,"ac":false},{"id":89,"n":"FULL KEEL MARINE LLC","s":"Active","am":"Performing","a":90000,"po":38310,"v":38310,"d":0,"f":549,"st":"RI","fr":"weekly","t":218.0,"sy":0,"nc":71,"o":"2025-12-24","ft":"New","nf":85500,"ex":128700,"p":0,"sp":false,"mc":false,"ac":false},{"id":95,"n":"SOLO MOTORSPORTS LLC","s":"Active","am":"Performing","a":225000,"po":124676,"v":115544,"d":1,"f":711,"st":"GA","fr":"weekly","t":240.0,"sy":0,"nc":81,"o":"2025-12-30","ft":"New","nf":216000,"ex":310500,"p":0,"sp":false,"mc":false,"ac":false},{"id":98,"n":"LAURYS BAKERY AND CAKE INC","s":"Active","am":"Performing","a":8000,"po":2454,"v":2133,"d":5,"f":513,"st":"IL","fr":"daily","t":148.0,"sy":0,"nc":31,"o":"2025-12-31","ft":"New","nf":7600,"ex":10720,"p":0,"sp":false,"mc":false,"ac":false},{"id":96,"n":"SARACINA CONCRETE LLC","s":"Active","am":"Performing","a":30000,"po":11925,"v":4050,"d":26,"f":587,"st":"ME","fr":"weekly","t":148.0,"sy":0,"nc":23,"o":"2025-12-31","ft":"New","nf":27000,"ex":45000,"p":0,"sp":true,"mc":true,"ac":true},{"id":100,"n":"SUSTAINABLE STAFFING, INC.","s":"Active","am":"Performing","a":150000,"po":94846,"v":94846,"d":0,"f":671,"st":"IL","fr":"weekly","t":275.0,"sy":0,"nc":56,"o":"2026-01-07","ft":"New","nf":144000,"ex":213000,"p":0,"sp":false,"mc":false,"ac":false},{"id":101,"n":"SUNSHINE HOMES INC","s":"Active","am":"Performing","a":70000,"po":39632,"v":39632,"d":0,"f":690,"st":"IA","fr":"weekly","t":240.0,"sy":0,"nc":62,"o":"2026-01-07","ft":"New","nf":66500,"ex":101500,"p":0,"sp":false,"mc":false,"ac":false},{"id":105,"n":"National Special Force LLC","s":"Active","am":"Performing","a":15000,"po":9150,"v":6600,"d":19,"f":null,"st":"TX","fr":"weekly","t":172.0,"sy":0,"nc":56,"o":"2026-01-09","ft":"New","nf":14250,"ex":20400,"p":0,"sp":false,"mc":false,"ac":false},{"id":108,"n":"VALENCIA AUTOMOTIVE LLC","s":"Active","am":"Performing","a":11000,"po":5643,"v":5643,"d":0,"f":null,"st":"CA","fr":"daily","t":178.0,"sy":0,"nc":81,"o":"2026-01-09","ft":"New","nf":10450,"ex":15180,"p":0,"sp":false,"mc":true,"ac":false},{"id":103,"n":"MATT KOMOROSKI SHOES, LLC","s":"Active","am":"Performing","a":300000,"po":172500,"v":158438,"d":5,"f":745,"st":"MI","fr":"weekly","t":228.0,"sy":0,"nc":44,"o":"2026-01-09","ft":"New","nf":158438,"ex":450000,"p":126562,"sp":false,"mc":false,"ac":false},{"id":107,"n":"DENVER BIAS INC","s":"Active","am":"Performing","a":60000,"po":34842,"v":34842,"d":0,"f":706,"st":"CO","fr":"weekly","t":240.0,"sy":0,"nc":33,"o":"2026-01-12","ft":"New","nf":57000,"ex":87600,"p":0,"sp":false,"mc":false,"ac":false},{"id":109,"n":"ARTLUX BUILDERS CORP","s":"Active","am":"Performing","a":100000,"po":57097,"v":52774,"d":1,"f":634,"st":"CA","fr":"weekly","t":219.0,"sy":0,"nc":23,"o":"2026-01-12","ft":"New","nf":69200,"ex":134000,"p":26800,"sp":false,"mc":false,"ac":false},{"id":110,"n":"PATRIOTS INC","s":"Active","am":"Slow Pay","a":100000,"po":71646,"v":50415,"d":28,"f":722,"st":"VA","fr":"daily","t":184.0,"sy":0,"nc":23,"o":"2026-01-12","ft":"New","nf":95000,"ex":138000,"p":0,"sp":false,"mc":true,"ac":true},{"id":111,"n":"VELOO LOGISTICS INC","s":"Active","am":"Performing","a":30000,"po":13600,"v":12110,"d":6,"f":686,"st":"MI","fr":"daily","t":176.0,"sy":0,"nc":48,"o":"2026-01-12","ft":"New","nf":28500,"ex":44700,"p":0,"sp":false,"mc":false,"ac":false},{"id":112,"n":"CHANNEL MARK CONSTRUCTION, INC","s":"Active","am":"Performing","a":150000,"po":97219,"v":90750,"d":5,"f":726,"st":"FL","fr":"weekly","t":228.0,"sy":0,"nc":23,"o":"2026-01-15","ft":"New","nf":142500,"ex":207000,"p":0,"sp":false,"mc":false,"ac":false},{"id":122,"n":"Elk Unlimited, LLC","s":"Active","am":"Performing","a":17500,"po":10544,"v":10544,"d":0,"f":null,"st":"TX","fr":"weekly","t":198.0,"sy":0,"nc":81,"o":"2026-01-20","ft":"New","nf":16625,"ex":24325,"p":0,"sp":false,"mc":false,"ac":false},{"id":124,"n":"CW Electrical LLC","s":"Active","am":"Performing","a":9000,"po":5033,"v":4280,"d":8,"f":null,"st":"KY","fr":"daily","t":146.0,"sy":0,"nc":23,"o":"2026-01-20","ft":"New","nf":8550,"ex":13140,"p":0,"sp":true,"mc":true,"ac":true},{"id":126,"n":"SUPER HOT BINZ, LLC","s":"Active","am":"Performing","a":250000,"po":169531,"v":169531,"d":0,"f":783,"st":"TN","fr":"weekly","t":226.0,"sy":0,"nc":45,"o":"2026-01-21","ft":"New","nf":237500,"ex":362500,"p":0,"sp":false,"mc":true,"ac":false},{"id":127,"n":"WHATEVERYOUWANT-WEYW LLC","s":"Active","am":"Performing","a":10000,"po":5556,"v":4898,"d":5,"f":null,"st":"NY","fr":"weekly","t":152.0,"sy":0,"nc":45,"o":"2026-01-22","ft":"New","nf":9500,"ex":13800,"p":0,"sp":false,"mc":false,"ac":false},{"id":129,"n":"GONZALEZ ROAD SERVICES LLC","s":"Active","am":"Performing","a":10600,"po":1558,"v":785,"d":5,"f":null,"st":"CA","fr":"daily","t":90.0,"sy":0,"nc":48,"o":"2026-01-22","ft":"New","nf":10070,"ex":15476,"p":0,"sp":false,"mc":false,"ac":false},{"id":131,"n":"DAZEY CHURN FLOWER FARM LLC","s":"Active","am":"Performing","a":12000,"po":7020,"v":6290,"d":5,"f":null,"st":"MO","fr":"weekly","t":170.0,"sy":0,"nc":45,"o":"2026-01-26","ft":"New","nf":11400,"ex":17520,"p":0,"sp":false,"mc":false,"ac":false},{"id":137,"n":"Employment Resources & Solutio","s":"Active","am":"Performing","a":12500,"po":7971,"v":7567,"d":5,"f":null,"st":"CA","fr":"daily","t":189.0,"sy":0,"nc":56,"o":"2026-01-29","ft":"New","nf":11875,"ex":17500,"p":0,"sp":false,"mc":false,"ac":false},{"id":138,"n":"Patrick R Navarro","s":"Active","am":"Performing","a":14300,"po":10006,"v":9623,"d":5,"f":null,"st":"SC","fr":"daily","t":232.0,"sy":0,"nc":81,"o":"2026-01-29","ft":"New","nf":13585,"ex":20449,"p":0,"sp":false,"mc":false,"ac":false},{"id":139,"n":"Redfire Consulting LLC","s":"Active","am":"Performing","a":6500,"po":3539,"v":3012,"d":5,"f":null,"st":"IL","fr":"weekly","t":137.0,"sy":0,"nc":54,"o":"2026-01-29","ft":"New","nf":6175,"ex":9490,"p":0,"sp":false,"mc":false,"ac":false},{"id":141,"n":"Vibra Cocina, LLC","s":"Active","am":"Performing","a":7000,"po":4705,"v":4113,"d":11,"f":null,"st":"DC","fr":"daily","t":178.0,"sy":0,"nc":72,"o":"2026-01-30","ft":"New","nf":6650,"ex":10150,"p":0,"sp":false,"mc":false,"ac":false},{"id":142,"n":"Jetts Discount, LLC","s":"Active","am":"Performing","a":7000,"po":4022,"v":3730,"d":5,"f":null,"st":"IN","fr":"daily","t":157.0,"sy":0,"nc":45,"o":"2026-01-30","ft":"New","nf":6650,"ex":10220,"p":0,"sp":false,"mc":false,"ac":false},{"id":143,"n":"New Jersey Recovery Service- L","s":"Active","am":"Performing","a":10000,"po":5747,"v":5330,"d":5,"f":null,"st":"NJ","fr":"daily","t":147.0,"sy":0,"nc":48,"o":"2026-01-30","ft":"New","nf":9500,"ex":13900,"p":0,"sp":false,"mc":false,"ac":false},{"id":149,"n":"CS & Sons Equipment Rentals & ","s":"Active","am":"Performing","a":50000,"po":37643,"v":35179,"d":5,"f":null,"st":"CA","fr":"weekly","t":198.0,"sy":0,"nc":53,"o":"2026-02-03","ft":"New","nf":47500,"ex":69000,"p":0,"sp":false,"mc":false,"ac":false},{"id":140,"n":"J. W. LOGISTICS, LLC","s":"Active","am":"Performing","a":915000,"po":664900,"v":664900,"d":0,"f":659,"st":"TX","fr":"weekly","t":212.0,"sy":0,"nc":48,"o":"2026-02-03","ft":"Renewal","nf":402400,"ex":1281000,"p":476000,"sp":true,"mc":true,"ac":false},{"id":146,"n":"Paint Pro America LLC","s":"Active","am":"Performing","a":5000,"po":3025,"v":2749,"d":6,"f":null,"st":"FL","fr":"daily","t":147.0,"sy":0,"nc":23,"o":"2026-02-03","ft":"New","nf":4750,"ex":6900,"p":0,"sp":false,"mc":false,"ac":false},{"id":147,"n":"Blaze Fire and Security LLC","s":"Active","am":"Performing","a":8000,"po":4356,"v":4356,"d":0,"f":null,"st":"FL","fr":"weekly","t":128.0,"sy":0,"nc":23,"o":"2026-02-03","ft":"New","nf":7600,"ex":11680,"p":0,"sp":false,"mc":false,"ac":false},{"id":150,"n":"Far Fetched PetQuarters LLC","s":"Active","am":"Performing","a":7000,"po":4512,"v":4245,"d":5,"f":null,"st":"VA","fr":"daily","t":162.0,"sy":0,"nc":81,"o":"2026-02-05","ft":"New","nf":6650,"ex":9800,"p":0,"sp":false,"mc":false,"ac":false},{"id":151,"n":"J & C Sealcoat & Striping Inc","s":"Active","am":"Performing","a":15000,"po":9840,"v":9840,"d":0,"f":null,"st":"FL","fr":"daily","t":147.0,"sy":0,"nc":23,"o":"2026-02-05","ft":"New","nf":14250,"ex":21000,"p":0,"sp":false,"mc":true,"ac":false},{"id":152,"n":"Perennial Benefit Corp","s":"Active","am":"Performing","a":20000,"po":14830,"v":14309,"d":5,"f":null,"st":"AL","fr":"daily","t":232.0,"sy":0,"nc":72,"o":"2026-02-05","ft":"New","nf":19000,"ex":27800,"p":0,"sp":false,"mc":false,"ac":false},{"id":153,"n":"VIP Beauty Bar Hair Salon LLC","s":"Active","am":"Performing","a":10000,"po":6447,"v":6182,"d":4,"f":null,"st":"FL","fr":"daily","t":161.0,"sy":0,"nc":81,"o":"2026-02-05","ft":"New","nf":9500,"ex":14600,"p":0,"sp":false,"mc":false,"ac":false},{"id":154,"n":"Sanmaster Automotive, Inc","s":"Active","am":"Performing","a":20000,"po":13647,"v":12917,"d":5,"f":null,"st":"CA","fr":"daily","t":178.0,"sy":0,"nc":81,"o":"2026-02-06","ft":"New","nf":19000,"ex":29200,"p":0,"sp":false,"mc":false,"ac":false},{"id":156,"n":"Pro-Mint Cleaning, LLC","s":"Active","am":"Performing","a":5000,"po":3047,"v":2803,"d":5,"f":null,"st":"MD","fr":"daily","t":134.0,"sy":0,"nc":56,"o":"2026-02-10","ft":"New","nf":4750,"ex":7300,"p":0,"sp":false,"mc":false,"ac":false},{"id":157,"n":"BSD, LLC.","s":"Active","am":"Performing","a":18000,"po":13629,"v":12934,"d":6,"f":null,"st":"MI","fr":"daily","t":204.0,"sy":0,"nc":71,"o":"2026-02-10","ft":"New","nf":17100,"ex":24300,"p":0,"sp":false,"mc":false,"ac":false},{"id":158,"n":"Simply Stella Rose LLC","s":"Active","am":"Performing","a":20000,"po":15544,"v":14776,"d":6,"f":null,"st":"IA","fr":"daily","t":218.0,"sy":0,"nc":45,"o":"2026-02-12","ft":"New","nf":19000,"ex":28800,"p":0,"sp":false,"mc":false,"ac":false},{"id":159,"n":"The Pub on 1 NPVD LLC","s":"Active","am":"Performing","a":20000,"po":15012,"v":14348,"d":5,"f":null,"st":"RI","fr":"daily","t":189.0,"sy":0,"nc":72,"o":"2026-02-13","ft":"New","nf":19000,"ex":28800,"p":0,"sp":false,"mc":false,"ac":false},{"id":166,"n":"The King Of The Grill Express ","s":"Active","am":"Performing","a":13500,"po":11213,"v":10854,"d":5,"f":null,"st":"MI","fr":"daily","t":224.0,"sy":0,"nc":72,"o":"2026-02-17","ft":"New","nf":12825,"ex":19710,"p":0,"sp":false,"mc":true,"ac":false},{"id":167,"n":"Mastermyr Builders LLC","s":"Active","am":"Performing","a":10000,"po":7750,"v":7167,"d":4,"f":null,"st":"AL","fr":"weekly","t":175.0,"sy":0,"nc":23,"o":"2026-02-17","ft":"New","nf":9500,"ex":14000,"p":0,"sp":false,"mc":false,"ac":false},{"id":165,"n":"Vista Brakes and Complete Auto","s":"Active","am":"Performing","a":15000,"po":11933,"v":11359,"d":6,"f":null,"st":"CA","fr":"daily","t":205.0,"sy":0,"nc":81,"o":"2026-02-17","ft":"New","nf":14250,"ex":21300,"p":0,"sp":false,"mc":false,"ac":false},{"id":168,"n":"Raul Uriel Valenzuela-Felix","s":"Active","am":"Performing","a":13000,"po":11318,"v":11318,"d":0,"f":null,"st":"UT","fr":"daily","t":181.0,"sy":0,"nc":33,"o":"2026-02-18","ft":"New","nf":12610,"ex":17940,"p":0,"sp":false,"mc":true,"ac":false},{"id":169,"n":"BRICK TAVERN GROCERY INC","s":"Active","am":"Performing","a":30000,"po":21042,"v":21042,"d":0,"f":545,"st":"NY","fr":"weekly","t":149.0,"sy":0,"nc":44,"o":"2026-02-18","ft":"Renewal","nf":10965,"ex":42000,"p":17535,"sp":true,"mc":true,"ac":false},{"id":171,"n":"Hip Hound LLC","s":"Active","am":"Performing","a":6500,"po":4839,"v":4394,"d":1,"f":null,"st":"CA","fr":"weekly","t":142.0,"sy":0,"nc":0,"o":"2026-02-18","ft":"New","nf":6175,"ex":8905,"p":0,"sp":false,"mc":false,"ac":false},{"id":172,"n":"Reel Automotive Services LLC","s":"Active","am":"Performing","a":10000,"po":7359,"v":6580,"d":6,"f":null,"st":"MD","fr":"daily","t":118.0,"sy":0,"nc":81,"o":"2026-02-18","ft":"New","nf":9500,"ex":14600,"p":0,"sp":false,"mc":true,"ac":false},{"id":175,"n":"Adrenalina Company, LLC","s":"Active","am":"Performing","a":7500,"po":5686,"v":5378,"d":5,"f":null,"st":"FL","fr":"daily","t":146.0,"sy":0,"nc":81,"o":"2026-02-19","ft":"New","nf":7125,"ex":10275,"p":0,"sp":false,"mc":false,"ac":false},{"id":177,"n":"MRP Mechanical Corp","s":"Active","am":"Performing","a":25000,"po":20437,"v":19727,"d":5,"f":null,"st":"NY","fr":"daily","t":217.0,"sy":0,"nc":23,"o":"2026-02-19","ft":"New","nf":23750,"ex":35500,"p":0,"sp":false,"mc":false,"ac":false},{"id":176,"n":"ALL IN ONE APPLIANCES LLC","s":"Active","am":"Performing","a":60000,"po":49800,"v":45750,"d":5,"f":726,"st":"CA","fr":"weekly","t":144.0,"sy":0,"nc":45,"o":"2026-02-20","ft":"New","nf":57900,"ex":81000,"p":0,"sp":false,"mc":false,"ac":false},{"id":182,"n":"Miguel Antonio Vargas","s":"Active","am":"Performing","a":10000,"po":7647,"v":7183,"d":5,"f":null,"st":"CA","fr":"daily","t":133.0,"sy":0,"nc":56,"o":"2026-02-23","ft":"New","nf":9500,"ex":13900,"p":0,"sp":false,"mc":false,"ac":false},{"id":179,"n":"Knudsen Racing Stables LLC","s":"Active","am":"Performing","a":10000,"po":8503,"v":7838,"d":8,"f":null,"st":"LA","fr":"daily","t":186.0,"sy":0,"nc":62,"o":"2026-02-23","ft":"New","nf":9500,"ex":14400,"p":0,"sp":false,"mc":false,"ac":false},{"id":180,"n":"Jet Tek Watersports Palm Beach","s":"Active","am":"Performing","a":23250,"po":19298,"v":18600,"d":5,"f":null,"st":"FL","fr":"daily","t":203.0,"sy":0,"nc":81,"o":"2026-02-23","ft":"New","nf":22088,"ex":32550,"p":0,"sp":false,"mc":false,"ac":false},{"id":181,"n":"CASEY VENTURES INC","s":"Active","am":"Performing","a":75000,"po":64768,"v":61152,"d":1,"f":834,"st":"CO","fr":"weekly","t":205.0,"sy":0,"nc":45,"o":"2026-02-23","ft":"New","nf":72000,"ex":101250,"p":0,"sp":false,"mc":false,"ac":false},{"id":183,"n":"Mastermyr Builders LLC","s":"Active","am":"Performing","a":10000,"po":8333,"v":7750,"d":4,"f":null,"st":"AL","fr":"weekly","t":170.0,"sy":0,"nc":23,"o":"2026-02-23","ft":"New","nf":9500,"ex":14000,"p":0,"sp":false,"mc":false,"ac":false},{"id":185,"n":"FREIGHT MANAGEMENT LLC","s":"Active","am":"Performing","a":135000,"po":117956,"v":117956,"d":0,"f":742,"st":"CA","fr":"weekly","t":226.0,"sy":0,"nc":48,"o":"2026-02-24","ft":"Renewal","nf":60600,"ex":186300,"p":69000,"sp":false,"mc":false,"ac":false},{"id":186,"n":"True Love Coffee","s":"Active","am":"Performing","a":6000,"po":4496,"v":4167,"d":5,"f":null,"st":"CA","fr":"daily","t":118.0,"sy":0,"nc":72,"o":"2026-02-24","ft":"New","nf":5700,"ex":8760,"p":0,"sp":false,"mc":false,"ac":false},{"id":178,"n":"STREET SHINE AUTO DETAIL LLC","s":"Active","am":"Performing","a":110000,"po":96360,"v":91272,"d":5,"f":525,"st":"HI","fr":"weekly","t":226.0,"sy":0,"nc":81,"o":"2026-02-24","ft":"New","nf":104500,"ex":162800,"p":0,"sp":false,"mc":false,"ac":false},{"id":187,"n":"T & J Medine LLC","s":"Active","am":"Performing","a":21500,"po":18544,"v":17979,"d":5,"f":null,"st":"LA","fr":"daily","t":232.0,"sy":0,"nc":72,"o":"2026-02-25","ft":"New","nf":20425,"ex":30100,"p":0,"sp":false,"mc":false,"ac":false},{"id":189,"n":"OCAK LLC","s":"Active","am":"Performing","a":75000,"po":59750,"v":56300,"d":5,"f":538,"st":"DE","fr":"daily","t":132.0,"sy":0,"nc":72,"o":"2026-02-26","ft":"New","nf":71250,"ex":103500,"p":0,"sp":false,"mc":false,"ac":false},{"id":163,"n":"TAMPON TRIBE, INC.","s":"Active","am":"Performing","a":40000,"po":34706,"v":34706,"d":0,"f":643,"st":"CA","fr":"weekly","t":480.0,"sy":0,"nc":45,"o":"2026-02-26","ft":"New","nf":38000,"ex":56000,"p":0,"sp":false,"mc":false,"ac":false},{"id":188,"n":"BCB Restaurant Group LLC","s":"Active","am":"Performing","a":250000,"po":221842,"v":221842,"d":0,"f":795,"st":"TN","fr":"weekly","t":270.0,"sy":0,"nc":72,"o":"2026-02-26","ft":"New","nf":240000,"ex":345000,"p":0,"sp":false,"mc":false,"ac":false},{"id":190,"n":"DOS PESOS, INC.","s":"Active","am":"Performing","a":40000,"po":32604,"v":30805,"d":5,"f":523,"st":"MI","fr":"daily","t":146.0,"sy":0,"nc":72,"o":"2026-02-27","ft":"New","nf":38000,"ex":59960,"p":0,"sp":false,"mc":false,"ac":false},{"id":191,"n":"After Hours Designs, LLC","s":"Active","am":"Performing","a":20000,"po":17300,"v":17300,"d":0,"f":null,"st":"GA","fr":"weekly","t":229.0,"sy":0,"nc":45,"o":"2026-02-27","ft":"New","nf":19000,"ex":27200,"p":0,"sp":false,"mc":false,"ac":false},{"id":192,"n":"M & M Alencar Sound Installati","s":"Active","am":"Performing","a":6000,"po":5116,"v":4897,"d":5,"f":null,"st":"CT","fr":"daily","t":174.0,"sy":0,"nc":44,"o":"2026-02-27","ft":"New","nf":5700,"ex":8760,"p":0,"sp":false,"mc":false,"ac":false},{"id":193,"n":"JASA Tradeschool, LLC","s":"Active","am":"Performing","a":20000,"po":17302,"v":16665,"d":5,"f":null,"st":"VA","fr":"daily","t":186.0,"sy":0,"nc":61,"o":"2026-03-02","ft":"New","nf":19000,"ex":27600,"p":0,"sp":false,"mc":false,"ac":false},{"id":194,"n":"THE BUSHWICK DINER INC.","s":"Active","am":"Performing","a":100000,"po":90781,"v":86562,"d":1,"f":629,"st":"NY","fr":"weekly","t":226.0,"sy":0,"nc":72,"o":"2026-03-03","ft":"New","nf":95000,"ex":135000,"p":0,"sp":false,"mc":false,"ac":false},{"id":195,"n":"JTB&B SERVICES LLC","s":"Active","am":"Performing","a":30000,"po":27507,"v":25023,"d":5,"f":456,"st":"NM","fr":"weekly","t":128.0,"sy":0,"nc":48,"o":"2026-03-04","ft":"New","nf":28500,"ex":44700,"p":0,"sp":false,"mc":false,"ac":false},{"id":197,"n":"ST BESSS KITCHEN ENTERPRISE LL","s":"Active","am":"Performing","a":82000,"po":75147,"v":75147,"d":0,"f":614,"st":"FL","fr":"weekly","t":198.0,"sy":0,"nc":72,"o":"2026-03-04","ft":"New","nf":79540,"ex":123000,"p":0,"sp":false,"mc":false,"ac":false},{"id":199,"n":"Touchstone Landscaping L.L.C.","s":"Active","am":"Performing","a":7400,"po":6355,"v":5950,"d":5,"f":null,"st":"NJ","fr":"daily","t":118.0,"sy":0,"nc":56,"o":"2026-03-04","ft":"New","nf":7030,"ex":10804,"p":0,"sp":false,"mc":false,"ac":false},{"id":203,"n":"FRS GROUP INC","s":"Active","am":"Performing","a":50000,"po":45240,"v":43170,"d":5,"f":686,"st":"FL","fr":"daily","t":146.0,"sy":0,"nc":42,"o":"2026-03-06","ft":"New","nf":31088,"ex":69000,"p":16912,"sp":false,"mc":false,"ac":false},{"id":204,"n":"International Corner Caf\u00e9 , LL","s":"Active","am":"Performing","a":12000,"po":10872,"v":10476,"d":5,"f":null,"st":"FL","fr":"daily","t":189.0,"sy":0,"nc":72,"o":"2026-03-06","ft":"New","nf":11400,"ex":17040,"p":0,"sp":false,"mc":false,"ac":false},{"id":201,"n":"INNAYAH SERVICES, INC.","s":"Active","am":"Performing","a":100000,"po":92525,"v":89050,"d":5,"f":null,"st":"NY","fr":"daily","t":172.0,"sy":0,"nc":23,"o":"2026-03-09","ft":"Renewal","nf":50826,"ex":139000,"p":45174,"sp":false,"mc":false,"ac":false},{"id":202,"n":"FLAG Solutions LLC","s":"Active","am":"Performing","a":140000,"po":134400,"v":128319,"d":5,"f":757,"st":"CA","fr":"weekly","t":231.0,"sy":0,"nc":56,"o":"2026-03-09","ft":"New","nf":134400,"ex":194600,"p":0,"sp":false,"mc":false,"ac":false},{"id":208,"n":"Mollie's Minis, LLC","s":"Active","am":"Performing","a":10000,"po":9338,"v":8851,"d":5,"f":null,"st":"NC","fr":"daily","t":133.0,"sy":0,"nc":72,"o":"2026-03-10","ft":"New","nf":9500,"ex":14600,"p":0,"sp":false,"mc":false,"ac":false},{"id":206,"n":"Burger Littles LLC","s":"Active","am":"Performing","a":8500,"po":7799,"v":7386,"d":5,"f":null,"st":"CA","fr":"daily","t":132.0,"sy":0,"nc":72,"o":"2026-03-10","ft":"New","nf":8075,"ex":12410,"p":0,"sp":false,"mc":false,"ac":false},{"id":205,"n":"FULTON AND FULTON LLC","s":"Active","am":"Performing","a":15000,"po":14250,"v":13593,"d":5,"f":567,"st":"AZ","fr":"weekly","t":244.0,"sy":0,"nc":62,"o":"2026-03-10","ft":"New","nf":14250,"ex":22350,"p":0,"sp":false,"mc":false,"ac":false},{"id":207,"n":"2 Brothers Auto Detailing & Up","s":"Active","am":"Performing","a":7500,"po":7125,"v":6714,"d":5,"f":null,"st":"NM","fr":"daily","t":118.0,"sy":0,"nc":44,"o":"2026-03-10","ft":"New","nf":7125,"ex":10950,"p":0,"sp":false,"mc":false,"ac":false},{"id":210,"n":"CARING HEARTS HOME CARE OF WES","s":"Active","am":"Performing","a":40000,"po":38400,"v":38400,"d":0,"f":null,"st":"TX","fr":"weekly","t":198.0,"sy":0,"nc":62,"o":"2026-03-11","ft":"New","nf":38400,"ex":55600,"p":0,"sp":false,"mc":true,"ac":false},{"id":212,"n":"Kaytee's Cleaning Services Cor","s":"Active","am":"Performing","a":10550,"po":10022,"v":9445,"d":5,"f":null,"st":"NY","fr":"daily","t":118.0,"sy":0,"nc":56,"o":"2026-03-11","ft":"New","nf":10022,"ex":15403,"p":0,"sp":false,"mc":false,"ac":false},{"id":213,"n":"Suwannee Restoration LLC","s":"Active","am":"Performing","a":15000,"po":14250,"v":13661,"d":5,"f":null,"st":"FL","fr":"daily","t":161.0,"sy":0,"nc":56,"o":"2026-03-11","ft":"New","nf":14250,"ex":21600,"p":0,"sp":false,"mc":false,"ac":false},{"id":211,"n":"MIRACLE MOVERS, INC.","s":"Active","am":"Performing","a":190000,"po":180500,"v":177080,"d":4,"f":604,"st":"NC","fr":"weekly","t":228.0,"sy":0,"nc":48,"o":"2026-03-12","ft":"New","nf":180500,"ex":273600,"p":0,"sp":false,"mc":false,"ac":false},{"id":216,"n":"Gorilla Men Movers LLC","s":"Active","am":"Performing","a":6850,"po":6508,"v":6243,"d":4,"f":null,"st":"FL","fr":"daily","t":112.0,"sy":0,"nc":48,"o":"2026-03-12","ft":"New","nf":6508,"ex":9932,"p":0,"sp":false,"mc":false,"ac":false},{"id":217,"n":"Shults Trucking and Transport ","s":"Active","am":"Performing","a":15000,"po":14250,"v":13932,"d":4,"f":null,"st":"OK","fr":"daily","t":196.0,"sy":0,"nc":48,"o":"2026-03-12","ft":"New","nf":14250,"ex":21450,"p":0,"sp":false,"mc":false,"ac":false},{"id":218,"n":"Ontopjunk LLC","s":"Active","am":"Performing","a":13000,"po":12350,"v":12040,"d":4,"f":null,"st":"CA","fr":"daily","t":174.0,"sy":0,"nc":56,"o":"2026-03-12","ft":"New","nf":12350,"ex":18590,"p":0,"sp":false,"mc":false,"ac":false},{"id":220,"n":"KC Grooming LLC","s":"Active","am":"Performing","a":10000,"po":9500,"v":9278,"d":4,"f":null,"st":"NJ","fr":"daily","t":182.0,"sy":0,"nc":81,"o":"2026-03-12","ft":"New","nf":9500,"ex":13900,"p":0,"sp":false,"mc":false,"ac":false},{"id":221,"n":"Legendary Roofing, L.L.C.","s":"Active","am":"Performing","a":25000,"po":23750,"v":23750,"d":0,"f":null,"st":"UT","fr":"weekly","t":200.0,"sy":0,"nc":23,"o":"2026-03-12","ft":"New","nf":23750,"ex":34000,"p":0,"sp":false,"mc":false,"ac":false},{"id":222,"n":"Los Tejados Mexican Restaurant","s":"Active","am":"Performing","a":9000,"po":8550,"v":8260,"d":4,"f":null,"st":"WI","fr":"daily","t":132.0,"sy":0,"nc":72,"o":"2026-03-12","ft":"New","nf":8550,"ex":13050,"p":0,"sp":false,"mc":false,"ac":false},{"id":224,"n":"Area 51 Kustoms Coachwork, INC","s":"Active","am":"Performing","a":5000,"po":4750,"v":4680,"d":1,"f":null,"st":"CA","fr":"daily","t":146.0,"sy":0,"nc":81,"o":"2026-03-13","ft":"New","nf":4750,"ex":6950,"p":0,"sp":false,"mc":false,"ac":false},{"id":225,"n":"Furm Quality Auto 11 Limited L","s":"Active","am":"Performing","a":8000,"po":7600,"v":7470,"d":1,"f":null,"st":"GA","fr":"daily","t":132.0,"sy":0,"nc":81,"o":"2026-03-13","ft":"New","nf":7600,"ex":11680,"p":0,"sp":false,"mc":false,"ac":false},{"id":223,"n":"SOJJU FOODS, INC.","s":"Active","am":"Performing","a":255000,"po":242250,"v":242250,"d":0,"f":654,"st":"NY","fr":"weekly","t":254.0,"sy":0,"nc":72,"o":"2026-03-16","ft":"New","nf":242250,"ex":344250,"p":0,"sp":false,"mc":false,"ac":false},{"id":228,"n":"BeCoolHVAC L.L.C.","s":"Active","am":"Performing","a":13500,"po":12825,"v":12825,"d":0,"f":null,"st":"ND","fr":"daily","t":144.0,"sy":0,"nc":23,"o":"2026-03-16","ft":"New","nf":12825,"ex":19710,"p":0,"sp":false,"mc":false,"ac":false}];
+const NM={0:'Unknown',11:'Agriculture',23:'Construction',31:'Manufacturing',33:'Manufacturing',42:'Wholesale',44:'Retail',45:'Retail',48:'Transportation',51:'Information',53:'Real Estate',54:'Professional Svc',56:'Admin & Support',61:'Education',62:'Healthcare',71:'Entertainment',72:'Food & Accom',81:'Other Services'};
+const fmt=n=>{if(n>=1e6)return'$'+(n/1e6).toFixed(1)+'M';if(n>=1e3)return'$'+Math.round(n/1e3)+'K';return'$'+Math.round(n)};
+const pct=n=>Math.round(n)+'%';
+const C={accent:'#6366f1',teal:'#14b8a6',amber:'#f59e0b',coral:'#f97316',red:'#ef4444',green:'#22c55e',blue:'#3b82f6',pink:'#ec4899'};
+const DPD_B=[{l:'Current',mn:0,mx:0,c:C.teal},{l:'1-10',mn:1,mx:10,c:C.blue},{l:'11-30',mn:11,mx:30,c:C.amber},{l:'31-60',mn:31,mx:60,c:C.coral},{l:'61-90+',mn:61,mx:999,c:C.red}];
+
+// Tab switching
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));
+t.classList.add('active');
+document.getElementById(t.dataset.v).classList.add('active');
+}));
+
+// Totals
+const active=D.filter(l=>l.s==='Active');
+const tot={a:D.reduce((s,l)=>s+l.a,0),po:D.reduce((s,l)=>s+l.po,0),v:D.reduce((s,l)=>s+l.v,0),ex:D.reduce((s,l)=>s+l.ex,0),p:D.reduce((s,l)=>s+l.p,0),nf:D.reduce((s,l)=>s+l.nf,0)};
+const ficoArr=D.filter(l=>l.f).map(l=>l.f);
+const avgFico=ficoArr.length?Math.round(ficoArr.reduce((a,b)=>a+b,0)/ficoArr.length):0;
+const avgTerm=Math.round(D.reduce((s,l)=>s+l.t,0)/D.length*10)/10;
+const syndCnt=D.filter(l=>l.sy).length;
+
+// Health indicator
+const delinqRate=D.filter(l=>l.d>10).length/D.length*100;
+const hd=document.getElementById('healthDot');
+if(delinqRate<5){hd.innerHTML='<span class="risk-dot" style="background:'+C.teal+'"></span> Strong';hd.style.color=C.teal}
+else if(delinqRate<15){hd.innerHTML='<span class="risk-dot" style="background:'+C.amber+'"></span> Watch';hd.style.color=C.amber}
+else{hd.innerHTML='<span class="risk-dot" style="background:'+C.red+'"></span> Elevated';hd.style.color=C.red}
+
+// Metrics
+const mBox=document.getElementById('metrics');
+[{l:'Active loans',v:active.length+' / '+D.length,s:'Active / Total'},{l:'Total advance',v:fmt(tot.a),s:fmt(tot.nf)+' net funded'},{l:'Principal outstanding',v:fmt(tot.po),s:pct(tot.po/tot.a*100)+' of advance'},{l:'Value of receivables',v:fmt(tot.v),s:pct(tot.v/tot.po*100)+' of PO'},{l:'Expected collections',v:fmt(tot.ex),s:fmt(tot.p)+' collected'},{l:'Avg FICO ('+ficoArr.length+' scored)',v:avgFico,s:'Range: '+Math.min(...ficoArr)+' - '+Math.max(...ficoArr)},{l:'Avg term',v:avgTerm+' mo',s:'Range: '+Math.min(...D.map(l=>l.t))+' - '+Math.max(...D.map(l=>l.t))},{l:'Syndicated',v:pct(syndCnt/D.length*100),s:syndCnt+' of '+D.length+' loans'}
+].forEach((m,i)=>{
+const d=document.createElement('div');d.className='metric slide-up';d.style.animationDelay=(i*0.06)+'s';
+d.innerHTML='<div class="label">'+m.l+'</div><div class="val">'+m.v+'</div><div class="sub2">'+m.s+'</div>';
+mBox.appendChild(d);
+});
+
+// DPD distribution
+const dpdData=DPD_B.map(b=>{const ls=D.filter(l=>l.d>=b.mn&&l.d<=b.mx);return{...b,cnt:ls.length,po:ls.reduce((s,l)=>s+l.po,0),v:ls.reduce((s,l)=>s+l.v,0)}});
+const totalPO=tot.po||1;
+
+// Stacked bar
+const stack=document.getElementById('dpdStack');
+dpdData.filter(b=>b.po>0).forEach(b=>{
+const seg=document.createElement('div');seg.className='stacked-seg';
+seg.style.width=(b.po/totalPO*100)+'%';seg.style.background=b.c;
+seg.title=b.l+': '+fmt(b.po)+' ('+pct(b.po/totalPO*100)+')';
+if(b.po/totalPO*100>8)seg.textContent=fmt(b.po);
+stack.appendChild(seg);
+});
+
+// Legend
+const leg=document.getElementById('dpdLegend');
+dpdData.forEach(b=>{leg.innerHTML+='<span><span class="dot" style="background:'+b.c+'"></span>'+b.l+' '+b.cnt+'</span>'});
+
+// DPD Donut
+new Chart(document.getElementById('dpdDonut'),{type:'doughnut',data:{labels:dpdData.map(b=>b.l),datasets:[{data:dpdData.map(b=>b.cnt),backgroundColor:dpdData.map(b=>b.c),borderWidth:2,borderColor:'#111827'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>{const b=dpdData[ctx.dataIndex];return b.l+': '+b.cnt+' loans ('+fmt(b.po)+')'}}}}}});
+
+// Funnel
+const fb=document.getElementById('funnelBars');
+[{l:'Total advance',v:tot.a,c:C.accent,max:tot.a},{l:'Net funded',v:tot.nf,c:C.blue,max:tot.a},{l:'Expected collections',v:tot.ex,c:C.teal,max:tot.ex},{l:'Collected to date',v:tot.p,c:C.green,max:tot.ex},{l:'Principal outstanding',v:tot.po,c:C.amber,max:tot.a},{l:'Value of receivables',v:tot.v,c:C.coral,max:tot.a}
+].forEach((item,i)=>{
+fb.innerHTML+='<div style="margin-bottom:14px;animation:slideUp .5s ease-out '+(i*0.1)+'s both"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;color:var(--t2)">'+item.l+'</span><span style="font-size:13px;font-weight:600;font-family:JetBrains Mono">'+fmt(item.v)+'</span></div><div class="progress"><div class="progress-fill" style="background:'+item.c+';width:'+Math.min(100,item.v/item.max*100)+'%"></div></div></div>';
+});
+
+// Origination chart
+const months={};D.forEach(l=>{const m=l.o.slice(0,7);if(!months[m])months[m]={cnt:0,amt:0};months[m].cnt++;months[m].amt+=l.a});
+const mKeys=Object.keys(months).sort().filter(k=>k>'2025-08');
+new Chart(document.getElementById('origChart'),{type:'bar',data:{labels:mKeys.map(k=>{const[y,m]=k.split('-');return['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+m]+" '"+y.slice(2)}),datasets:[{label:'Amount',data:mKeys.map(k=>months[k].amt),backgroundColor:C.accent+'aa',borderRadius:6,yAxisID:'y'},{label:'Count',data:mKeys.map(k=>months[k].cnt),type:'line',borderColor:C.teal,pointBackgroundColor:C.teal,pointRadius:5,borderWidth:2,yAxisID:'y1',tension:.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:11},usePointStyle:true,pointStyle:'rect',padding:12}}},scales:{x:{ticks:{color:'#64748b',font:{size:11},autoSkip:false},grid:{color:'rgba(30,41,59,.4)'}},y:{ticks:{color:'#64748b',font:{size:11},callback:v=>fmt(v)},grid:{color:'rgba(30,41,59,.3)'}},y1:{position:'right',grid:{drawOnChartArea:false},ticks:{color:'#64748b',font:{size:11}}}}}});
+
+// Size distribution
+const sBins=[{l:'<$25K',mn:0,mx:25000},{l:'$25-50K',mn:25000,mx:50000},{l:'$50-100K',mn:50000,mx:100000},{l:'$100-250K',mn:100000,mx:250000},{l:'$250-500K',mn:250000,mx:500000},{l:'$500K+',mn:500000,mx:1e9}];
+const sData=sBins.map(b=>{const ls=D.filter(l=>l.a>=b.mn&&l.a<b.mx);return{cnt:ls.length,amt:ls.reduce((s,l)=>s+l.a,0)}});
+new Chart(document.getElementById('sizeChart'),{type:'bar',data:{labels:sBins.map(b=>b.l),datasets:[{label:'Count',data:sData.map(d=>d.cnt),backgroundColor:C.blue+'aa',borderRadius:6,yAxisID:'y'},{label:'Total $',data:sData.map(d=>d.amt),type:'line',borderColor:C.coral,pointBackgroundColor:C.coral,pointRadius:5,borderWidth:2,yAxisID:'y1',tension:.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:11},usePointStyle:true,pointStyle:'rect',padding:12}}},scales:{x:{ticks:{color:'#64748b',font:{size:11},autoSkip:false},grid:{color:'rgba(30,41,59,.4)'}},y:{ticks:{color:'#64748b'},grid:{color:'rgba(30,41,59,.3)'}},y1:{position:'right',grid:{drawOnChartArea:false},ticks:{color:'#64748b',callback:v=>fmt(v)}}}}});
+
+// DELINQUENCY TAB
+const dBkt=document.getElementById('dpdBuckets');
+dpdData.forEach((b,i)=>{
+const haircut=b.po>0?Math.round((b.po-b.v)/b.po*100):0;
+dBkt.innerHTML+='<div style="margin-bottom:18px;animation:slideUp .5s ease-out '+(i*.12)+'s both"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><div style="display:flex;align-items:center;gap:8px"><span class="dot" style="background:'+b.c+'"></span><span style="font-weight:600">'+b.l+' DPD</span><span style="color:var(--t3);font-size:12px">'+b.cnt+' loans</span></div><span style="font-size:12px;font-family:JetBrains Mono">PO: '+fmt(b.po)+' &middot; VOR: '+fmt(b.v)+'</span></div><div style="display:flex;gap:4px"><div style="flex:1"><div class="progress"><div class="progress-fill" style="background:'+b.c+';width:'+(b.po/totalPO*100)+'%"></div></div><div style="font-size:11px;color:var(--t3)">PO share: '+pct(b.po/totalPO*100)+'</div></div><div style="flex:1"><div class="progress"><div class="progress-fill" style="background:'+b.c+'88;width:'+(b.v/(tot.v||1)*100)+'%"></div></div><div style="font-size:11px;color:var(--t3)">VOR share: '+pct(b.v/(tot.v||1)*100)+'</div></div></div></div>';
+});
+
+// Haircut chart
+const hcData=dpdData.filter(b=>b.po>0).map(b=>({l:b.l,v:Math.round((b.po-b.v)/b.po*100),c:b.c}));
+new Chart(document.getElementById('haircutChart'),{type:'bar',data:{labels:hcData.map(h=>h.l),datasets:[{data:hcData.map(h=>h.v),backgroundColor:hcData.map(h=>h.c),borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.parsed.x+'% haircut'}}},scales:{x:{max:100,ticks:{color:'#64748b',callback:v=>v+'%'},grid:{color:'rgba(30,41,59,.3)'}},y:{ticks:{color:'#94a3b8'},grid:{display:false}}}}});
+
+// Watchlist
+const wl=document.getElementById('watchlist');
+const watchLoans=D.filter(l=>l.d>10).sort((a,b)=>b.d-a.d);
+let wHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-size:14px;font-weight:600;color:var(--t1)">'+watchLoans.length+' loans on watchlist</div><div style="font-size:12px;color:var(--t3)">Total PO: '+fmt(watchLoans.reduce((s,l)=>s+l.po,0))+' &middot; Total VOR: '+fmt(watchLoans.reduce((s,l)=>s+l.v,0))+'</div></div>';
+wHTML+='<div style="overflow-x:auto"><table><thead><tr><th>Name</th><th>Status</th><th>DPD</th><th>Advance</th><th>PO</th><th>VOR</th><th>Haircut</th></tr></thead><tbody>';
+watchLoans.forEach(l=>{
+const hc=l.po>0?Math.round((l.po-l.v)/l.po*100):0;
+const pcl=l.am==='Legal'?'pill-r':l.am==='Slow Pay'?'pill-y':'pill-g';
+wHTML+='<tr><td style="font-weight:500">'+l.n+'</td><td><span class="pill '+pcl+'">'+l.am+'</span></td><td><div class="dpd-bar"><div class="dpd-fill" style="width:'+Math.min(100,l.d/90*100)+'%;background:'+(l.d>30?C.red:l.d>10?C.amber:C.teal)+'"></div></div>'+l.d+'</td><td>'+fmt(l.a)+'</td><td>'+fmt(l.po)+'</td><td>'+fmt(l.v)+'</td><td style="color:'+(hc>50?C.red:hc>20?C.amber:C.teal)+'">'+hc+'%</td></tr>';
+});
+wHTML+='</tbody></table></div>';
+if(watchLoans.length===0)wHTML='<div style="text-align:center;padding:24px;color:var(--t3)">No loans currently on watchlist (DPD &gt; 10)</div>';
+wl.innerHTML=wHTML;
+
+// VINTAGE TAB
+const vint={};D.forEach(l=>{const m=l.o.slice(0,7);if(!vint[m])vint[m]={cnt:0,po:0,v:0,ex:0,p:0,dpd:0,d10:0};const v=vint[m];v.cnt++;v.po+=l.po;v.v+=l.v;v.ex+=l.ex;v.p+=l.p;v.dpd+=l.d;if(l.d>10)v.d10++});
+const vKeys=Object.keys(vint).sort().filter(k=>k>'2025-08');
+const vLabels=vKeys.map(k=>{const[y,m]=k.split('-');return['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+m]+" '"+y.slice(2)});
+
+new Chart(document.getElementById('vintPerf'),{type:'bar',data:{labels:vLabels,datasets:[{label:'Avg DPD',data:vKeys.map(k=>Math.round(vint[k].dpd/vint[k].cnt*10)/10),backgroundColor:C.amber+'aa',borderRadius:6,yAxisID:'y'},{label:'10+ DPD loans',data:vKeys.map(k=>vint[k].d10),type:'line',borderColor:C.red,pointBackgroundColor:C.red,pointRadius:5,borderWidth:2,yAxisID:'y1',tension:.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:11},usePointStyle:true,pointStyle:'rect',padding:12}}},scales:{x:{ticks:{color:'#64748b',autoSkip:false},grid:{color:'rgba(30,41,59,.4)'}},y:{ticks:{color:'#64748b'},grid:{color:'rgba(30,41,59,.3)'},title:{display:true,text:'Avg DPD',color:'#64748b',font:{size:11}}},y1:{position:'right',grid:{drawOnChartArea:false},ticks:{color:'#64748b'},title:{display:true,text:'10+ DPD',color:'#64748b',font:{size:11}}}}}});
+
+new Chart(document.getElementById('vintColl'),{type:'bar',data:{labels:vLabels,datasets:[{label:'Expected',data:vKeys.map(k=>vint[k].ex),backgroundColor:C.accent+'66',borderRadius:6},{label:'Collected',data:vKeys.map(k=>vint[k].p),backgroundColor:C.teal+'cc',borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:11},usePointStyle:true,pointStyle:'rect',padding:12}}},scales:{x:{ticks:{color:'#64748b',autoSkip:false},grid:{color:'rgba(30,41,59,.4)'}},y:{ticks:{color:'#64748b',callback:v=>fmt(v)},grid:{color:'rgba(30,41,59,.3)'}},}}});
+
+// INDUSTRY TAB
+const ind={};D.forEach(l=>{const n=NM[l.nc]||'Other';if(!ind[n])ind[n]={n,cnt:0,a:0,po:0,v:0};ind[n].cnt++;ind[n].a+=l.a;ind[n].po+=l.po;ind[n].v+=l.v});
+const indArr=Object.values(ind).sort((a,b)=>b.a-a.a).slice(0,10);
+
+new Chart(document.getElementById('indChart'),{type:'bar',data:{labels:indArr.map(i=>i.n),datasets:[{data:indArr.map(i=>i.a),backgroundColor:indArr.map((_,i)=>[C.accent,C.teal,C.blue,C.amber,C.coral,C.pink,C.green,C.red,'#8b5cf6','#06b6d4'][i%10]),borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>{const d=indArr[ctx.dataIndex];return fmt(d.a)+' ('+d.cnt+' loans)'}}}},scales:{x:{ticks:{color:'#64748b',callback:v=>fmt(v)},grid:{color:'rgba(30,41,59,.3)'}},y:{ticks:{color:'#94a3b8',font:{size:12}},grid:{display:false}}}}});
+
+new Chart(document.getElementById('poVorChart'),{type:'bar',data:{labels:indArr.map(i=>i.n),datasets:[{label:'PO',data:indArr.map(i=>i.po),backgroundColor:C.accent+'aa',borderRadius:6},{label:'VOR',data:indArr.map(i=>i.v),backgroundColor:C.teal+'aa',borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:11},usePointStyle:true,pointStyle:'rect',padding:12}}},scales:{x:{ticks:{color:'#64748b',maxRotation:45,autoSkip:false,font:{size:10}},grid:{color:'rgba(30,41,59,.4)'}},y:{ticks:{color:'#64748b',callback:v=>fmt(v)},grid:{color:'rgba(30,41,59,.3)'}},}}});
+
+// GEOGRAPHY TAB
+const geo={};D.forEach(l=>{if(!geo[l.st])geo[l.st]={st:l.st,cnt:0,a:0,po:0,dpd:0};geo[l.st].cnt++;geo[l.st].a+=l.a;geo[l.st].po+=l.po;geo[l.st].dpd+=l.d});
+const gArr=Object.values(geo).sort((a,b)=>b.a-a.a).slice(0,12);
+
+new Chart(document.getElementById('stateChart'),{type:'bar',data:{labels:gArr.map(g=>g.st),datasets:[{label:'Advance',data:gArr.map(g=>g.a),backgroundColor:C.teal+'aa',borderRadius:6,yAxisID:'y'},{label:'Count',data:gArr.map(g=>g.cnt),type:'line',borderColor:C.accent,pointBackgroundColor:C.accent,pointRadius:5,borderWidth:2,yAxisID:'y1'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:11},usePointStyle:true,pointStyle:'rect',padding:12}}},scales:{x:{ticks:{color:'#64748b',autoSkip:false},grid:{color:'rgba(30,41,59,.4)'}},y:{ticks:{color:'#64748b',callback:v=>fmt(v)},grid:{color:'rgba(30,41,59,.3)'}},y1:{position:'right',grid:{drawOnChartArea:false},ticks:{color:'#64748b'}}}}});
+
+// State heatmap
+const sh=document.getElementById('stateHeat');
+let shHTML='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">';
+gArr.forEach((g,i)=>{
+const avgDPD=Math.round(g.dpd/g.cnt*10)/10;
+const col=avgDPD>10?C.red:avgDPD>5?C.amber:avgDPD>2?C.blue:C.teal;
+shHTML+='<div style="background:'+col+'15;border:1px solid '+col+'33;border-radius:var(--r);padding:12px;text-align:center;animation:slideUp .4s ease-out '+(i*.06)+'s both"><div style="font-size:20px;font-weight:700;color:'+col+'">'+g.st+'</div><div style="font-size:11px;color:var(--t3);margin-top:4px">'+g.cnt+' loans &middot; '+fmt(g.a)+'</div><div style="font-size:13px;font-weight:600;margin-top:4px;color:'+col+'">Avg DPD: '+avgDPD+'</div></div>';
+});
+shHTML+='</div>';sh.innerHTML=shHTML;
+
+// LOANS TAB
+const lf=document.getElementById('loanFilters');
+lf.innerHTML='<span style="font-size:12px;color:var(--t3);margin-right:4px">Status:</span>';
+['All','Performing','Legal','Slow Pay'].forEach(s=>{lf.innerHTML+='<button class="fbtn'+(s==='All'?' on':'')+'" data-g="am" data-v="'+s+'">'+s+'</button>'});
+lf.innerHTML+='<span style="font-size:12px;color:var(--t3);margin-left:12px;margin-right:4px">DPD:</span>';
+['All',...DPD_B.map(b=>b.l)].forEach(d=>{lf.innerHTML+='<button class="fbtn'+(d==='All'?' on':'')+'" data-g="dpd" data-v="'+d+'">'+d+'</button>'});
+
+let sortKey='a',sortDir=-1,filterAm='All',filterDpd='All';
+
+document.querySelectorAll('#loanFilters .fbtn').forEach(btn=>{
+btn.addEventListener('click',()=>{
+const g=btn.dataset.g;
+document.querySelectorAll('#loanFilters .fbtn[data-g="'+g+'"]').forEach(b=>b.classList.remove('on'));
+btn.classList.add('on');
+if(g==='am')filterAm=btn.dataset.v;else filterDpd=btn.dataset.v;
+renderLoans();
+});
+});
+
+function renderLoans(){
+let ls=[...D];
+if(filterAm!=='All')ls=ls.filter(l=>l.am===filterAm);
+if(filterDpd!=='All'){const b=DPD_B.find(x=>x.l===filterDpd);if(b)ls=ls.filter(l=>l.d>=b.mn&&l.d<=b.mx)}
+ls.sort((a,b)=>sortDir*(a[sortKey]-b[sortKey]));
+
+const cols=[{k:'n',l:'Name',w:180},{k:'am',l:'Status',w:80},{k:'a',l:'Advance',w:90},{k:'po',l:'PO',w:80},{k:'v',l:'VOR',w:80},{k:'d',l:'DPD',w:90},{k:'p',l:'Collected',w:90},{k:'st',l:'State',w:50}];
+const head=document.getElementById('loanHead');
+head.innerHTML='<tr>'+cols.map(c=>'<th style="width:'+c.w+'px" data-k="'+c.k+'">'+c.l+(sortKey===c.k?(sortDir<0?' ↓':' ↑'):'')+'</th>').join('')+'</tr>';
+head.querySelectorAll('th').forEach(th=>{th.addEventListener('click',()=>{const k=th.dataset.k;if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=-1}renderLoans()})});
+
+const body=document.getElementById('loanBody');
+body.innerHTML=ls.map((l,i)=>{
+const pcl=l.am==='Legal'?'pill-r':l.am==='Slow Pay'?'pill-y':'pill-g';
+const dCol=l.d>30?C.red:l.d>10?C.amber:l.d>0?C.blue:C.teal;
+const maxD=Math.max(...D.map(x=>x.d),1);
+return '<tr style="cursor:pointer;animation:fadeIn .3s ease-out '+Math.min(i*.02,.6)+'s both" onclick="showDetail('+l.id+')"><td style="font-weight:500;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+l.n+'</td><td><span class="pill '+pcl+'">'+l.am+'</span></td><td style="font-family:JetBrains Mono;font-size:11px">'+fmt(l.a)+'</td><td style="font-family:JetBrains Mono;font-size:11px">'+fmt(l.po)+'</td><td style="font-family:JetBrains Mono;font-size:11px">'+fmt(l.v)+'</td><td><div class="dpd-bar"><div class="dpd-fill" style="width:'+Math.max(3,l.d/maxD*100)+'%;background:'+dCol+'"></div></div><span style="color:'+dCol+';font-weight:600;font-size:12px">'+l.d+'</span></td><td style="font-family:JetBrains Mono;font-size:11px">'+fmt(l.p)+'</td><td>'+l.st+'</td></tr>'
+}).join('');
+}
+renderLoans();
+
+window.showDetail=function(id){
+const l=D.find(x=>x.id===id);if(!l)return;
+const collPct=l.ex>0?Math.min(100,l.p/l.ex*100):0;
+const hc=l.po>0?Math.round((l.po-l.v)/l.po*100):0;
+const dp=document.getElementById('loanDetail');
+dp.innerHTML='<div class="detail-panel"><div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:14px"><div><div style="font-size:17px;font-weight:600">'+l.n+'</div><div style="font-size:12px;color:var(--t3)">ID: '+l.id+' &middot; '+l.st+' &middot; '+(NM[l.nc]||'Unknown')+' &middot; '+l.ft+' &middot; '+l.fr+'</div></div><span class="pill '+(l.am==='Legal'?'pill-r':l.am==='Slow Pay'?'pill-y':'pill-g')+'">'+l.am+'</span></div><div class="grid g4" style="margin-bottom:14px">'+[{l:'Advance',v:fmt(l.a)},{l:'Net funded',v:fmt(l.nf)},{l:'PO',v:fmt(l.po)},{l:'VOR',v:fmt(l.v)},{l:'Expected',v:fmt(l.ex)},{l:'Collected',v:fmt(l.p)},{l:'FICO',v:l.f||'N/A'},{l:'Term',v:l.t+' mo'}].map(m=>'<div style="background:var(--bg);border-radius:8px;padding:10px"><div style="font-size:11px;color:var(--t3)">'+m.l+'</div><div style="font-size:15px;font-weight:600;font-family:JetBrains Mono">'+m.v+'</div></div>').join('')+'</div><div style="margin-bottom:8px;font-size:12px;color:var(--t2)">Collection: '+pct(collPct)+' &middot; VOR haircut: <span style="color:'+(hc>30?C.red:hc>10?C.amber:C.teal)+'">'+hc+'%</span></div><div class="progress"><div class="progress-fill" style="background:'+(collPct>80?C.teal:collPct>50?C.blue:C.amber)+';width:'+collPct+'%"></div></div><div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">'+(l.sp?'<span class="pill pill-r">Stop payment</span>':'')+(l.mc?'<span class="pill pill-y">Material change</span>':'')+(l.ac?'<span class="pill pill-y">Amount change</span>':'')+(l.sy?'<span class="pill" style="background:rgba(99,102,241,.12);color:var(--accent)">Syndicated</span>':'')+'</div></div>';
+};
+
+// Theme toggle
+const themeBtn=document.getElementById('themeToggle');
+function applyTheme(theme){
+document.documentElement.setAttribute('data-theme',theme);
+themeBtn.innerHTML=theme==='light'?'&#9728;':'&#9790;';
+localStorage.setItem('mca-theme',theme);
+const gridColor=theme==='light'?'rgba(148,163,184,.25)':'rgba(30,41,59,.4)';
+const tickColor=theme==='light'?'#475569':'#64748b';
+const labelColor=theme==='light'?'#0f172a':'#94a3b8';
+const borderCol=theme==='light'?'#ffffff':'#111827';
+Object.values(Chart.instances).forEach(chart=>{
+if(!chart||!chart.options)return;
+if(chart.config.type==='doughnut'){
+chart.data.datasets.forEach(ds=>{ds.borderColor=borderCol});
+}
+const scales=chart.options.scales||{};
+Object.values(scales).forEach(s=>{
+if(s.ticks)s.ticks.color=tickColor;
+if(s.grid)s.grid.color=gridColor;
+});
+if(chart.options.plugins&&chart.options.plugins.legend&&chart.options.plugins.legend.labels){
+chart.options.plugins.legend.labels.color=labelColor;
+}
+chart.update('none');
+});
+}
+themeBtn.addEventListener('click',()=>{
+const cur=document.documentElement.getAttribute('data-theme');
+applyTheme(cur==='light'?'dark':'light');
+});
+const saved=localStorage.getItem('mca-theme');
+if(saved==='light')applyTheme('light');
+</script>
+</body>
+</html>

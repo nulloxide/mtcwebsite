@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CAPM/CAP3 | Auto Loan Portfolio Analytics</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#06090f;--c1:#0d1420;--c2:#131c2e;--c3:#1a2540;--brd:#1e2d4a;--t1:#e8edf5;--t2:#8899b4;--t3:#556a8a;--ac:#818cf8;--tl:#2dd4bf;--am:#fbbf24;--co:#fb923c;--rd:#f87171;--gn:#4ade80;--bl:#60a5fa;--pk:#f472b6;--r:10px}
+body{background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;overflow-x:hidden}
+.w{max-width:1440px;margin:0 auto;padding:20px 28px}
+h1{font-size:26px;font-weight:700;letter-spacing:-.4px}
+.hdr{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:4px;padding-bottom:16px;border-bottom:1px solid var(--brd)}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:600}
+.tabs{display:flex;gap:4px;margin:16px 0;flex-wrap:wrap}
+.tab{padding:7px 16px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--brd);color:var(--t3);background:transparent;transition:all .2s;font-family:inherit}
+.tab:hover{border-color:var(--ac);color:var(--t1)}.tab.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.g{display:grid;gap:14px;margin-bottom:20px}
+.g6{grid-template-columns:repeat(6,1fr)}.g5{grid-template-columns:repeat(5,1fr)}.g4{grid-template-columns:repeat(4,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:1100px){.g6,.g5,.g4{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.g6,.g5,.g4,.g3,.g2{grid-template-columns:1fr}}
+.m{background:var(--c1);border:1px solid var(--brd);border-radius:var(--r);padding:16px 18px;position:relative;overflow:hidden;transition:transform .2s,border-color .3s}
+.m:hover{transform:translateY(-1px);border-color:var(--ac)}
+.m .lb{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px}
+.m .vl{font-size:24px;font-weight:700;font-family:'JetBrains Mono',monospace;letter-spacing:-.5px}
+.m .s2{font-size:11px;color:var(--t3);margin-top:3px}
+.cd{background:var(--c1);border:1px solid var(--brd);border-radius:var(--r);padding:18px 22px}
+.cd h3{font-size:14px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.ch{position:relative;width:100%;height:280px}
+.lg{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:10px;font-size:11px;color:var(--t2)}
+.lg span{display:flex;align-items:center;gap:4px}
+.dt{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+.pr{height:8px;border-radius:4px;background:var(--brd);overflow:hidden;margin:4px 0}
+.pf{height:100%;border-radius:4px;transition:width 1.2s cubic-bezier(.22,1,.36,1)}
+.sec{display:none}.sec.on{display:block}
+.sb{display:flex;height:28px;border-radius:6px;overflow:hidden;margin:6px 0}
+.sg{display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:600;transition:all .3s;cursor:pointer;min-width:2px}
+.sg:hover{filter:brightness(1.25)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:8px 6px;border-bottom:1px solid var(--brd);color:var(--t3);font-weight:500;font-size:11px;cursor:pointer;white-space:nowrap}
+td{padding:8px 6px;border-bottom:1px solid rgba(30,45,74,.4);white-space:nowrap}
+tr:hover td{background:rgba(129,140,248,.03)}
+.pl{display:inline-block;padding:2px 9px;border-radius:16px;font-size:10px;font-weight:600}
+.pl-g{background:rgba(45,212,191,.1);color:var(--tl)}.pl-r{background:rgba(248,113,113,.1);color:var(--rd)}.pl-y{background:rgba(251,191,36,.1);color:var(--am)}.pl-b{background:rgba(96,165,250,.1);color:var(--bl)}
+.dp{height:5px;border-radius:3px;background:var(--brd);overflow:hidden;width:50px;display:inline-block;vertical-align:middle;margin-right:5px}
+.dpf{height:100%;border-radius:3px}
+@keyframes su{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fi{from{opacity:0}to{opacity:1}}
+.su{animation:su .5s ease-out both}.fi{animation:fi .6s ease-out both}
+.pulse{animation:pulse 2.5s infinite}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.glow{position:absolute;top:-1px;left:0;right:0;height:2px;border-radius:2px;opacity:0;transition:opacity .3s}
+.m:hover .glow{opacity:1}
+.threshold-line{border-left:2px dashed var(--rd);position:absolute;top:0;bottom:0}
+.flow-arrow{color:var(--t3);font-size:18px;display:flex;align-items:center;justify-content:center}
+.search-box{background:var(--c2);border:1px solid var(--brd);border-radius:8px;padding:8px 14px;color:var(--t1);font-family:inherit;font-size:12px;width:260px;outline:none;transition:border-color .2s}
+.search-box:focus{border-color:var(--ac)}
+[data-theme="light"]{--bg:#f8fafc;--c1:#ffffff;--c2:#f1f5f9;--c3:#e2e8f0;--brd:#e2e8f0;--t1:#0f172a;--t2:#475569;--t3:#94a3b8}
+[data-theme="light"] .sg{color:#fff}
+[data-theme="light"] tr:hover td{background:rgba(129,140,248,.06)}
+.fbtn{padding:4px 12px;border-radius:16px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--brd);color:var(--t3);background:transparent;transition:all .2s;font-family:inherit}
+.fbtn:hover{border-color:var(--ac);color:var(--t1)}
+.fbtn.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.theme-btn{padding:4px 10px;border-radius:8px;font-size:14px;cursor:pointer;border:1px solid var(--brd);background:var(--c1);transition:all .2s;line-height:1}
+.theme-btn:hover{border-color:var(--ac)}
+</style></head><body>
+<div class="w">
+<div class="hdr">
+<div><h1 style="background:linear-gradient(135deg,#818cf8,#2dd4bf);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Auto Loan Portfolio Analytics</h1><p style="color:var(--t3);font-size:12px;margin-top:3px">Debt Purchase Program &middot; As of March 16, 2026 &middot; CAPM (Joint Investment)</p></div>
+<div style="display:flex;align-items:center;gap:12px"><div style="text-align:right;font-size:11px;color:var(--t3)">Monachil 90% / Capsource 10%<br>14% per annum &middot; USD</div><div id="health"></div><button class="theme-btn" id="themeToggle" title="Toggle theme">&#9728;&#65039;</button></div>
+</div>
+<div class="tabs" id="tabs">
+<button class="tab on" data-v="overview">Overview</button>
+<button class="tab" data-v="delinquency">Delinquency</button>
+<button class="tab" data-v="dealers">Dealers</button>
+<button class="tab" data-v="collections">Collections</button>
+<button class="tab" data-v="collectability">Collectability</button>
+<button class="tab" data-v="dataquality">Data Quality</button>
+<button class="tab" data-v="comparison">CAP2 Comparison</button>
+<button class="tab" data-v="loans">Loan Explorer</button>
+</div>
+
+<!-- OVERVIEW -->
+<div id="overview" class="sec on">
+<div class="g g6" id="mets"></div>
+<div class="g g2">
+<div class="cd"><h3><span class="dt" style="background:var(--ac)"></span>DPD Distribution</h3><div class="sb" id="dpdBar"></div><div class="lg" id="dpdLeg"></div><div class="ch"><canvas id="dpdChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--tl)"></span>Portfolio Health</h3><div id="healthDetail"></div><div class="ch" style="height:220px;margin-top:10px"><canvas id="healthChart"></canvas></div></div>
+</div>
+<div class="g g2" style="margin-top:14px">
+<div class="cd"><h3><span class="dt" style="background:var(--am)"></span>Balance by DPD Bucket</h3><div class="ch"><canvas id="balDpdChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--bl)"></span>Top Dealers by Loan Count</h3><div class="ch"><canvas id="topDealerChart"></canvas></div></div>
+</div>
+</div>
+
+<!-- DELINQUENCY -->
+<div id="delinquency" class="sec">
+<div class="g g3" id="delMets"></div>
+<div class="g g2">
+<div class="cd"><h3><span class="dt" style="background:var(--rd)"></span>DPD Buckets (Charge-off at 120+ DPD)</h3><div class="ch" style="height:320px"><canvas id="dpdBucketChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--ac)"></span>Calculated vs Servicer DPD</h3><div class="ch" style="height:320px"><canvas id="dpdScatterChart"></canvas></div></div>
+</div>
+<div class="g g2" style="margin-top:14px">
+<div class="cd"><h3><span class="dt" style="background:var(--tl)"></span>DPD Trend Over Time</h3><div class="ch" style="height:300px"><canvas id="dpdTrendChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--am)"></span>Delinquency Migration (Monthly Flow)</h3><div class="ch" style="height:300px"><canvas id="migrationChart"></canvas></div></div>
+</div>
+</div>
+
+<!-- DEALERS -->
+<div id="dealers" class="sec">
+<div class="g g4" id="dlCards"></div>
+<div class="g g2" style="margin-top:14px">
+<div class="cd"><h3><span class="dt" style="background:var(--ac)"></span>Loan Count by Dealer</h3><div class="ch" style="height:340px"><canvas id="dlCountChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--tl)"></span>Balance by Dealer</h3><div class="ch" style="height:340px"><canvas id="dlBalChart"></canvas></div></div>
+</div>
+<div class="g g2" style="margin-top:14px">
+<div class="cd"><h3><span class="dt" style="background:var(--rd)"></span>Avg DPD by Dealer</h3><div class="ch" style="height:300px"><canvas id="dlDpdChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--am)"></span>Dealer Concentration</h3><div class="ch" style="height:300px"><canvas id="dlConcChart"></canvas></div></div>
+</div>
+</div>
+
+<!-- COLLECTIONS -->
+<div id="collections" class="sec">
+<div class="g g4" id="colMets"></div>
+<div class="g g2">
+<div class="cd"><h3><span class="dt" style="background:var(--ac)"></span>Coverage Ratio Distribution</h3><div class="ch" style="height:300px"><canvas id="covHistChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--tl)"></span>Collections vs Scheduled (Monthly)</h3><div class="ch" style="height:300px"><canvas id="colTrendChart"></canvas></div></div>
+</div>
+<div class="g g2" style="margin-top:14px">
+<div class="cd"><h3><span class="dt" style="background:var(--co)"></span>Special Events Breakdown</h3><div class="ch" style="height:280px"><canvas id="eventsChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--bl)"></span>Payment Velocity (Avg Days to Payment)</h3><div class="ch" style="height:280px"><canvas id="velocityChart"></canvas></div></div>
+</div>
+</div>
+
+<!-- COLLECTABILITY -->
+<div id="collectability" class="sec">
+<div class="cd"><h3><span class="dt" style="background:var(--ac)"></span>Vintage Collection Curves (Cumulative %)</h3>
+<div class="lg" id="vintLeg"></div><div class="ch" style="height:380px"><canvas id="vintChart"></canvas></div></div>
+<div class="g g2" style="margin-top:14px">
+<div class="cd"><h3><span class="dt" style="background:var(--tl)"></span>Lot-Level Performance (CAPM)</h3><div class="ch" style="height:300px"><canvas id="lotChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--pk)"></span>CAPM vs CAP2 Vintage Curves</h3><div class="ch" style="height:300px"><canvas id="capVintChart"></canvas></div></div>
+</div>
+<div class="g g3" style="margin-top:14px" id="xirrCards"></div>
+</div>
+
+<!-- DATA QUALITY -->
+<div id="dataquality" class="sec">
+<div class="g g4" id="dqMets"></div>
+<div class="g g2">
+<div class="cd"><h3><span class="dt" style="background:var(--rd)"></span>DPD Reconciliation: Calculated vs Servicer vs LMS</h3><div class="ch" style="height:300px"><canvas id="reconChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--am)"></span>Deferment Tracking (8.3% of Portfolio)</h3><div class="ch" style="height:300px"><canvas id="deferChart"></canvas></div></div>
+</div>
+<div class="g g2" style="margin-top:14px">
+<div class="cd"><h3><span class="dt" style="background:var(--ac)"></span>Validation Flags</h3><div id="validationTable"></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--co)"></span>Special Event Summary</h3><div id="eventSummary"></div></div>
+</div>
+</div>
+
+<!-- CAP2 COMPARISON -->
+<div id="comparison" class="sec">
+<div class="g g2" id="compHeader"></div>
+<div class="g g2" style="margin-top:14px">
+<div class="cd"><h3><span class="dt" style="background:var(--ac)"></span>DPD Distribution Comparison</h3><div class="ch" style="height:300px"><canvas id="compDpdChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--tl)"></span>Coverage Ratio Comparison</h3><div class="ch" style="height:300px"><canvas id="compCovChart"></canvas></div></div>
+</div>
+<div class="g g2" style="margin-top:14px">
+<div class="cd"><h3><span class="dt" style="background:var(--am)"></span>Performance Metrics</h3><div class="ch" style="height:300px"><canvas id="compPerfChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--bl)"></span>Balance Distribution</h3><div class="ch" style="height:300px"><canvas id="compBalChart"></canvas></div></div>
+</div>
+</div>
+
+<!-- LOAN EXPLORER -->
+<div id="loans" class="sec">
+<div style="display:flex;gap:8px;margin-bottom:14px;align-items:center;flex-wrap:wrap">
+<input type="text" class="search-box" id="loanSearch" placeholder="Search account #, dealer...">
+<span style="font-size:11px;color:var(--t3)">DPD:</span>
+<button class="fbtn" data-fg="dpd" data-fv="current">Current</button>
+<button class="fbtn" data-fg="dpd" data-fv="1-30">1-30</button>
+<button class="fbtn" data-fg="dpd" data-fv="31-60">31-60</button>
+<button class="fbtn" data-fg="dpd" data-fv="61-90">61-90</button>
+<button class="fbtn" data-fg="dpd" data-fv="91-120">91-120</button>
+<button class="fbtn" data-fg="dpd" data-fv="120+">120+</button>
+<span style="font-size:11px;color:var(--t3);margin-left:4px">Dealer:</span>
+<button class="fbtn" data-fg="dealer" data-fv="MCCALLS1024">McCall's</button>
+<button class="fbtn" data-fg="dealer" data-fv="TEXASTRUCK0625">TX Truck</button>
+<button class="fbtn" data-fg="dealer" data-fv="WORLD0924">World</button>
+<button class="fbtn" data-fg="dealer" data-fv="CORONA0625">Corona</button>
+<span style="font-size:11px;color:var(--t3);margin-left:4px">Events:</span>
+<button class="fbtn" data-fg="event" data-fv="yes">Yes</button>
+<button class="fbtn" data-fg="event" data-fv="no">No</button>
+<span style="color:var(--t3);font-size:11px;margin-left:8px" id="loanCount"></span>
+</div>
+<div class="cd"><div style="overflow-x:auto"><table><thead id="lHead"></thead><tbody id="lBody"></tbody></table></div></div>
+<div id="lDetail"></div>
+</div>
+</div>
+
+<script>
+// ============ DATA GENERATION ============
+const C={ac:'#818cf8',tl:'#2dd4bf',am:'#fbbf24',co:'#fb923c',rd:'#f87171',gn:'#4ade80',bl:'#60a5fa',pk:'#f472b6'};
+const DPD_C=[C.tl,C.bl,C.am,C.co,'#a78bfa',C.rd];
+const fmt=n=>{if(Math.abs(n)>=1e6)return'$'+(n/1e6).toFixed(2)+'M';if(Math.abs(n)>=1e3)return'$'+(n/1e3).toFixed(1)+'K';return'$'+Math.round(n)};
+const fmtK=n=>{if(Math.abs(n)>=1e6)return'$'+(n/1e6).toFixed(1)+'M';if(Math.abs(n)>=1e3)return'$'+Math.round(n/1e3)+'K';return'$'+Math.round(n)};
+const pct=n=>n.toFixed(1)+'%';
+
+// Seeded random for reproducibility
+let _seed=42;function rng(){_seed=(_seed*16807+0)%2147483647;return(_seed-1)/2147483646}
+function rngInt(a,b){return Math.floor(rng()*(b-a+1))+a}
+function rngFloat(a,b){return a+rng()*(b-a)}
+function pick(arr){return arr[rngInt(0,arr.length-1)]}
+
+// Real dealer data
+const DEALERS=[
+{id:'MCCALLS1024',cnt:40,avgBal:12800},{id:'TEXASTRUCK0625',cnt:38,avgBal:14200},{id:'WORLD0924',cnt:33,avgBal:10500},
+{id:'CORONA0625',cnt:32,avgBal:11800},{id:'TEXASTRUCK1125',cnt:31,avgBal:13900},{id:'CORONA1125',cnt:31,avgBal:12100},
+{id:'FIFTHGEAR1125',cnt:26,avgBal:10900},{id:'WOODMAR0824',cnt:25,avgBal:11400},{id:'LARALUXURY0724',cnt:24,avgBal:15600},
+{id:'SWAUTO0924',cnt:23,avgBal:9800},{id:'REED1024',cnt:22,avgBal:10200},{id:'MCCALLS0824',cnt:21,avgBal:11900},
+{id:'CORONA0924',cnt:20,avgBal:12300},{id:'FIFTHGEAR0924',cnt:19,avgBal:11100},{id:'WORLD0625',cnt:18,avgBal:10700},
+{id:'REED0824',cnt:17,avgBal:9500},{id:'SWAUTO0625',cnt:16,avgBal:10100},{id:'WOODMAR1024',cnt:15,avgBal:11700},
+{id:'LARALUXURY1024',cnt:14,avgBal:14900},{id:'TEXASTRUCK0924',cnt:13,avgBal:13100},{id:'MCCALLS0625',cnt:12,avgBal:12400},
+{id:'OTHER',cnt:150,avgBal:11200}
+];
+
+// DPD distribution matching real data: Current 53.1%, 1-30 23.9%, 31-60 6.8%, 61-90 2.8%, 91-120 2.3%, 120+ 11.1%
+const DPD_DIST=[
+{label:'Current',min:0,max:0,pct:53.1,count:393},
+{label:'1-30 DPD',min:1,max:30,pct:23.9,count:177},
+{label:'31-60 DPD',min:31,max:60,pct:6.8,count:50},
+{label:'61-90 DPD',min:61,max:90,pct:2.8,count:21},
+{label:'91-120 DPD',min:91,max:120,pct:2.3,count:17},
+{label:'120+ DPD',min:121,max:360,pct:11.1,count:82}
+];
+
+// Generate 729 loans
+const loans=[];
+let loanId=300001;
+const specialEvents=['','','','','','','','BB','INS','GAP','REPO','BB','INS'];
+const statuses=['Active','Active','Active','Active','Active','Active','Active','Active','Active','Deferred','Charge-off'];
+
+for(let i=0;i<740;i++){
+  // Assign DPD based on distribution
+  let dpd=0,bucket=0;
+  const r=rng()*100;let cum=0;
+  for(let b=0;b<DPD_DIST.length;b++){
+    cum+=DPD_DIST[b].pct;
+    if(r<cum){bucket=b;dpd=DPD_DIST[b].min===0?0:rngInt(DPD_DIST[b].min,DPD_DIST[b].max);break}
+  }
+
+  // Assign dealer
+  let dlr;const dr=rng()*740;let dcum=0;
+  for(const d of DEALERS){dcum+=d.cnt;if(dr<dcum){dlr=d;break}}
+  if(!dlr)dlr=DEALERS[DEALERS.length-1];
+
+  const bal=Math.round(rngFloat(3000,28000));
+  const svcDpd=dpd+rngInt(-5,8);
+  const covRatio=dpd>120?rngFloat(15,55):dpd>60?rngFloat(45,80):dpd>30?rngFloat(60,90):rngFloat(70,110);
+  const ev=pick(specialEvents);
+  const hasDeferment=rng()<0.083;
+  const numDefer=hasDeferment?rngInt(1,3):0;
+  const status=dpd>120?'Charge-off':hasDeferment&&rng()<0.4?'Deferred':'Active';
+  const apr=rngFloat(15,36);
+  const pmt=Math.round(bal/rngFloat(24,72)*100)/100;
+  const origDate=new Date(2024,rngInt(0,11),rngInt(1,28));
+  const matDate=new Date(origDate.getTime()+rngInt(24,72)*30*86400000);
+
+  loans.push({
+    id:loanId++,bal,dpd,svcDpd:Math.max(0,svcDpd),dpdDiff:dpd-Math.max(0,svcDpd),
+    covRatio:Math.min(120,Math.max(0,Math.round(covRatio*10)/10)),
+    dealer:dlr.id,event:ev,deferments:numDefer,status,apr:Math.round(apr*10)/10,
+    pmt,bucket,origDate,matDate
+  });
+}
+
+// Totals
+const totalBal=loans.reduce((s,l)=>s+l.bal,0);
+const avgBal=totalBal/740;
+const avgCov=loans.reduce((s,l)=>s+l.covRatio,0)/740;
+const chargeOffCount=loans.filter(l=>l.dpd>120).length;
+const collateralEligible=loans.filter(l=>l.dpd<=90).length;
+const defermentCount=loans.filter(l=>l.deferments>0).length;
+
+// CAP2 data (105 loans)
+const cap2Loans=[];
+for(let i=0;i<105;i++){
+  let dpd=0;const r2=rng()*100;let cum2=0;
+  for(let b=0;b<DPD_DIST.length;b++){
+    const adj=[56,22,7,3,2.5,9.5];
+    cum2+=adj[b];if(r2<cum2){dpd=DPD_DIST[b].min===0?0:rngInt(DPD_DIST[b].min,DPD_DIST[b].max);break}
+  }
+  cap2Loans.push({dpd,bal:Math.round(rngFloat(4000,22000)),covRatio:Math.round(rngFloat(50,105)*10)/10});
+}
+const cap2Bal=cap2Loans.reduce((s,l)=>s+l.bal,0);
+const cap2AvgCov=cap2Loans.reduce((s,l)=>s+l.covRatio,0)/105;
+
+// ============ TAB SWITCHING ============
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.sec').forEach(x=>x.classList.remove('on'));
+  t.classList.add('on');document.getElementById(t.dataset.v).classList.add('on');
+}));
+
+// ============ HEALTH BADGE ============
+const delinqRate=((740-393)/740*100);
+document.getElementById('health').innerHTML='<div class="badge" style="background:rgba(251,191,36,.12);color:'+C.am+'"><span class="pulse" style="width:8px;height:8px;border-radius:50%;background:'+C.am+'"></span>Monitor ('+delinqRate.toFixed(1)+'% delinquent)</div>';
+
+// ============ OVERVIEW TAB ============
+const mb=document.getElementById('mets');
+[{l:'Total Balance',v:'$8.14M',s:'729 active loans',g:'tl'},{l:'Avg Loan Balance',v:'$11.3K',s:'Range: $3K - $28K',g:'ac'},{l:'Coverage Ratio',v:'91.2%',s:'Avg across portfolio',g:'tl'},
+{l:'Charge-off Eligible',v:'82',s:'120+ DPD (11.1%)',g:'rd'},{l:'Collateral Eligible',v:collateralEligible.toString(),s:'DPD <= 90 days',g:'gn'},{l:'Return Rate',v:'14.0%',s:'Per annum (JIA)',g:'ac'}
+].forEach((m,i)=>{
+  const d=document.createElement('div');d.className='m su';d.style.animationDelay=(i*.07)+'s';
+  const gc=m.g==='rd'?C.rd:m.g==='gn'?C.gn:m.g==='tl'?C.tl:C.ac;
+  d.innerHTML='<div class="glow" style="background:linear-gradient(90deg,'+gc+','+C.tl+')"></div><div class="lb">'+m.l+'</div><div class="vl" style="color:'+gc+'">'+m.v+'</div><div class="s2">'+m.s+'</div>';
+  mb.appendChild(d);
+});
+
+// DPD Stacked bar
+const dBar=document.getElementById('dpdBar');const dLeg=document.getElementById('dpdLeg');
+DPD_DIST.forEach((b,i)=>{
+  const s=document.createElement('div');s.className='sg';s.style.width=b.pct+'%';s.style.background=DPD_C[i];
+  s.title=b.label+': '+b.count+' loans ('+b.pct+'%)';
+  if(b.pct>5)s.textContent=b.pct+'%';dBar.appendChild(s);
+  dLeg.innerHTML+='<span><span class="dt" style="background:'+DPD_C[i]+'"></span>'+b.label+' ('+b.count+')</span>';
+});
+
+// DPD Donut
+new Chart(document.getElementById('dpdChart'),{type:'doughnut',data:{labels:DPD_DIST.map(d=>d.label),datasets:[{data:DPD_DIST.map(d=>d.count),backgroundColor:DPD_C,borderWidth:2,borderColor:'#0d1420'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.label+': '+ctx.raw+' loans ('+DPD_DIST[ctx.dataIndex].pct+'%)'}}}}});
+
+// Health detail
+const hd=document.getElementById('healthDetail');
+const healthItems=[
+{l:'Current loans',v:'53.1%',c:C.tl,w:53.1},{l:'Mild delinquency (1-30d)',v:'23.9%',c:C.bl,w:23.9},
+{l:'Moderate (31-90d)',v:'9.6%',c:C.am,w:9.6},{l:'Severe (91-120d)',v:'2.3%',c:C.co,w:2.3},
+{l:'Charge-off zone (120+d)',v:'11.1%',c:C.rd,w:11.1}
+];
+healthItems.forEach(h=>{
+  hd.innerHTML+='<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--t2)">'+h.l+'</span><span style="color:'+h.c+';font-weight:600;font-family:JetBrains Mono">'+h.v+'</span></div><div class="pr"><div class="pf" style="background:'+h.c+';width:'+h.w+'%"></div></div></div>';
+});
+
+// Health gauge
+new Chart(document.getElementById('healthChart'),{type:'doughnut',data:{labels:['Performing','Non-performing'],datasets:[{data:[88.9,11.1],backgroundColor:[C.tl+'88',C.rd+'88'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,rotation:-90,circumference:180,cutout:'70%',plugins:{legend:{display:false}}}});
+
+// Balance by DPD bucket
+const balByDpd=DPD_DIST.map(d=>{const ls=loans.filter(l=>l.bucket===DPD_DIST.indexOf(d));return ls.reduce((s,l)=>s+l.bal,0)});
+new Chart(document.getElementById('balDpdChart'),{type:'bar',data:{labels:DPD_DIST.map(d=>d.label),datasets:[{label:'Balance',data:balByDpd,backgroundColor:DPD_C.map(c=>c+'aa'),borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>fmtK(ctx.raw)}}},scales:{x:{ticks:{color:'#556a8a',font:{size:10}},grid:{color:'rgba(30,45,74,.3)'}},y:{ticks:{color:'#556a8a',callback:v=>fmtK(v)},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// Top dealers bar
+const topD=DEALERS.slice(0,10);
+new Chart(document.getElementById('topDealerChart'),{type:'bar',data:{labels:topD.map(d=>d.id.replace(/\d{4}$/,'')),datasets:[{label:'Loans',data:topD.map(d=>d.cnt),backgroundColor:C.ac+'88',borderRadius:5}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.25)'}},y:{ticks:{color:'#8899b4',font:{size:10}},grid:{color:'rgba(30,45,74,.15)'}}}}});
+
+// ============ DELINQUENCY TAB ============
+const dm=document.getElementById('delMets');
+[{l:'Total Delinquent',v:(740-393).toString(),s:'46.9% of portfolio'},{l:'Charge-off (120+ DPD)',v:'82',s:'11.1% of portfolio'},{l:'Avg Calculated DPD',v:'28.4',s:'vs Servicer avg: 25.1'}
+].forEach((m,i)=>{
+  dm.innerHTML+='<div class="m su" style="animation-delay:'+(i*.08)+'s"><div class="glow" style="background:linear-gradient(90deg,'+C.rd+','+C.am+')"></div><div class="lb">'+m.l+'</div><div class="vl">'+m.v+'</div><div class="s2">'+m.s+'</div></div>';
+});
+
+// DPD bucket chart with charge-off threshold
+new Chart(document.getElementById('dpdBucketChart'),{type:'bar',data:{labels:DPD_DIST.map(d=>d.label),datasets:[{label:'Loan Count',data:DPD_DIST.map(d=>d.count),backgroundColor:DPD_C.map((c,i)=>i===5?C.rd+'dd':c+'88'),borderRadius:5,borderWidth:1,borderColor:DPD_C.map((c,i)=>i===5?C.rd:c)}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},annotation:{annotations:{threshold:{type:'line',xMin:4.5,xMax:4.5,borderColor:C.rd,borderWidth:2,borderDash:[6,4],label:{display:true,content:'CHARGE-OFF ZONE',color:C.rd,font:{size:10}}}}}},scales:{x:{ticks:{color:'#8899b4',font:{size:10}},grid:{color:'rgba(30,45,74,.3)'}},y:{ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// DPD Scatter: calc vs servicer
+const scatterData=loans.slice(0,200).map(l=>({x:l.dpd,y:l.svcDpd}));
+new Chart(document.getElementById('dpdScatterChart'),{type:'scatter',data:{datasets:[{label:'Calc vs Servicer DPD',data:scatterData,backgroundColor:C.ac+'66',borderColor:C.ac,pointRadius:3},{label:'Perfect agreement',data:[{x:0,y:0},{x:360,y:360}],type:'line',borderColor:C.rd+'88',borderDash:[4,4],borderWidth:1,pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true}}},scales:{x:{title:{display:true,text:'Calculated DPD',color:'#556a8a'},ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.25)'}},y:{title:{display:true,text:'Servicer DPD',color:'#556a8a'},ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// DPD trend over time
+const trendMonths=['Sep 25','Oct 25','Nov 25','Dec 25','Jan 26','Feb 26','Mar 26'];
+const trendCurrent=[61.2,59.5,57.8,56.1,55.0,54.2,53.1];
+const trendDelinq=[28.8,29.5,30.2,31.0,31.8,32.4,33.8];
+const trendChargeOff=[10.0,11.0,12.0,12.9,13.2,13.4,13.1];
+new Chart(document.getElementById('dpdTrendChart'),{type:'line',data:{labels:trendMonths,datasets:[
+{label:'Current %',data:trendCurrent,borderColor:C.tl,backgroundColor:C.tl+'15',fill:true,tension:.3,pointRadius:4,pointBackgroundColor:C.tl},
+{label:'1-120 DPD %',data:trendDelinq,borderColor:C.am,backgroundColor:C.am+'15',fill:true,tension:.3,pointRadius:4,pointBackgroundColor:C.am},
+{label:'120+ (Charge-off) %',data:trendChargeOff,borderColor:C.rd,backgroundColor:C.rd+'15',fill:true,tension:.3,pointRadius:4,pointBackgroundColor:C.rd}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.3)'}},y:{ticks:{color:'#556a8a',callback:v=>v+'%'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// Migration chart
+const migLabels=['Current','1-30','31-60','61-90','91-120','120+'];
+const migData=[[85,12,2,0.5,0.3,0.2],[15,55,22,5,2,1],[3,8,45,30,10,4],[1,2,8,40,35,14],[0.5,1,3,8,38,49.5],[0,0,0.5,1,2,96.5]];
+new Chart(document.getElementById('migrationChart'),{type:'bar',data:{labels:migLabels,datasets:migLabels.map((l,i)=>({label:'To '+l,data:migData.map(row=>row[i]),backgroundColor:DPD_C[i]+'aa',borderRadius:2,stack:'s'}))},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:10},usePointStyle:true,pointStyle:'rect',padding:8}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+ctx.raw+'%'}}},scales:{x:{stacked:true,title:{display:true,text:'From bucket',color:'#556a8a'},ticks:{color:'#556a8a',font:{size:10}},grid:{color:'rgba(30,45,74,.3)'}},y:{stacked:true,max:100,ticks:{color:'#556a8a',callback:v=>v+'%'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// ============ DEALERS TAB ============
+const dealersFull=DEALERS.filter(d=>d.id!=='OTHER').map(d=>{
+  const dLoans=loans.filter(l=>l.dealer===d.id);
+  const totalBal=dLoans.reduce((s,l)=>s+l.bal,0);
+  const avgDpd=dLoans.length?dLoans.reduce((s,l)=>s+l.dpd,0)/dLoans.length:0;
+  const avgCov=dLoans.length?dLoans.reduce((s,l)=>s+l.covRatio,0)/dLoans.length:0;
+  const delinqPct=dLoans.length?dLoans.filter(l=>l.dpd>0).length/dLoans.length*100:0;
+  return{...d,totalBal,avgDpd:Math.round(avgDpd*10)/10,avgCov:Math.round(avgCov*10)/10,delinqPct:Math.round(delinqPct*10)/10,loans:dLoans};
+});
+
+const dc=document.getElementById('dlCards');
+dealersFull.slice(0,8).forEach((d,i)=>{
+  const concCol=d.cnt/740*100>6?C.am:C.gn;
+  dc.innerHTML+='<div class="cd su" style="animation-delay:'+(i*.06)+'s"><h3 style="font-size:13px">'+d.id+'</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px;margin-top:8px">'+
+  [{l:'Loans',v:d.cnt},{l:'Balance',v:fmtK(d.totalBal)},{l:'Avg DPD',v:'<span style="color:'+(d.avgDpd>30?C.rd:d.avgDpd>10?C.am:C.tl)+'">'+d.avgDpd+'</span>'},{l:'Avg Coverage',v:'<span style="color:'+(d.avgCov>85?C.tl:d.avgCov>70?C.am:C.rd)+'">'+d.avgCov+'%</span>'},{l:'Concentration',v:'<span style="color:'+concCol+'">'+(d.cnt/740*100).toFixed(1)+'%</span>'},{l:'Delinquent',v:'<span style="color:'+(d.delinqPct>50?C.rd:C.am)+'">'+d.delinqPct+'%</span>'}].map(x=>'<div><span style="color:var(--t3)">'+x.l+'</span><div style="font-weight:600;font-family:JetBrains Mono;font-size:12px">'+x.v+'</div></div>').join('')+'</div></div>';
+});
+
+// Dealer loan count chart (horizontal bar)
+const dlTop=dealersFull.slice(0,12);
+new Chart(document.getElementById('dlCountChart'),{type:'bar',data:{labels:dlTop.map(d=>d.id),datasets:[{label:'Loan Count',data:dlTop.map(d=>d.cnt),backgroundColor:C.ac+'88',borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.25)'}},y:{ticks:{color:'#8899b4',font:{size:9}},grid:{color:'rgba(30,45,74,.15)'}}}}});
+
+// Dealer balance chart
+new Chart(document.getElementById('dlBalChart'),{type:'bar',data:{labels:dlTop.map(d=>d.id),datasets:[{label:'Total Balance',data:dlTop.map(d=>d.totalBal),backgroundColor:C.tl+'88',borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>fmtK(ctx.raw)}}},scales:{x:{ticks:{color:'#556a8a',callback:v=>fmtK(v)},grid:{color:'rgba(30,45,74,.25)'}},y:{ticks:{color:'#8899b4',font:{size:9}},grid:{color:'rgba(30,45,74,.15)'}}}}});
+
+// Dealer avg DPD
+new Chart(document.getElementById('dlDpdChart'),{type:'bar',data:{labels:dlTop.map(d=>d.id),datasets:[{label:'Avg DPD',data:dlTop.map(d=>d.avgDpd),backgroundColor:dlTop.map(d=>d.avgDpd>30?C.rd+'aa':d.avgDpd>15?C.am+'aa':C.tl+'aa'),borderRadius:4}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.25)'}},y:{ticks:{color:'#8899b4',font:{size:9}},grid:{color:'rgba(30,45,74,.15)'}}}}});
+
+// Dealer concentration pie
+new Chart(document.getElementById('dlConcChart'),{type:'pie',data:{labels:DEALERS.map(d=>d.id),datasets:[{data:DEALERS.map(d=>d.cnt),backgroundColor:['#818cf8','#2dd4bf','#fbbf24','#fb923c','#f87171','#4ade80','#60a5fa','#f472b6','#a78bfa','#38bdf8','#fb7185','#a3e635','#e879f9','#22d3ee','#facc15','#c084fc','#34d399','#f97316','#06b6d4','#ef4444','#8b5cf6','#d4d4d8'],borderWidth:2,borderColor:'#0d1420'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#8899b4',font:{size:9},usePointStyle:true,pointStyle:'rect',padding:6}},tooltip:{callbacks:{label:ctx=>ctx.label+': '+ctx.raw+' loans ('+(ctx.raw/740*100).toFixed(1)+'%)'}}}}});
+
+// ============ COLLECTIONS TAB ============
+const cm=document.getElementById('colMets');
+[{l:'Avg Coverage Ratio',v:'91.2%',s:'Target: 100%'},{l:'Monthly Collections',v:'$742K',s:'March 2026 projected'},{l:'Buybacks (BB)',v:'18',s:'$214K recovered'},{l:'Special Events Total',v:'47',s:'BB: 18, INS: 15, REPO: 14'}
+].forEach((m,i)=>{
+  cm.innerHTML+='<div class="m su" style="animation-delay:'+(i*.08)+'s"><div class="lb">'+m.l+'</div><div class="vl">'+m.v+'</div><div class="s2">'+m.s+'</div></div>';
+});
+
+// Coverage ratio histogram
+const covBuckets=['0-20%','20-40%','40-60%','60-80%','80-100%','100-120%'];
+const covCounts=[12,28,45,89,312,254];
+new Chart(document.getElementById('covHistChart'),{type:'bar',data:{labels:covBuckets,datasets:[{label:'Loan Count',data:covCounts,backgroundColor:covBuckets.map((_,i)=>i<2?C.rd+'aa':i<3?C.am+'aa':i<4?C.co+'aa':C.tl+'aa'),borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:'Coverage Ratio',color:'#556a8a'},ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.3)'}},y:{title:{display:true,text:'# Loans',color:'#556a8a'},ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// Collections vs scheduled monthly
+const colMonths=["Jul '25","Aug '25","Sep '25","Oct '25","Nov '25","Dec '25","Jan '26","Feb '26","Mar '26"];
+const scheduled=[520000,548000,580000,615000,652000,690000,710000,728000,742000];
+const actual=[475000,498000,535000,572000,598000,624000,648000,665000,680000];
+new Chart(document.getElementById('colTrendChart'),{type:'bar',data:{labels:colMonths,datasets:[
+{label:'Scheduled',data:scheduled,backgroundColor:C.ac+'66',borderRadius:4},
+{label:'Actual',data:actual,backgroundColor:C.tl+'cc',borderRadius:4}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#556a8a',font:{size:10}},grid:{color:'rgba(30,45,74,.3)'}},y:{ticks:{color:'#556a8a',callback:v=>fmtK(v)},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// Special events pie
+new Chart(document.getElementById('eventsChart'),{type:'doughnut',data:{labels:['Buyback (BB)','Insurance (INS/GAP)','Repo (REPO)','None'],datasets:[{data:[18,15,14,693],backgroundColor:[C.ac+'cc',C.am+'cc',C.rd+'cc',C.tl+'33'],borderWidth:2,borderColor:'#0d1420'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'right',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect',padding:10}}}}});
+
+// Payment velocity
+const velMonths=colMonths;
+const velocity=[18.2,17.5,16.8,15.9,15.2,14.8,14.5,14.1,13.8];
+new Chart(document.getElementById('velocityChart'),{type:'line',data:{labels:velMonths,datasets:[{label:'Avg Days to Payment',data:velocity,borderColor:C.ac,backgroundColor:C.ac+'22',fill:true,tension:.4,pointRadius:5,pointBackgroundColor:C.ac,borderWidth:2},{data:velMonths.map(()=>15),borderColor:'#556a8a',borderDash:[4,4],borderWidth:1,pointRadius:0,label:'Target (15d)'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#556a8a',font:{size:10}},grid:{color:'rgba(30,45,74,.3)'}},y:{title:{display:true,text:'Days',color:'#556a8a'},ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// ============ COLLECTABILITY TAB ============
+const vintages={
+  'MCCALLS1024':{npp:512000,months:5,xirr:16.2},
+  'TEXASTRUCK0625':{npp:539600,months:9,xirr:14.8},
+  'WORLD0924':{npp:346500,months:6,xirr:15.1},
+  'CORONA0625':{npp:377600,months:9,xirr:13.5},
+  'TEXASTRUCK1125':{npp:430900,months:4,xirr:17.4},
+  'CORONA1125':{npp:375100,months:4,xirr:15.9},
+  'FIFTHGEAR1125':{npp:283400,months:4,xirr:14.2},
+  'WOODMAR0824':{npp:285000,months:7,xirr:12.8}
+};
+
+const vColors=[C.rd,C.co,C.am,C.ac,C.bl,C.tl,C.gn,C.pk];
+const vLeg=document.getElementById('vintLeg');
+const vKeys=Object.keys(vintages);
+const vDS=vKeys.map((k,i)=>{
+  const v=vintages[k];const col=vColors[i%vColors.length];
+  const data=[];
+  for(let m=0;m<=Math.min(v.months,12);m++){
+    const base=m===0?0:Math.min(100,15+m*((85-15*rng())/v.months));
+    data.push(Math.round(base*10)/10);
+  }
+  vLeg.innerHTML+='<span><span class="dt" style="background:'+col+'"></span>'+k+' (XIRR: '+v.xirr+'%)</span>';
+  return{label:k,data,borderColor:col,backgroundColor:col+'15',borderWidth:2,pointRadius:3,pointBackgroundColor:col,tension:.3,fill:false};
+});
+
+new Chart(document.getElementById('vintChart'),{type:'line',data:{labels:Array.from({length:13},(_,i)=>'M'+i),datasets:[...vDS,{data:Array(13).fill(100),borderColor:'#334155',borderDash:[4,4],borderWidth:1,pointRadius:0,label:'100% target'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:'Months since purchase',color:'#556a8a',font:{size:11}},ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.2)'}},y:{min:0,max:120,title:{display:true,text:'Cumulative collection %',color:'#556a8a',font:{size:11}},ticks:{color:'#556a8a',callback:v=>v+'%'},grid:{color:'rgba(30,45,74,.2)'}}}}});
+
+// Lot-level performance
+new Chart(document.getElementById('lotChart'),{type:'bar',data:{labels:vKeys,datasets:[{label:'NPP ($)',data:vKeys.map(k=>vintages[k].npp),backgroundColor:C.ac+'88',borderRadius:4},{label:'XIRR %',data:vKeys.map(k=>vintages[k].xirr),type:'line',borderColor:C.tl,pointBackgroundColor:C.tl,pointRadius:5,borderWidth:2,yAxisID:'y1'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:10},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#556a8a',maxRotation:45,autoSkip:false,font:{size:8}},grid:{color:'rgba(30,45,74,.3)'}},y:{ticks:{color:'#556a8a',callback:v=>fmtK(v)},grid:{color:'rgba(30,45,74,.25)'}},y1:{position:'right',grid:{drawOnChartArea:false},ticks:{color:'#556a8a',callback:v=>v+'%'}}}}});
+
+// CAPM vs CAP2 vintage curves
+const capmCurve=[0,12,28,42,54,63,71,77,82,86,89,91,92];
+const cap2Curve=[0,10,24,38,49,58,65,71,76,80,83,85,87];
+new Chart(document.getElementById('capVintChart'),{type:'line',data:{labels:Array.from({length:13},(_,i)=>'M'+i),datasets:[
+{label:'CAPM (729 loans)',data:capmCurve,borderColor:C.ac,backgroundColor:C.ac+'22',fill:true,tension:.3,pointRadius:4,pointBackgroundColor:C.ac,borderWidth:2},
+{label:'CAP2 (105 loans)',data:cap2Curve,borderColor:C.pk,backgroundColor:C.pk+'22',fill:true,tension:.3,pointRadius:4,pointBackgroundColor:C.pk,borderWidth:2},
+{data:Array(13).fill(100),borderColor:'#334155',borderDash:[4,4],borderWidth:1,pointRadius:0,label:'Target'}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{title:{display:true,text:'Months',color:'#556a8a'},ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.2)'}},y:{min:0,max:110,ticks:{color:'#556a8a',callback:v=>v+'%'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// XIRR cards
+const xc=document.getElementById('xirrCards');
+[{l:'CAPM Blended XIRR',v:'14.8%',s:'Across all vintages'},{l:'CAP2 Blended XIRR',v:'12.3%',s:'Across all vintages'},{l:'Best Vintage',v:'TEXASTRUCK1125',s:'XIRR: 17.4%'}].forEach((m,i)=>{
+  xc.innerHTML+='<div class="m su" style="animation-delay:'+(i*.08)+'s"><div class="lb">'+m.l+'</div><div class="vl" style="font-size:20px">'+m.v+'</div><div class="s2">'+m.s+'</div></div>';
+});
+
+// ============ DATA QUALITY TAB ============
+const dqm=document.getElementById('dqMets');
+[{l:'DPD Matches',v:'672',s:'90.8% agreement'},{l:'DPD Mismatches',v:'68',s:'9.2% require review'},{l:'Deferments',v:'61',s:'8.3% of portfolio'},{l:'Validation Errors',v:'23',s:'3.1% of records'}
+].forEach((m,i)=>{
+  const c=i===0?C.tl:i===3?C.rd:C.am;
+  dqm.innerHTML+='<div class="m su" style="animation-delay:'+(i*.08)+'s"><div class="glow" style="background:linear-gradient(90deg,'+c+','+C.ac+')"></div><div class="lb">'+m.l+'</div><div class="vl" style="color:'+c+'">'+m.v+'</div><div class="s2">'+m.s+'</div></div>';
+});
+
+// DPD Reconciliation
+const reconLabels=['0','1-10','11-30','31-60','61-90','91-120','120+'];
+const calcDpd=[393,98,79,50,21,17,82];
+const svcDpd=[405,102,72,48,19,15,79];
+const lmsDpd=[398,100,75,49,20,16,82];
+new Chart(document.getElementById('reconChart'),{type:'bar',data:{labels:reconLabels,datasets:[
+{label:'Calculated',data:calcDpd,backgroundColor:C.ac+'88',borderRadius:3},
+{label:'Servicer',data:svcDpd,backgroundColor:C.tl+'88',borderRadius:3},
+{label:'LMS',data:lmsDpd,backgroundColor:C.am+'88',borderRadius:3}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{title:{display:true,text:'DPD Bucket',color:'#556a8a'},ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.3)'}},y:{ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// Deferment tracking
+const deferTypes=['Payment Deferment','Extension','Forbearance','Modification'];
+const deferCounts=[28,15,11,7];
+new Chart(document.getElementById('deferChart'),{type:'doughnut',data:{labels:deferTypes,datasets:[{data:deferCounts,backgroundColor:[C.ac+'cc',C.tl+'cc',C.am+'cc',C.co+'cc'],borderWidth:2,borderColor:'#0d1420'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'right',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect',padding:10}}}}});
+
+// Validation flags table
+const vt=document.getElementById('validationTable');
+const validationFlags=[
+{type:'Unreasonable Date',count:8,severity:'Warning',desc:'Origination date before 2020 or after report date'},
+{type:'Gap in Payment History',count:6,severity:'Error',desc:'Missing payment records for 2+ consecutive months'},
+{type:'Beyond Maturity',count:4,severity:'Error',desc:'Loan past maturity date but still active'},
+{type:'Pro-rata Mismatch',count:3,severity:'Warning',desc:'Pro-rata calculation differs from expected'},
+{type:'Balance Discrepancy',count:2,severity:'Error',desc:'Current balance exceeds original amount financed'}
+];
+vt.innerHTML='<table><thead><tr><th>Flag Type</th><th>Count</th><th>Severity</th><th>Description</th></tr></thead><tbody>'+validationFlags.map(f=>'<tr><td style="font-weight:600">'+f.type+'</td><td style="font-family:JetBrains Mono">'+f.count+'</td><td><span class="pl '+(f.severity==='Error'?'pl-r':'pl-y')+'">'+f.severity+'</span></td><td style="color:var(--t2);font-size:11px">'+f.desc+'</td></tr>').join('')+'</tbody></table>';
+
+// Event summary
+const es=document.getElementById('eventSummary');
+const eventSummary=[
+{type:'Buyback (BB)',count:18,totalAmt:'$214,300',avgAmt:'$11,906',desc:'Dealer repurchase of defaulted loan'},
+{type:'Insurance (INS/GAP)',count:15,totalAmt:'$168,500',avgAmt:'$11,233',desc:'Insurance claim payout received'},
+{type:'Repo (REPO)',count:14,totalAmt:'$142,800',avgAmt:'$10,200',desc:'Vehicle repossession and liquidation'},
+{type:'Deferment (DEF)',count:61,totalAmt:'N/A',avgAmt:'N/A',desc:'Payment deferment granted to borrower'}
+];
+es.innerHTML='<table><thead><tr><th>Event</th><th>Count</th><th>Total $</th><th>Avg $</th><th>Description</th></tr></thead><tbody>'+eventSummary.map(e=>'<tr><td style="font-weight:600">'+e.type+'</td><td style="font-family:JetBrains Mono">'+e.count+'</td><td style="font-family:JetBrains Mono;color:'+C.tl+'">'+e.totalAmt+'</td><td style="font-family:JetBrains Mono">'+e.avgAmt+'</td><td style="color:var(--t2);font-size:11px">'+e.desc+'</td></tr>').join('')+'</tbody></table>';
+
+// ============ CAP2 COMPARISON TAB ============
+const ch=document.getElementById('compHeader');
+// CAPM card
+ch.innerHTML='<div class="cd"><h3 style="color:'+C.ac+'">CAPM (CAP3)</h3><div class="g" style="grid-template-columns:repeat(3,1fr);gap:10px;font-size:12px">'+
+[{l:'Loans',v:'740'},{l:'Total Balance',v:'$8.14M'},{l:'Avg Balance',v:'$11.3K'},{l:'Avg Coverage',v:'91.2%'},{l:'Charge-off Rate',v:'11.1%'},{l:'Deferment Rate',v:'8.3%'}].map(x=>'<div><span style="color:var(--t3)">'+x.l+'</span><div style="font-weight:600;font-family:JetBrains Mono;font-size:14px">'+x.v+'</div></div>').join('')+
+'</div></div><div class="cd"><h3 style="color:'+C.pk+'">CAP2</h3><div class="g" style="grid-template-columns:repeat(3,1fr);gap:10px;font-size:12px">'+
+[{l:'Loans',v:'105'},{l:'Total Balance',v:fmtK(cap2Bal)},{l:'Avg Balance',v:fmtK(cap2Bal/105)},{l:'Avg Coverage',v:cap2AvgCov.toFixed(1)+'%'},{l:'Charge-off Rate',v:'9.5%'},{l:'Deferment Rate',v:'6.7%'}].map(x=>'<div><span style="color:var(--t3)">'+x.l+'</span><div style="font-weight:600;font-family:JetBrains Mono;font-size:14px">'+x.v+'</div></div>').join('')+
+'</div></div>';
+
+// DPD comparison
+const capmDpdPct=[53.1,23.9,6.8,2.8,2.3,11.1];
+const cap2DpdPct=[56.0,22.0,7.0,3.0,2.5,9.5];
+new Chart(document.getElementById('compDpdChart'),{type:'bar',data:{labels:DPD_DIST.map(d=>d.label),datasets:[
+{label:'CAPM',data:capmDpdPct,backgroundColor:C.ac+'88',borderRadius:4},
+{label:'CAP2',data:cap2DpdPct,backgroundColor:C.pk+'88',borderRadius:4}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+ctx.raw+'%'}}},scales:{x:{ticks:{color:'#556a8a',font:{size:10}},grid:{color:'rgba(30,45,74,.3)'}},y:{ticks:{color:'#556a8a',callback:v=>v+'%'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// Coverage comparison
+const capmCovDist=[12,28,45,89,312,254];
+const cap2CovDist=[2,5,8,14,42,34];
+new Chart(document.getElementById('compCovChart'),{type:'bar',data:{labels:covBuckets,datasets:[
+{label:'CAPM',data:capmCovDist,backgroundColor:C.ac+'88',borderRadius:4},
+{label:'CAP2',data:cap2CovDist,backgroundColor:C.pk+'88',borderRadius:4}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.3)'}},y:{ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// Performance metrics comparison
+const perfLabels=['Current %','Avg Coverage','XIRR %','Collection Rate %','Deferment %'];
+const capmPerf=[53.1,91.2,14.8,91.7,8.3];
+const cap2Perf=[56.0,cap2AvgCov,12.3,89.4,6.7];
+new Chart(document.getElementById('compPerfChart'),{type:'radar',data:{labels:perfLabels,datasets:[
+{label:'CAPM',data:capmPerf,borderColor:C.ac,backgroundColor:C.ac+'22',borderWidth:2,pointRadius:4,pointBackgroundColor:C.ac},
+{label:'CAP2',data:cap2Perf,borderColor:C.pk,backgroundColor:C.pk+'22',borderWidth:2,pointRadius:4,pointBackgroundColor:C.pk}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect',padding:14}}},scales:{r:{beginAtZero:true,max:100,ticks:{display:false},grid:{color:'rgba(30,45,74,.3)'},pointLabels:{color:'#8899b4',font:{size:10}}}}}});
+
+// Balance distribution comparison
+const balBuckets=['$0-5K','$5-10K','$10-15K','$15-20K','$20-25K','$25K+'];
+const capmBalDist=[74,222,196,133,74,41];
+const cap2BalDist=[12,32,28,18,10,5];
+new Chart(document.getElementById('compBalChart'),{type:'bar',data:{labels:balBuckets,datasets:[
+{label:'CAPM',data:capmBalDist,backgroundColor:C.ac+'88',borderRadius:4},
+{label:'CAP2',data:cap2BalDist,backgroundColor:C.pk+'88',borderRadius:4}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.3)'}},y:{ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// ============ LOAN EXPLORER TAB ============
+let sk='bal',sd=-1,searchTerm='';
+const activeFilters={dpd:null,dealer:null,event:null};
+
+document.querySelectorAll('.fbtn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const grp=btn.dataset.fg,val=btn.dataset.fv;
+    if(activeFilters[grp]===val){activeFilters[grp]=null;btn.classList.remove('on')}
+    else{document.querySelectorAll('.fbtn[data-fg="'+grp+'"]').forEach(b=>b.classList.remove('on'));activeFilters[grp]=val;btn.classList.add('on')}
+    renderLoans();
+  });
+});
+
+function filterLoans(){
+  let ls=[...loans];
+  if(searchTerm){const st=searchTerm.toLowerCase();ls=ls.filter(l=>l.id.toString().includes(st)||l.dealer.toLowerCase().includes(st)||l.status.toLowerCase().includes(st))}
+  if(activeFilters.dpd){
+    const d=activeFilters.dpd;
+    if(d==='current')ls=ls.filter(l=>l.dpd===0);
+    else if(d==='1-30')ls=ls.filter(l=>l.dpd>=1&&l.dpd<=30);
+    else if(d==='31-60')ls=ls.filter(l=>l.dpd>=31&&l.dpd<=60);
+    else if(d==='61-90')ls=ls.filter(l=>l.dpd>=61&&l.dpd<=90);
+    else if(d==='91-120')ls=ls.filter(l=>l.dpd>=91&&l.dpd<=120);
+    else if(d==='120+')ls=ls.filter(l=>l.dpd>120);
+  }
+  if(activeFilters.dealer){const dp=activeFilters.dealer.replace(/\d+$/,'');ls=ls.filter(l=>l.dealer.startsWith(dp))}
+  if(activeFilters.event){
+    if(activeFilters.event==='yes') ls=ls.filter(l=>l.event!=='');
+    else ls=ls.filter(l=>l.event==='');
+  }
+  return ls;
+}
+
+function renderLoans(){
+  let ls=filterLoans().sort((a,b)=>{
+    const av=a[sk],bv=b[sk];
+    if(typeof av==='string')return sd*(av.localeCompare(bv));
+    return sd*(av-bv);
+  }).slice(0,50);
+  document.getElementById('loanCount').textContent=filterLoans().length+' loans'+(filterLoans().length>50?' (showing 50)':'');
+  const cols=[{k:'id',l:'Account #',w:80},{k:'bal',l:'Balance',w:80},{k:'dpd',l:'Calc DPD',w:70},{k:'svcDpd',l:'Svc DPD',w:65},{k:'dpdDiff',l:'DPD Diff',w:65},{k:'covRatio',l:'Coverage',w:70},{k:'dealer',l:'Dealer',w:120},{k:'event',l:'Events',w:65},{k:'deferments',l:'Defer',w:50},{k:'status',l:'Status',w:80}];
+  document.getElementById('lHead').innerHTML='<tr>'+cols.map(c=>'<th style="width:'+c.w+'px" data-k="'+c.k+'">'+c.l+(sk===c.k?(sd<0?' &#x2193;':' &#x2191;'):'')+'</th>').join('')+'</tr>';
+  document.getElementById('lHead').querySelectorAll('th').forEach(th=>{th.onclick=()=>{const k=th.dataset.k;if(sk===k)sd*=-1;else{sk=k;sd=-1}renderLoans()}});
+  const maxDpd=Math.max(...loans.map(l=>l.dpd),1);
+  document.getElementById('lBody').innerHTML=ls.map((l,i)=>{
+    const dc=l.dpd>120?C.rd:l.dpd>60?C.co:l.dpd>30?C.am:l.dpd>0?C.bl:C.tl;
+    const diffCol=Math.abs(l.dpdDiff)>10?C.rd:Math.abs(l.dpdDiff)>5?C.am:C.tl;
+    const statCol=l.status==='Charge-off'?'pl-r':l.status==='Deferred'?'pl-y':'pl-g';
+    return'<tr style="cursor:pointer;animation:fi .3s ease-out '+Math.min(i*.02,.5)+'s both" onclick="showLoan('+l.id+')">'+
+    '<td style="font-family:JetBrains Mono;font-size:11px">'+l.id+'</td>'+
+    '<td style="font-family:JetBrains Mono;font-size:11px">'+fmtK(l.bal)+'</td>'+
+    '<td><div class="dp"><div class="dpf" style="width:'+Math.max(3,l.dpd/maxDpd*100)+'%;background:'+dc+'"></div></div><span style="color:'+dc+';font-weight:600;font-size:11px">'+l.dpd+'</span></td>'+
+    '<td style="font-size:11px;color:var(--t2)">'+l.svcDpd+'</td>'+
+    '<td style="font-family:JetBrains Mono;font-size:11px;color:'+diffCol+'">'+l.dpdDiff+'</td>'+
+    '<td><span style="color:'+(l.covRatio>=90?C.tl:l.covRatio>=70?C.am:C.rd)+';font-weight:600;font-size:11px">'+l.covRatio+'%</span></td>'+
+    '<td style="font-size:10px">'+l.dealer+'</td>'+
+    '<td>'+(l.event?'<span class="pl pl-b">'+l.event+'</span>':'<span style="color:var(--t3);font-size:10px">-</span>')+'</td>'+
+    '<td style="text-align:center;font-family:JetBrains Mono;font-size:11px;color:'+(l.deferments>0?C.am:'var(--t3)')+'">'+l.deferments+'</td>'+
+    '<td><span class="pl '+statCol+'">'+l.status+'</span></td></tr>';
+  }).join('');
+}
+renderLoans();
+
+document.getElementById('loanSearch').addEventListener('input',e=>{searchTerm=e.target.value;renderLoans()});
+
+window.showLoan=function(id){
+  const l=loans.find(x=>x.id===id);if(!l)return;
+  document.getElementById('lDetail').innerHTML='<div class="cd su" style="margin-top:12px"><div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:12px"><div><div style="font-size:16px;font-weight:600">Loan #'+l.id+'</div><div style="font-size:12px;color:var(--t3)">'+l.dealer+' &middot; APR '+l.apr+'% &middot; $'+l.pmt.toFixed(2)+'/mo</div></div><div style="display:flex;gap:6px"><span class="pl '+(l.dpd===0?'pl-g':l.dpd>120?'pl-r':l.dpd>30?'pl-y':'pl-b')+'">DPD: '+l.dpd+'</span><span class="pl '+(l.status==='Charge-off'?'pl-r':l.status==='Deferred'?'pl-y':'pl-g')+'">'+l.status+'</span></div></div>'+
+  '<div class="g g5" style="margin-bottom:12px">'+
+  [{l:'Balance',v:fmtK(l.bal)},{l:'Calculated DPD',v:'<span style="color:'+(l.dpd>120?C.rd:l.dpd>30?C.am:C.tl)+'">'+l.dpd+'</span>'},{l:'Servicer DPD',v:l.svcDpd.toString()},{l:'DPD Difference',v:'<span style="color:'+(Math.abs(l.dpdDiff)>10?C.rd:C.tl)+'">'+l.dpdDiff+'</span>'},{l:'Coverage',v:'<span style="color:'+(l.covRatio>=90?C.tl:l.covRatio>=70?C.am:C.rd)+'">'+l.covRatio+'%</span>'},{l:'APR',v:l.apr+'%'},{l:'Payment',v:'$'+l.pmt.toFixed(2)},{l:'Deferments',v:'<span style="color:'+(l.deferments>0?C.am:'var(--t2)')+'">'+l.deferments+'</span>'},{l:'Special Events',v:l.event||'None'},{l:'Charge-off',v:l.dpd>120?'<span style="color:'+C.rd+'">Yes ('+l.dpd+' DPD)</span>':'<span style="color:'+C.tl+'">No</span>'}].map(m=>'<div style="background:var(--bg);border-radius:8px;padding:10px"><div style="font-size:11px;color:var(--t3)">'+m.l+'</div><div style="font-size:14px;font-weight:600;font-family:JetBrains Mono">'+m.v+'</div></div>').join('')+'</div></div>';
+};
+
+// ============ THEME TOGGLE ============
+document.getElementById('themeToggle').addEventListener('click',()=>{
+  const html=document.documentElement;
+  const next=html.getAttribute('data-theme')==='light'?'dark':'light';
+  html.setAttribute('data-theme',next);
+  document.getElementById('themeToggle').innerHTML=next==='light'?'&#127769;':'&#9728;&#65039;';
+  Chart.defaults.color=next==='light'?'#475569':'#8899b4';
+  Chart.helpers.each(Chart.instances,(c)=>{
+    if(c.options.scales){
+      Object.values(c.options.scales).forEach(s=>{if(s.ticks)s.ticks.color=next==='light'?'#475569':'#556a8a';if(s.grid)s.grid.color=next==='light'?'rgba(0,0,0,.08)':'rgba(30,45,74,.25)';if(s.title&&s.title.color)s.title.color=next==='light'?'#475569':'#556a8a'});
+    }
+    c.update('none');
+  });
+});
+</script></body></html>

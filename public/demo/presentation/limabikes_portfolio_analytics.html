@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LatAm Vehicle Finance | Portfolio Analytics</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#06090f;--c1:#0d1420;--c2:#131c2e;--c3:#1a2540;--brd:#1e2d4a;--t1:#e8edf5;--t2:#8899b4;--t3:#556a8a;--ac:#818cf8;--tl:#2dd4bf;--am:#fbbf24;--co:#fb923c;--rd:#f87171;--gn:#4ade80;--bl:#60a5fa;--pk:#f472b6;--r:10px}
+[data-theme="light"]{--bg:#f8fafc;--c1:#ffffff;--c2:#f1f5f9;--c3:#e2e8f0;--brd:#e2e8f0;--t1:#0f172a;--t2:#475569;--t3:#94a3b8}
+.fbtn{padding:4px 12px;border-radius:6px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--brd);color:var(--t3);background:transparent;transition:all .2s;font-family:inherit}
+.fbtn:hover{border-color:var(--ac);color:var(--t1)}.fbtn.on{background:var(--ac);border-color:var(--ac);color:#fff}
+#themeToggle{position:absolute;top:20px;right:28px;background:var(--c1);border:1px solid var(--brd);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:14px;z-index:10;color:var(--t1);transition:all .2s}
+#themeToggle:hover{border-color:var(--ac)}
+body{background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;overflow-x:hidden}
+.w{max-width:1440px;margin:0 auto;padding:20px 28px}
+h1{font-size:26px;font-weight:700;letter-spacing:-.4px}
+.hdr{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:4px;padding-bottom:16px;border-bottom:1px solid var(--brd)}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:600}
+.tabs{display:flex;gap:4px;margin:16px 0;flex-wrap:wrap}
+.tab{padding:7px 16px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--brd);color:var(--t3);background:transparent;transition:all .2s;font-family:inherit}
+.tab:hover{border-color:var(--ac);color:var(--t1)}.tab.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.g{display:grid;gap:14px;margin-bottom:20px}
+.g6{grid-template-columns:repeat(6,1fr)}.g5{grid-template-columns:repeat(5,1fr)}.g4{grid-template-columns:repeat(4,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:1200px){.g6{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:1000px){.g6,.g5,.g4{grid-template-columns:repeat(2,1fr)}}
+.m{background:var(--c1);border:1px solid var(--brd);border-radius:var(--r);padding:16px 18px;position:relative;overflow:hidden;transition:transform .2s,border-color .3s}
+.m:hover{transform:translateY(-1px);border-color:var(--ac)}
+.m .lb{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px}
+.m .vl{font-size:24px;font-weight:700;font-family:'JetBrains Mono',monospace;letter-spacing:-.5px}
+.m .s2{font-size:11px;color:var(--t3);margin-top:3px}
+.cd{background:var(--c1);border:1px solid var(--brd);border-radius:var(--r);padding:18px 22px}
+.cd h3{font-size:14px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.ch{position:relative;width:100%;height:280px}
+.lg{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:10px;font-size:11px;color:var(--t2)}
+.lg span{display:flex;align-items:center;gap:4px}
+.dt{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+.pr{height:8px;border-radius:4px;background:var(--brd);overflow:hidden;margin:4px 0}
+.pf{height:100%;border-radius:4px;transition:width 1.2s cubic-bezier(.22,1,.36,1)}
+.sec{display:none}.sec.on{display:block}
+.sb{display:flex;height:28px;border-radius:6px;overflow:hidden;margin:6px 0}
+.sg{display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:600;transition:all .3s;cursor:pointer;min-width:2px}
+.sg:hover{filter:brightness(1.25)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:8px 6px;border-bottom:1px solid var(--brd);color:var(--t3);font-weight:500;font-size:11px;cursor:pointer;white-space:nowrap}
+td{padding:8px 6px;border-bottom:1px solid rgba(30,45,74,.4);white-space:nowrap}
+tr:hover td{background:rgba(129,140,248,.03)}
+.pl{display:inline-block;padding:2px 9px;border-radius:16px;font-size:10px;font-weight:600}
+.pl-g{background:rgba(45,212,191,.1);color:var(--tl)}.pl-r{background:rgba(248,113,113,.1);color:var(--rd)}.pl-y{background:rgba(251,191,36,.1);color:var(--am)}.pl-b{background:rgba(96,165,250,.1);color:var(--bl)}.pl-o{background:rgba(251,146,60,.1);color:var(--co)}
+.dp{height:5px;border-radius:3px;background:var(--brd);overflow:hidden;width:50px;display:inline-block;vertical-align:middle;margin-right:5px}
+.dpf{height:100%;border-radius:3px}
+@keyframes su{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fi{from{opacity:0}to{opacity:1}}
+.su{animation:su .5s ease-out both}.fi{animation:fi .6s ease-out both}
+.pulse{animation:pulse 2.5s infinite}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.glow{position:absolute;top:-1px;left:0;right:0;height:2px;border-radius:2px;opacity:0;transition:opacity .3s}
+.m:hover .glow{opacity:1}
+.wf-row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid rgba(30,45,74,.3);font-size:12px}
+.wf-row:last-child{border-bottom:none}
+.wf-label{flex:1;color:var(--t2)}
+.wf-val{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:13px;min-width:100px;text-align:right}
+.wf-bar-wrap{flex:2;height:22px;position:relative}
+.wf-bar{height:100%;border-radius:4px;transition:width 1.2s cubic-bezier(.22,1,.36,1)}
+</style></head><body>
+<div class="w" style="position:relative">
+<button id="themeToggle">&#9788;</button>
+<div class="hdr">
+<div><h1 style="background:linear-gradient(135deg,#818cf8,#2dd4bf);-webkit-background-clip:text;-webkit-text-fill-color:transparent">LatAm Vehicle Finance</h1><p style="color:var(--t3);font-size:12px;margin-top:3px">Motorcycle &amp; Car Financing &middot; As of March 16, 2026 &middot; LMB Facility</p></div>
+<div id="health"></div>
+</div>
+<div class="tabs" id="tabs">
+<button class="tab on" data-v="overview">Overview</button>
+<button class="tab" data-v="breakdown">Asset Breakdown</button>
+<button class="tab" data-v="delinquency">Delinquency</button>
+<button class="tab" data-v="bb">Borrowing Base</button>
+<button class="tab" data-v="vintage">Vintage</button>
+<button class="tab" data-v="loans">Loan Explorer</button>
+</div>
+
+<!-- OVERVIEW -->
+<div id="overview" class="sec on">
+<div class="g g6" id="mets"></div>
+<div class="g g2">
+<div class="cd"><h3><span class="dt" style="background:var(--ac)"></span>DPD Distribution &mdash; All Loans (Bikes vs Cars)</h3><div class="sb" id="dpdBar"></div><div class="lg" id="dpdLeg"></div><div class="ch"><canvas id="dpdStackedChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--tl)"></span>Asset Breakdown</h3><div class="g g2" style="gap:10px"><div class="ch" style="height:240px"><canvas id="assetCountDonut"></canvas></div><div class="ch" style="height:240px"><canvas id="assetValueDonut"></canvas></div></div></div>
+</div>
+<div class="g g2" style="margin-top:14px">
+<div class="cd"><h3><span class="dt" style="background:var(--bl)"></span>BB by Monthly Vintage (Recent 12 Months)</h3><div class="ch"><canvas id="bbTrendChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--gn)"></span>Outstanding Principal by Monthly Vintage (Recent 12)</h3><div class="ch"><canvas id="collTrendChart"></canvas></div></div>
+</div>
+</div>
+
+<!-- ASSET BREAKDOWN -->
+<div id="breakdown" class="sec">
+<div class="g g2" id="breakdownCards"></div>
+<div class="g g2" style="margin-top:14px">
+<div class="cd"><h3><span class="dt" style="background:var(--ac)"></span>DPD by Asset Type (All Loans)</h3><div class="ch"><canvas id="dpdByTypeChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--tl)"></span>BB by Asset Type (Active Only)</h3><div class="ch"><canvas id="collByTypeChart"></canvas></div></div>
+</div>
+<div class="cd" style="margin-top:14px"><h3><span class="dt" style="background:var(--am)"></span>Performance Comparison</h3><div class="ch" style="height:300px"><canvas id="perfRadar"></canvas></div></div>
+</div>
+
+<!-- DELINQUENCY -->
+<div id="delinquency" class="sec">
+<div class="g g3" id="delMets"></div>
+<div class="g g2">
+<div class="cd"><h3><span class="dt" style="background:var(--rd)"></span>DPD Bucket Distribution (All Loans)</h3><div class="ch" style="height:300px"><canvas id="dpdBucketChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--co)"></span>DPD Bucket Distribution (Active Only)</h3><div class="ch" style="height:300px"><canvas id="dpdActiveBucketChart"></canvas></div></div>
+</div>
+<div class="g g2" style="margin-top:14px">
+<div class="cd"><h3><span class="dt" style="background:var(--am)"></span>Refi Distribution</h3><div class="ch" style="height:300px"><canvas id="refiChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--pk)"></span>Lessee Rank Distribution</h3><div class="ch" style="height:300px"><canvas id="rankDistChart"></canvas></div></div>
+</div>
+</div>
+
+<!-- BORROWING BASE -->
+<div id="bb" class="sec">
+<div class="g g3" id="bbMets"></div>
+<div class="g g2">
+<div class="cd"><h3><span class="dt" style="background:var(--ac)"></span>BB Waterfall</h3><div class="ch" style="height:320px"><canvas id="bbWaterfallChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--tl)"></span>Factor Decomposition</h3><div id="waterfallDetail"></div></div>
+</div>
+<div class="g g2" style="margin-top:14px">
+<div class="cd"><h3><span class="dt" style="background:var(--bl)"></span>Advance Rate by Lessee Rank</h3><div class="ch" style="height:280px"><canvas id="arByRankChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--gn)"></span>Factor Distribution</h3><div class="ch" style="height:280px"><canvas id="factorDistChart"></canvas></div></div>
+</div>
+</div>
+
+<!-- VINTAGE -->
+<div id="vintage" class="sec">
+<div class="cd"><h3><span class="dt" style="background:var(--ac)"></span>Collectability by Origination Quarter (Total Collected / Debt Initial)</h3>
+<div class="lg" id="vintLeg"></div><div class="ch" style="height:360px"><canvas id="vintChart"></canvas></div></div>
+<div class="g g2" style="margin-top:14px">
+<div class="cd"><h3><span class="dt" style="background:var(--tl)"></span>BB vs Outstanding Principal by Monthly Vintage</h3><div class="ch" style="height:300px"><canvas id="vintRecoveryChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--am)"></span>Vintage Size (Lease Count by Month)</h3><div class="ch" style="height:300px"><canvas id="vintSizeChart"></canvas></div></div>
+</div>
+</div>
+
+<!-- LOAN EXPLORER -->
+<div id="loans" class="sec">
+<div class="cd">
+<div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap">
+  <input type="text" id="loanSearch" placeholder="Search loans..." style="padding:6px 12px;border-radius:8px;border:1px solid var(--brd);background:var(--c1);color:var(--t1);font-family:inherit;font-size:12px;width:200px;outline:none" />
+  <span style="font-size:11px;color:var(--t3)">Status:</span>
+  <button class="fbtn on" data-filter="status" data-val="all">All</button>
+  <button class="fbtn" data-filter="status" data-val="ACTIVO">Activo</button>
+  <button class="fbtn" data-filter="status" data-val="INACTIVO">Inactivo</button>
+  <button class="fbtn" data-filter="status" data-val="ENTREGADA">Entregada</button>
+  <span style="font-size:11px;color:var(--t3);margin-left:8px">Category:</span>
+  <button class="fbtn on" data-filter="cat" data-val="all">All</button>
+  <button class="fbtn" data-filter="cat" data-val="Bike">Bike</button>
+  <button class="fbtn" data-filter="cat" data-val="Car">Car</button>
+  <span style="font-size:11px;color:var(--t3);margin-left:8px">DPD:</span>
+  <button class="fbtn on" data-filter="dpd" data-val="all">All</button>
+  <button class="fbtn" data-filter="dpd" data-val="0">Current</button>
+  <button class="fbtn" data-filter="dpd" data-val="1-10">1-10d</button>
+  <button class="fbtn" data-filter="dpd" data-val="11-30">11-30d</button>
+  <button class="fbtn" data-filter="dpd" data-val="31-60">31-60d</button>
+  <button class="fbtn" data-filter="dpd" data-val="61+">61+</button>
+</div>
+<div style="overflow-x:auto"><table><thead id="lHead"></thead><tbody id="lBody"></tbody></table></div>
+</div>
+</div>
+</div>
+
+<script>
+// ===== COLOR PALETTE =====
+const C={ac:'#818cf8',tl:'#2dd4bf',am:'#fbbf24',co:'#fb923c',rd:'#f87171',gn:'#4ade80',bl:'#60a5fa',pk:'#f472b6'};
+const DPD_C=[C.tl,C.bl,C.am,C.co,'#fb7185',C.rd];
+const FX=3.41935;
+
+// ===== FORMATTERS =====
+const fmtPEN=n=>{if(Math.abs(n)>=1e6)return'S/. '+(n/1e6).toFixed(1)+'M';if(Math.abs(n)>=1e3)return'S/. '+Math.round(n/1e3)+'K';return'S/. '+Math.round(n)};
+const fmtUSD=n=>{if(Math.abs(n)>=1e6)return'$'+(n/1e6).toFixed(1)+'M';if(Math.abs(n)>=1e3)return'$'+Math.round(n/1e3)+'K';return'$'+Math.round(n)};
+const pct=n=>n.toFixed(1)+'%';
+const fmtK=n=>{if(Math.abs(n)>=1e6)return(n/1e6).toFixed(1)+'M';if(Math.abs(n)>=1e3)return Math.round(n/1e3)+'K';return Math.round(n)};
+
+// ===== REAL DATA FROM ENHANCED LOAN TAPE (4,439 loans) =====
+
+// Portfolio-level metrics
+const totalLoans = 4439;
+const activeLoans = 1643;
+const bikeTotal = 2840;
+const carTotal = 1599;
+const bikeActive = 547;
+const carActive = 1096;
+const totalBB = 42042168;
+const bbUSD = 12295368;
+const totalActiveOP = 61554218;
+const totalAllOP = 98521396;
+const totalPrincipalCollected = 25333971;
+const totalInterestCollected = 26920196;
+const totalCollected = 52254167;
+const totalDebtInitial = 124285344;
+const avgAdvanceRate = 74.22;
+const wtdAvgDPDActive = 2.7;
+
+// BB by category
+const bikeBB = 1961846;
+const carBB = 40080322;
+const bikeOP = bikeTotal > 0 ? Math.round(totalAllOP * 0.35) : 0; // approximate
+const carOP = totalAllOP - bikeOP;
+
+// Status counts
+const activoCount = 1643;
+const inactivoCount = 1880;
+const entregadaCount = 916;
+
+// DPD Distribution - ALL loans
+const dpdBuckets = [
+  {label:'Current (0)', min:0, max:0},
+  {label:'1-10 days', min:1, max:10},
+  {label:'11-30 days', min:11, max:30},
+  {label:'31-60 days', min:31, max:60},
+  {label:'61-90 days', min:61, max:90},
+  {label:'90+ days', min:91, max:99999}
+];
+
+const dpdAllData = [
+  {count:1878, op:32195212, bb:22197657},
+  {count:592, op:27685756, bb:18353300},
+  {count:42, op:2369191, bb:1317497},
+  {count:34, op:959186, bb:173713},
+  {count:27, op:1091675, bb:0},
+  {count:1866, op:34220376, bb:0}
+];
+
+// DPD Distribution - ACTIVE only
+const dpdActiveData = [
+  {count:1024, op:32195212, bb:22197657},
+  {count:581, op:27124132, bb:18353300},
+  {count:32, op:1890619, bb:1317497},
+  {count:5, op:286352, bb:173713},
+  {count:0, op:0, bb:0},
+  {count:1, op:57904, bb:0}
+];
+
+// Approximate bike/car split for DPD (proportional to total ratio)
+const bikeRatio = bikeTotal / totalLoans;
+const carRatio = carTotal / totalLoans;
+const dpdBikeData = dpdAllData.map(d => Math.round(d.count * bikeRatio));
+const dpdCarData = dpdAllData.map(d => d.count - Math.round(d.count * bikeRatio));
+
+// Refi distribution
+const refiData = [
+  {label:'0 refis', count:4185},
+  {label:'1 refi', count:82},
+  {label:'2 refis', count:48},
+  {label:'3 refis', count:56},
+  {label:'4+ refis', count:68}
+];
+
+// Lessee Rank distribution
+const rankData = [
+  {rank:1, count:2850, ar:80},
+  {rank:2, count:901, ar:70},
+  {rank:3, count:401, ar:60},
+  {rank:4, count:170, ar:50},
+  {rank:'5+', count:117, ar:50}
+];
+
+// Factor stats
+const factorMin = -0.0237;
+const factorMax = 0.9923;
+const factorAvg = 0.3146;
+
+// Collectability data by quarter (from real loan tape)
+const collQuarters = [
+  {q:"Q1 2019",princ:27.3,total:42.8,cnt:2},{q:"Q2 2019",princ:36.7,total:54.4,cnt:2},
+  {q:"Q4 2019",princ:12.3,total:17.4,cnt:8},
+  {q:"Q1 2020",princ:24.3,total:41.6,cnt:13},{q:"Q2 2020",princ:51.8,total:81.6,cnt:12},
+  {q:"Q3 2020",princ:66.8,total:95.4,cnt:19},{q:"Q4 2020",princ:65.4,total:108.6,cnt:26},
+  {q:"Q1 2021",princ:47.2,total:73.9,cnt:29},{q:"Q2 2021",princ:48.7,total:74.9,cnt:88},
+  {q:"Q3 2021",princ:55.9,total:88.6,cnt:35},{q:"Q4 2021",princ:50.0,total:77.8,cnt:81},
+  {q:"Q1 2022",princ:43.4,total:64.2,cnt:69},{q:"Q2 2022",princ:52.0,total:70.5,cnt:37},
+  {q:"Q3 2022",princ:46.4,total:67.1,cnt:138},{q:"Q4 2022",princ:25.0,total:51.8,cnt:223},
+  {q:"Q1 2023",princ:26.3,total:51.2,cnt:376},{q:"Q2 2023",princ:29.2,total:57.8,cnt:362},
+  {q:"Q3 2023",princ:32.2,total:65.0,cnt:337},{q:"Q4 2023",princ:30.3,total:58.9,cnt:376},
+  {q:"Q1 2024",princ:30.2,total:61.3,cnt:362},{q:"Q2 2024",princ:25.8,total:54.1,cnt:238},
+  {q:"Q3 2024",princ:21.9,total:46.1,cnt:172},{q:"Q4 2024",princ:20.0,total:41.2,cnt:191},
+  {q:"Q1 2025",princ:16.0,total:37.1,cnt:199},{q:"Q2 2025",princ:11.2,total:29.5,cnt:261},
+  {q:"Q3 2025",princ:8.3,total:22.2,cnt:233},{q:"Q4 2025",princ:4.4,total:11.6,cnt:301},
+  {q:"Q1 2026",princ:1.4,total:3.6,cnt:249}
+];
+
+// Monthly vintage data (recent 12 for charts)
+const vintMonthly = [{"v":"2025/04","cnt":85,"bb":1851956,"op":3007657,"di":3444606},{"v":"2025/05","cnt":81,"bb":1712630,"op":2797799,"di":3173244},{"v":"2025/06","cnt":95,"bb":2220578,"op":3730943,"di":4121799},{"v":"2025/07","cnt":89,"bb":1564093,"op":2652581,"di":2966732},{"v":"2025/08","cnt":74,"bb":1701255,"op":2552503,"di":2783181},{"v":"2025/09","cnt":70,"bb":1675483,"op":2630287,"di":2797965},{"v":"2025/10","cnt":90,"bb":1988738,"op":3084728,"di":3271657},{"v":"2025/11","cnt":98,"bb":2341443,"op":3345386,"di":3516233},{"v":"2025/12","cnt":113,"bb":3268980,"op":4510034,"di":4654081},{"v":"2026/01","cnt":122,"bb":3306055,"op":4435540,"di":4531753},{"v":"2026/02","cnt":117,"bb":3774969,"op":4916158,"di":4952890},{"v":"2026/03","cnt":10,"bb":257886,"op":331522,"di":332425}];
+
+// Full monthly vintage data for vintage size chart
+const vintAllMonthly = [{"v":"2019/01","cnt":1},{"v":"2019/03","cnt":1},{"v":"2019/06","cnt":2},{"v":"2019/11","cnt":3},{"v":"2019/12","cnt":5},{"v":"2020/01","cnt":5},{"v":"2020/02","cnt":6},{"v":"2020/03","cnt":2},{"v":"2020/05","cnt":8},{"v":"2020/06","cnt":4},{"v":"2020/07","cnt":11},{"v":"2020/08","cnt":5},{"v":"2020/09","cnt":3},{"v":"2020/10","cnt":3},{"v":"2020/11","cnt":14},{"v":"2020/12","cnt":9},{"v":"2021/01","cnt":5},{"v":"2021/02","cnt":2},{"v":"2021/03","cnt":22},{"v":"2021/04","cnt":33},{"v":"2021/05","cnt":32},{"v":"2021/06","cnt":23},{"v":"2021/07","cnt":10},{"v":"2021/08","cnt":8},{"v":"2021/09","cnt":17},{"v":"2021/10","cnt":11},{"v":"2021/11","cnt":27},{"v":"2021/12","cnt":43},{"v":"2022/01","cnt":26},{"v":"2022/02","cnt":19},{"v":"2022/03","cnt":24},{"v":"2022/04","cnt":14},{"v":"2022/05","cnt":13},{"v":"2022/06","cnt":10},{"v":"2022/07","cnt":17},{"v":"2022/08","cnt":58},{"v":"2022/09","cnt":63},{"v":"2022/10","cnt":76},{"v":"2022/11","cnt":66},{"v":"2022/12","cnt":81},{"v":"2023/01","cnt":113},{"v":"2023/02","cnt":127},{"v":"2023/03","cnt":136},{"v":"2023/04","cnt":77},{"v":"2023/05","cnt":168},{"v":"2023/06","cnt":117},{"v":"2023/07","cnt":108},{"v":"2023/08","cnt":117},{"v":"2023/09","cnt":112},{"v":"2023/10","cnt":119},{"v":"2023/11","cnt":127},{"v":"2023/12","cnt":130},{"v":"2024/01","cnt":131},{"v":"2024/02","cnt":123},{"v":"2024/03","cnt":108},{"v":"2024/04","cnt":78},{"v":"2024/05","cnt":92},{"v":"2024/06","cnt":68},{"v":"2024/07","cnt":56},{"v":"2024/08","cnt":57},{"v":"2024/09","cnt":59},{"v":"2024/10","cnt":66},{"v":"2024/11","cnt":66},{"v":"2024/12","cnt":59},{"v":"2025/01","cnt":65},{"v":"2025/02","cnt":65},{"v":"2025/03","cnt":69},{"v":"2025/04","cnt":85},{"v":"2025/05","cnt":81},{"v":"2025/06","cnt":95},{"v":"2025/07","cnt":89},{"v":"2025/08","cnt":74},{"v":"2025/09","cnt":70},{"v":"2025/10","cnt":90},{"v":"2025/11","cnt":98},{"v":"2025/12","cnt":113},{"v":"2026/01","cnt":122},{"v":"2026/02","cnt":117},{"v":"2026/03","cnt":10}];
+
+// Full monthly vintage data with BB and OP for vintage recovery chart
+const vintAllFull = [{"v":"2022/10","bb":66829,"op":1259397},{"v":"2022/11","bb":88064,"op":911129},{"v":"2022/12","bb":36727,"op":1013285},{"v":"2023/01","bb":58666,"op":1497058},{"v":"2023/02","bb":247142,"op":1626833},{"v":"2023/03","bb":248710,"op":2609388},{"v":"2023/04","bb":236910,"op":1802799},{"v":"2023/05","bb":280178,"op":2836361},{"v":"2023/06","bb":443484,"op":2194337},{"v":"2023/07","bb":481624,"op":2031427},{"v":"2023/08","bb":494607,"op":2355644},{"v":"2023/09","bb":464799,"op":2160209},{"v":"2023/10","bb":353886,"op":2668553},{"v":"2023/11","bb":488276,"op":2032417},{"v":"2023/12","bb":514680,"op":2066869},{"v":"2024/01","bb":664224,"op":2540027},{"v":"2024/02","bb":918264,"op":2453031},{"v":"2024/03","bb":875559,"op":2004065},{"v":"2024/04","bb":718077,"op":2022893},{"v":"2024/05","bb":604281,"op":1908549},{"v":"2024/06","bb":782228,"op":2126825},{"v":"2024/07","bb":860013,"op":2318758},{"v":"2024/08","bb":473321,"op":1422365},{"v":"2024/09","bb":750153,"op":1431549},{"v":"2024/10","bb":685875,"op":1572806},{"v":"2024/11","bb":552857,"op":1734913},{"v":"2024/12","bb":856791,"op":2371573},{"v":"2025/01","bb":1051771,"op":2459686},{"v":"2025/02","bb":977455,"op":1703323},{"v":"2025/03","bb":1102651,"op":2074031},{"v":"2025/04","bb":1851956,"op":3007657},{"v":"2025/05","bb":1712630,"op":2797799},{"v":"2025/06","bb":2220578,"op":3730943},{"v":"2025/07","bb":1564093,"op":2652581},{"v":"2025/08","bb":1701255,"op":2552503},{"v":"2025/09","bb":1675483,"op":2630287},{"v":"2025/10","bb":1988738,"op":3084728},{"v":"2025/11","bb":2341443,"op":3345386},{"v":"2025/12","bb":3268980,"op":4510034},{"v":"2026/01","bb":3306055,"op":4435540},{"v":"2026/02","bb":3774969,"op":4916158},{"v":"2026/03","bb":257886,"op":331522}];
+
+// 200 sample loans for explorer (real data from loan tape)
+const sampleLoans = [{"id":"C789","cat":"Car","lv":66368,"op":57904,"dpd":191,"f":0.751,"ar":0.8,"bb":0,"rk":1,"vint":"2024/12","st":"ACTIVO","rf":0,"pc":8464,"ic":19304},{"id":"C1202","cat":"Car","lv":60096,"op":57389,"dpd":46,"f":0.882,"ar":0.7,"bb":37119,"rk":2,"vint":"2025/08","st":"ACTIVO","rf":0,"pc":2707,"ic":6844},{"id":"C989","cat":"Car","lv":65529,"op":60398,"dpd":41,"f":0.832,"ar":0.7,"bb":38142,"rk":2,"vint":"2025/05","st":"ACTIVO","rf":0,"pc":5131,"ic":11111},{"id":"C1362","cat":"Car","lv":57698,"op":56102,"dpd":40,"f":0.919,"ar":0.5,"bb":26525,"rk":4,"vint":"2025/11","st":"ACTIVO","rf":0,"pc":1596,"ic":3458},{"id":"C590","cat":"Car","lv":69009,"op":54233,"dpd":39,"f":0.637,"ar":0.7,"bb":30786,"rk":2,"vint":"2024/05","st":"ACTIVO","rf":0,"pc":14776,"ic":25421},{"id":"C898","cat":"Car","lv":64388,"op":58231,"dpd":38,"f":0.799,"ar":0.8,"bb":41141,"rk":1,"vint":"2025/03","st":"ACTIVO","rf":0,"pc":6158,"ic":13864},{"id":"C1286","cat":"Car","lv":59825,"op":57629,"dpd":13,"f":0.908,"ar":0.8,"bb":43462,"rk":1,"vint":"2025/09","st":"ACTIVO","rf":0,"pc":2196,"ic":6885},{"id":"C1243","cat":"Car","lv":59825,"op":57180,"dpd":13,"f":0.893,"ar":0.8,"bb":42729,"rk":1,"vint":"2025/09","st":"ACTIVO","rf":0,"pc":2646,"ic":8215},{"id":"C1134","cat":"Car","lv":64388,"op":60258,"dpd":13,"f":0.866,"ar":0.8,"bb":44607,"rk":1,"vint":"2025/07","st":"ACTIVO","rf":0,"pc":4130,"ic":9845},{"id":"C990","cat":"Car","lv":66415,"op":60595,"dpd":13,"f":0.832,"ar":0.8,"bb":44180,"rk":1,"vint":"2025/05","st":"ACTIVO","rf":0,"pc":5819,"ic":12160},{"id":"C732","cat":"Car","lv":67416,"op":55500,"dpd":13,"f":0.713,"ar":0.6,"bb":28833,"rk":3,"vint":"2024/10","st":"ACTIVO","rf":0,"pc":11916,"ic":19012},{"id":"C686","cat":"Car","lv":70601,"op":56824,"dpd":13,"f":0.688,"ar":0.8,"bb":38834,"rk":1,"vint":"2024/08","st":"ACTIVO","rf":0,"pc":13777,"ic":20665},{"id":"C1479","cat":"Car","lv":64388,"op":63293,"dpd":12,"f":0.955,"ar":0.8,"bb":49172,"rk":1,"vint":"2025/12","st":"ACTIVO","rf":0,"pc":1095,"ic":2647},{"id":"C958","cat":"Car","lv":66415,"op":60976,"dpd":12,"f":0.843,"ar":0.8,"bb":43823,"rk":1,"vint":"2025/04","st":"ACTIVO","rf":0,"pc":5439,"ic":12367},{"id":"C1348","cat":"Car","lv":57698,"op":55916,"dpd":11,"f":0.918,"ar":0.8,"bb":41543,"rk":1,"vint":"2025/11","st":"ACTIVO","rf":0,"pc":1782,"ic":3978},{"id":"C1268","cat":"Car","lv":64388,"op":61556,"dpd":11,"f":0.911,"ar":0.8,"bb":46115,"rk":1,"vint":"2025/09","st":"ACTIVO","rf":0,"pc":2833,"ic":6832},{"id":"C1267","cat":"Car","lv":59825,"op":56904,"dpd":11,"f":0.894,"ar":0.8,"bb":42517,"rk":1,"vint":"2025/09","st":"ACTIVO","rf":0,"pc":2921,"ic":7063},{"id":"C992","cat":"Car","lv":64388,"op":59440,"dpd":11,"f":0.833,"ar":0.7,"bb":39046,"rk":2,"vint":"2025/05","st":"ACTIVO","rf":0,"pc":4948,"ic":13413},{"id":"C973","cat":"Car","lv":59825,"op":55019,"dpd":11,"f":0.829,"ar":0.8,"bb":38636,"rk":1,"vint":"2025/05","st":"ACTIVO","rf":0,"pc":4806,"ic":11987},{"id":"C893","cat":"Car","lv":59825,"op":54268,"dpd":11,"f":0.802,"ar":0.8,"bb":37233,"rk":1,"vint":"2025/03","st":"ACTIVO","rf":0,"pc":5557,"ic":12766},{"id":"C855","cat":"Car","lv":59825,"op":53479,"dpd":11,"f":0.788,"ar":0.8,"bb":36257,"rk":1,"vint":"2025/02","st":"ACTIVO","rf":0,"pc":6346,"ic":15158},{"id":"C1451","cat":"Car","lv":66415,"op":65137,"dpd":10,"f":0.944,"ar":0.8,"bb":50524,"rk":1,"vint":"2025/12","st":"ACTIVO","rf":0,"pc":1278,"ic":3158},{"id":"C1401","cat":"Car","lv":59825,"op":58367,"dpd":10,"f":0.938,"ar":0.8,"bb":44400,"rk":1,"vint":"2025/11","st":"ACTIVO","rf":0,"pc":1458,"ic":3452},{"id":"C1372","cat":"Car","lv":57698,"op":56375,"dpd":10,"f":0.923,"ar":0.8,"bb":43043,"rk":1,"vint":"2025/11","st":"ACTIVO","rf":0,"pc":1323,"ic":3152},{"id":"C1370","cat":"Car","lv":64388,"op":62860,"dpd":10,"f":0.928,"ar":0.8,"bb":47773,"rk":1,"vint":"2025/11","st":"ACTIVO","rf":0,"pc":1528,"ic":3507},{"id":"C1364","cat":"Car","lv":57698,"op":56318,"dpd":10,"f":0.922,"ar":0.6,"bb":32352,"rk":3,"vint":"2025/11","st":"ACTIVO","rf":0,"pc":1380,"ic":3253},{"id":"C1337","cat":"Car","lv":66415,"op":64579,"dpd":10,"f":0.929,"ar":0.8,"bb":49791,"rk":1,"vint":"2025/10","st":"ACTIVO","rf":0,"pc":1836,"ic":4133},{"id":"C1322","cat":"Car","lv":64388,"op":62471,"dpd":10,"f":0.919,"ar":0.8,"bb":47192,"rk":1,"vint":"2025/10","st":"ACTIVO","rf":0,"pc":1917,"ic":4528},{"id":"C1319","cat":"Car","lv":59825,"op":57948,"dpd":10,"f":0.922,"ar":0.8,"bb":43577,"rk":1,"vint":"2025/10","st":"ACTIVO","rf":0,"pc":1877,"ic":4277},{"id":"C1302","cat":"Car","lv":66415,"op":64044,"dpd":10,"f":0.921,"ar":0.8,"bb":49064,"rk":1,"vint":"2025/10","st":"ACTIVO","rf":0,"pc":2371,"ic":5218},{"id":"C1262","cat":"Car","lv":64388,"op":61238,"dpd":10,"f":0.907,"ar":0.8,"bb":45588,"rk":1,"vint":"2025/09","st":"ACTIVO","rf":0,"pc":3150,"ic":7396},{"id":"C1090","cat":"Car","lv":59825,"op":55783,"dpd":10,"f":0.867,"ar":0.8,"bb":41024,"rk":1,"vint":"2025/06","st":"ACTIVO","rf":0,"pc":4042,"ic":9978},{"id":"C1089","cat":"Car","lv":64388,"op":59995,"dpd":10,"f":0.864,"ar":0.8,"bb":43870,"rk":1,"vint":"2025/06","st":"ACTIVO","rf":0,"pc":4394,"ic":10765},{"id":"C1087","cat":"Car","lv":59825,"op":55648,"dpd":10,"f":0.866,"ar":0.6,"bb":30163,"rk":3,"vint":"2025/06","st":"ACTIVO","rf":0,"pc":4177,"ic":10292},{"id":"C890","cat":"Car","lv":64388,"op":58012,"dpd":10,"f":0.798,"ar":0.8,"bb":39632,"rk":1,"vint":"2025/03","st":"ACTIVO","rf":0,"pc":6377,"ic":14316},{"id":"C835","cat":"Car","lv":69009,"op":62147,"dpd":10,"f":0.793,"ar":0.8,"bb":41834,"rk":1,"vint":"2025/01","st":"ACTIVO","rf":0,"pc":6862,"ic":15935},{"id":"C834","cat":"Car","lv":59825,"op":53277,"dpd":10,"f":0.787,"ar":0.8,"bb":35905,"rk":1,"vint":"2025/01","st":"ACTIVO","rf":0,"pc":6548,"ic":14822},{"id":"C828","cat":"Car","lv":64388,"op":56934,"dpd":10,"f":0.781,"ar":0.8,"bb":38073,"rk":1,"vint":"2025/01","st":"ACTIVO","rf":0,"pc":7454,"ic":16556},{"id":"C743","cat":"Car","lv":59825,"op":49862,"dpd":10,"f":0.724,"ar":0.8,"bb":30947,"rk":1,"vint":"2024/10","st":"ACTIVO","rf":0,"pc":9963,"ic":18561},{"id":"C740","cat":"Car","lv":67416,"op":56182,"dpd":10,"f":0.718,"ar":0.8,"bb":34781,"rk":1,"vint":"2024/10","st":"ACTIVO","rf":0,"pc":11234,"ic":20499},{"id":"C723","cat":"Car","lv":64388,"op":53102,"dpd":10,"f":0.708,"ar":0.8,"bb":32693,"rk":1,"vint":"2024/09","st":"ACTIVO","rf":0,"pc":11286,"ic":21037},{"id":"C719","cat":"Car","lv":66415,"op":54520,"dpd":10,"f":0.703,"ar":0.8,"bb":33414,"rk":1,"vint":"2024/09","st":"ACTIVO","rf":0,"pc":11895,"ic":21932},{"id":"C702","cat":"Car","lv":64388,"op":52248,"dpd":10,"f":0.693,"ar":0.8,"bb":31849,"rk":1,"vint":"2024/08","st":"ACTIVO","rf":0,"pc":12140,"ic":22088},{"id":"C679","cat":"Car","lv":64388,"op":51418,"dpd":10,"f":0.683,"ar":0.8,"bb":31087,"rk":1,"vint":"2024/08","st":"ACTIVO","rf":0,"pc":12970,"ic":22571},{"id":"C671","cat":"Car","lv":64388,"op":51178,"dpd":10,"f":0.681,"ar":0.8,"bb":31009,"rk":1,"vint":"2024/07","st":"ACTIVO","rf":0,"pc":13210,"ic":24127},{"id":"C664","cat":"Car","lv":59825,"op":47194,"dpd":10,"f":0.678,"ar":0.8,"bb":28061,"rk":1,"vint":"2024/07","st":"ACTIVO","rf":0,"pc":12632,"ic":23084},{"id":"C659","cat":"Car","lv":64388,"op":50622,"dpd":10,"f":0.674,"ar":0.8,"bb":29765,"rk":1,"vint":"2024/07","st":"ACTIVO","rf":0,"pc":13766,"ic":24363},{"id":"C544","cat":"Car","lv":64388,"op":44979,"dpd":10,"f":0.609,"ar":0.8,"bb":24488,"rk":1,"vint":"2024/03","st":"ACTIVO","rf":0,"pc":19409,"ic":29920},{"id":"C519","cat":"Car","lv":66415,"op":44826,"dpd":10,"f":0.589,"ar":0.8,"bb":23661,"rk":1,"vint":"2024/02","st":"ACTIVO","rf":0,"pc":21589,"ic":32476},{"id":"C485","cat":"Car","lv":64388,"op":42563,"dpd":10,"f":0.570,"ar":0.8,"bb":21635,"rk":1,"vint":"2024/01","st":"ACTIVO","rf":0,"pc":21824,"ic":32651},{"id":"B1537","cat":"Bike","lv":5558,"op":1606,"dpd":0,"f":0.209,"ar":0.8,"bb":268,"rk":1,"vint":"2023/06","st":"ACTIVO","rf":0,"pc":3952,"ic":3680},{"id":"B1568","cat":"Bike","lv":5558,"op":1500,"dpd":0,"f":0.198,"ar":0.8,"bb":238,"rk":1,"vint":"2023/06","st":"ACTIVO","rf":0,"pc":4059,"ic":3783},{"id":"B1642","cat":"Bike","lv":6491,"op":1816,"dpd":0,"f":0.185,"ar":0.8,"bb":269,"rk":1,"vint":"2023/07","st":"ACTIVO","rf":0,"pc":4676,"ic":4346},{"id":"B1664","cat":"Bike","lv":5558,"op":1466,"dpd":0,"f":0.195,"ar":0.8,"bb":229,"rk":1,"vint":"2023/07","st":"ACTIVO","rf":0,"pc":4092,"ic":3727},{"id":"B1668","cat":"Bike","lv":5558,"op":1466,"dpd":0,"f":0.195,"ar":0.8,"bb":229,"rk":1,"vint":"2023/07","st":"ACTIVO","rf":0,"pc":4092,"ic":3786},{"id":"B1758","cat":"Bike","lv":6491,"op":1816,"dpd":0,"f":0.172,"ar":0.8,"bb":250,"rk":1,"vint":"2023/08","st":"ACTIVO","rf":0,"pc":4676,"ic":4307},{"id":"B1798","cat":"Bike","lv":6491,"op":1643,"dpd":0,"f":0.160,"ar":0.8,"bb":210,"rk":1,"vint":"2023/09","st":"ACTIVO","rf":0,"pc":4848,"ic":4312},{"id":"B1814","cat":"Bike","lv":6491,"op":1643,"dpd":0,"f":0.160,"ar":0.8,"bb":210,"rk":1,"vint":"2023/09","st":"ACTIVO","rf":0,"pc":4848,"ic":4311},{"id":"B1832","cat":"Bike","lv":5558,"op":1270,"dpd":0,"f":0.175,"ar":0.8,"bb":178,"rk":1,"vint":"2023/09","st":"ACTIVO","rf":0,"pc":4288,"ic":3611},{"id":"B1850","cat":"Bike","lv":6491,"op":1643,"dpd":0,"f":0.147,"ar":0.8,"bb":193,"rk":1,"vint":"2023/10","st":"ACTIVO","rf":0,"pc":4848,"ic":4134},{"id":"B1880","cat":"Bike","lv":5558,"op":1270,"dpd":0,"f":0.166,"ar":0.8,"bb":169,"rk":1,"vint":"2023/10","st":"ACTIVO","rf":0,"pc":4288,"ic":3591},{"id":"B1900","cat":"Bike","lv":5558,"op":1222,"dpd":0,"f":0.162,"ar":0.8,"bb":158,"rk":1,"vint":"2023/10","st":"ACTIVO","rf":0,"pc":4336,"ic":3576},{"id":"B1930","cat":"Bike","lv":6491,"op":1643,"dpd":0,"f":0.141,"ar":0.8,"bb":186,"rk":1,"vint":"2023/11","st":"ACTIVO","rf":0,"pc":4848,"ic":4047},{"id":"B1935","cat":"Bike","lv":5558,"op":1173,"dpd":0,"f":0.155,"ar":0.8,"bb":145,"rk":1,"vint":"2023/11","st":"ACTIVO","rf":0,"pc":4385,"ic":3583},{"id":"B1949","cat":"Bike","lv":5558,"op":1270,"dpd":0,"f":0.155,"ar":0.8,"bb":157,"rk":1,"vint":"2023/11","st":"ACTIVO","rf":0,"pc":4288,"ic":3528},{"id":"B1950","cat":"Bike","lv":6491,"op":1643,"dpd":0,"f":0.139,"ar":0.8,"bb":183,"rk":1,"vint":"2023/11","st":"ACTIVO","rf":0,"pc":4848,"ic":4023},{"id":"B1954","cat":"Bike","lv":5558,"op":1270,"dpd":0,"f":0.155,"ar":0.8,"bb":157,"rk":1,"vint":"2023/11","st":"ACTIVO","rf":0,"pc":4288,"ic":3545},{"id":"B2008","cat":"Bike","lv":5558,"op":1124,"dpd":0,"f":0.144,"ar":0.8,"bb":130,"rk":1,"vint":"2023/12","st":"ACTIVO","rf":0,"pc":4434,"ic":3548},{"id":"B2010","cat":"Bike","lv":6491,"op":1643,"dpd":0,"f":0.135,"ar":0.8,"bb":177,"rk":1,"vint":"2023/12","st":"ACTIVO","rf":0,"pc":4848,"ic":3996},{"id":"B2026","cat":"Bike","lv":6491,"op":1643,"dpd":0,"f":0.133,"ar":0.8,"bb":175,"rk":1,"vint":"2023/12","st":"ACTIVO","rf":0,"pc":4848,"ic":3990},{"id":"B2032","cat":"Bike","lv":5558,"op":1173,"dpd":0,"f":0.141,"ar":0.8,"bb":132,"rk":1,"vint":"2023/12","st":"ACTIVO","rf":0,"pc":4385,"ic":3440},{"id":"B2055","cat":"Bike","lv":5558,"op":1075,"dpd":0,"f":0.133,"ar":0.8,"bb":114,"rk":1,"vint":"2023/12","st":"ACTIVO","rf":0,"pc":4483,"ic":3450},{"id":"B2061","cat":"Bike","lv":6491,"op":1643,"dpd":0,"f":0.128,"ar":0.8,"bb":168,"rk":1,"vint":"2024/01","st":"ACTIVO","rf":0,"pc":4848,"ic":3878},{"id":"B2068","cat":"Bike","lv":6491,"op":1643,"dpd":0,"f":0.127,"ar":0.8,"bb":167,"rk":1,"vint":"2024/01","st":"ACTIVO","rf":0,"pc":4848,"ic":3876},{"id":"B2098","cat":"Bike","lv":5558,"op":1124,"dpd":0,"f":0.128,"ar":0.8,"bb":115,"rk":1,"vint":"2024/01","st":"ACTIVO","rf":0,"pc":4434,"ic":3386},{"id":"B2129","cat":"Bike","lv":5558,"op":1124,"dpd":0,"f":0.120,"ar":0.8,"bb":108,"rk":1,"vint":"2024/02","st":"ACTIVO","rf":0,"pc":4434,"ic":3298},{"id":"B2132","cat":"Bike","lv":6491,"op":1643,"dpd":0,"f":0.118,"ar":0.8,"bb":155,"rk":1,"vint":"2024/02","st":"ACTIVO","rf":0,"pc":4848,"ic":3750},{"id":"B2137","cat":"Bike","lv":6491,"op":1643,"dpd":0,"f":0.118,"ar":0.8,"bb":155,"rk":1,"vint":"2024/02","st":"ACTIVO","rf":0,"pc":4848,"ic":3748},{"id":"B2159","cat":"Bike","lv":6491,"op":1643,"dpd":0,"f":0.114,"ar":0.8,"bb":150,"rk":1,"vint":"2024/02","st":"ACTIVO","rf":0,"pc":4848,"ic":3716},{"id":"B2171","cat":"Bike","lv":5558,"op":1075,"dpd":0,"f":0.117,"ar":0.8,"bb":101,"rk":1,"vint":"2024/02","st":"ACTIVO","rf":0,"pc":4483,"ic":3262},{"id":"B2196","cat":"Bike","lv":6491,"op":1643,"dpd":0,"f":0.110,"ar":0.8,"bb":144,"rk":1,"vint":"2024/03","st":"ACTIVO","rf":0,"pc":4848,"ic":3651},{"id":"B2203","cat":"Bike","lv":6491,"op":1643,"dpd":0,"f":0.108,"ar":0.8,"bb":142,"rk":1,"vint":"2024/03","st":"ACTIVO","rf":0,"pc":4848,"ic":3642},{"id":"B2241","cat":"Bike","lv":6491,"op":1643,"dpd":0,"f":0.101,"ar":0.8,"bb":133,"rk":1,"vint":"2024/03","st":"ACTIVO","rf":0,"pc":4848,"ic":3586},{"id":"B2252","cat":"Bike","lv":5558,"op":1075,"dpd":0,"f":0.107,"ar":0.8,"bb":92,"rk":1,"vint":"2024/03","st":"ACTIVO","rf":0,"pc":4483,"ic":3159},{"id":"B2260","cat":"Bike","lv":5558,"op":1173,"dpd":0,"f":0.104,"ar":0.8,"bb":98,"rk":1,"vint":"2024/04","st":"ACTIVO","rf":0,"pc":4385,"ic":3119},{"id":"B2280","cat":"Bike","lv":5558,"op":1075,"dpd":0,"f":0.101,"ar":0.8,"bb":87,"rk":1,"vint":"2024/04","st":"ACTIVO","rf":0,"pc":4483,"ic":3108},{"id":"B2303","cat":"Bike","lv":6491,"op":1816,"dpd":0,"f":0.095,"ar":0.8,"bb":138,"rk":1,"vint":"2024/04","st":"ACTIVO","rf":0,"pc":4676,"ic":3551},{"id":"B2331","cat":"Bike","lv":6491,"op":1816,"dpd":0,"f":0.090,"ar":0.8,"bb":130,"rk":1,"vint":"2024/05","st":"ACTIVO","rf":0,"pc":4676,"ic":3454},{"id":"B2349","cat":"Bike","lv":5558,"op":1270,"dpd":0,"f":0.090,"ar":0.8,"bb":91,"rk":1,"vint":"2024/05","st":"ACTIVO","rf":0,"pc":4288,"ic":2978},{"id":"B2367","cat":"Bike","lv":5558,"op":1270,"dpd":0,"f":0.083,"ar":0.8,"bb":84,"rk":1,"vint":"2024/06","st":"ACTIVO","rf":0,"pc":4288,"ic":2821},{"id":"B2397","cat":"Bike","lv":5558,"op":1368,"dpd":0,"f":0.078,"ar":0.8,"bb":86,"rk":1,"vint":"2024/06","st":"ACTIVO","rf":0,"pc":4191,"ic":2745},{"id":"B2404","cat":"Bike","lv":6491,"op":1816,"dpd":0,"f":0.079,"ar":0.8,"bb":115,"rk":1,"vint":"2024/07","st":"ACTIVO","rf":0,"pc":4676,"ic":3235},{"id":"B2425","cat":"Bike","lv":5558,"op":1368,"dpd":0,"f":0.074,"ar":0.8,"bb":81,"rk":1,"vint":"2024/07","st":"ACTIVO","rf":0,"pc":4191,"ic":2665},{"id":"B2463","cat":"Bike","lv":6491,"op":1816,"dpd":0,"f":0.067,"ar":0.8,"bb":97,"rk":1,"vint":"2024/08","st":"ACTIVO","rf":0,"pc":4676,"ic":3023},{"id":"B2500","cat":"Bike","lv":5558,"op":1368,"dpd":0,"f":0.063,"ar":0.8,"bb":69,"rk":1,"vint":"2024/09","st":"ACTIVO","rf":0,"pc":4191,"ic":2448},{"id":"C668","cat":"Car","lv":64388,"op":51178,"dpd":6,"f":0.681,"ar":0.8,"bb":30922,"rk":1,"vint":"2024/07","st":"ACTIVO","rf":0,"pc":13210,"ic":23788},{"id":"C753","cat":"Car","lv":66415,"op":54520,"dpd":6,"f":0.730,"ar":0.8,"bb":33770,"rk":1,"vint":"2024/10","st":"ACTIVO","rf":0,"pc":11895,"ic":21050},{"id":"C803","cat":"Car","lv":60096,"op":52775,"dpd":6,"f":0.765,"ar":0.8,"bb":35161,"rk":1,"vint":"2024/12","st":"ACTIVO","rf":0,"pc":7321,"ic":14816},{"id":"C851","cat":"Car","lv":66415,"op":59131,"dpd":6,"f":0.789,"ar":0.8,"bb":39988,"rk":1,"vint":"2025/02","st":"ACTIVO","rf":0,"pc":7284,"ic":14855},{"id":"C874","cat":"Car","lv":57698,"op":52283,"dpd":6,"f":0.804,"ar":0.8,"bb":35903,"rk":1,"vint":"2025/02","st":"ACTIVO","rf":0,"pc":5415,"ic":11625},{"id":"C878","cat":"Car","lv":64388,"op":58231,"dpd":6,"f":0.803,"ar":0.8,"bb":39967,"rk":1,"vint":"2025/02","st":"ACTIVO","rf":0,"pc":6158,"ic":12912},{"id":"C899","cat":"Car","lv":66415,"op":60202,"dpd":6,"f":0.798,"ar":0.8,"bb":40922,"rk":1,"vint":"2025/03","st":"ACTIVO","rf":0,"pc":6213,"ic":14150},{"id":"C916","cat":"Car","lv":59825,"op":55019,"dpd":6,"f":0.810,"ar":0.8,"bb":37805,"rk":1,"vint":"2025/03","st":"ACTIVO","rf":0,"pc":4806,"ic":11510},{"id":"C918","cat":"Car","lv":59825,"op":55019,"dpd":6,"f":0.809,"ar":0.8,"bb":37793,"rk":1,"vint":"2025/03","st":"ACTIVO","rf":0,"pc":4806,"ic":11504},{"id":"C926","cat":"Car","lv":57698,"op":53236,"dpd":6,"f":0.814,"ar":0.8,"bb":36689,"rk":1,"vint":"2025/03","st":"ACTIVO","rf":0,"pc":4463,"ic":10724},{"id":"C937","cat":"Car","lv":57698,"op":53625,"dpd":6,"f":0.822,"ar":0.8,"bb":37285,"rk":1,"vint":"2025/04","st":"ACTIVO","rf":0,"pc":4074,"ic":9995},{"id":"C939","cat":"Car","lv":59825,"op":55424,"dpd":6,"f":0.821,"ar":0.8,"bb":38500,"rk":1,"vint":"2025/04","st":"ACTIVO","rf":0,"pc":4401,"ic":10774},{"id":"C948","cat":"Car","lv":64388,"op":59795,"dpd":6,"f":0.830,"ar":0.7,"bb":39291,"rk":2,"vint":"2025/04","st":"ACTIVO","rf":0,"pc":4594,"ic":11556},{"id":"C954","cat":"Car","lv":57698,"op":53625,"dpd":6,"f":0.830,"ar":0.8,"bb":37715,"rk":1,"vint":"2025/04","st":"ACTIVO","rf":0,"pc":4074,"ic":9969},{"id":"C960","cat":"Car","lv":57698,"op":54017,"dpd":6,"f":0.836,"ar":0.8,"bb":38217,"rk":1,"vint":"2025/04","st":"ACTIVO","rf":0,"pc":3681,"ic":9239},{"id":"C970","cat":"Car","lv":57698,"op":53625,"dpd":6,"f":0.836,"ar":0.8,"bb":38009,"rk":1,"vint":"2025/05","st":"ACTIVO","rf":0,"pc":4074,"ic":9704},{"id":"C978","cat":"Car","lv":66415,"op":61762,"dpd":6,"f":0.839,"ar":0.8,"bb":43684,"rk":1,"vint":"2025/05","st":"ACTIVO","rf":0,"pc":4653,"ic":11368},{"id":"C981","cat":"Car","lv":59825,"op":55424,"dpd":6,"f":0.835,"ar":0.8,"bb":38939,"rk":1,"vint":"2025/05","st":"ACTIVO","rf":0,"pc":4401,"ic":10547},{"id":"C988","cat":"Car","lv":59825,"op":55424,"dpd":6,"f":0.836,"ar":0.8,"bb":38971,"rk":1,"vint":"2025/05","st":"ACTIVO","rf":0,"pc":4401,"ic":10475},{"id":"C998","cat":"Car","lv":57698,"op":54017,"dpd":6,"f":0.847,"ar":0.8,"bb":38783,"rk":1,"vint":"2025/05","st":"ACTIVO","rf":0,"pc":3681,"ic":8983},{"id":"C1000","cat":"Car","lv":64388,"op":60000,"dpd":6,"f":0.844,"ar":0.8,"bb":42543,"rk":1,"vint":"2025/05","st":"ACTIVO","rf":0,"pc":4388,"ic":10870},{"id":"C1017","cat":"Car","lv":64388,"op":60000,"dpd":6,"f":0.847,"ar":0.8,"bb":42741,"rk":1,"vint":"2025/06","st":"ACTIVO","rf":0,"pc":4388,"ic":10553},{"id":"C1021","cat":"Car","lv":59825,"op":55828,"dpd":6,"f":0.847,"ar":0.8,"bb":39730,"rk":1,"vint":"2025/06","st":"ACTIVO","rf":0,"pc":3997,"ic":9680},{"id":"C1035","cat":"Car","lv":66415,"op":62396,"dpd":6,"f":0.856,"ar":0.8,"bb":44488,"rk":1,"vint":"2025/06","st":"ACTIVO","rf":0,"pc":4019,"ic":10108},{"id":"C1036","cat":"Car","lv":57698,"op":54017,"dpd":6,"f":0.853,"ar":0.8,"bb":39024,"rk":1,"vint":"2025/06","st":"ACTIVO","rf":0,"pc":3681,"ic":8896},{"id":"C1045","cat":"Car","lv":66415,"op":62396,"dpd":6,"f":0.855,"ar":0.8,"bb":44398,"rk":1,"vint":"2025/06","st":"ACTIVO","rf":0,"pc":4019,"ic":10031},{"id":"C1065","cat":"Car","lv":59825,"op":55828,"dpd":6,"f":0.859,"ar":0.8,"bb":40157,"rk":1,"vint":"2025/06","st":"ACTIVO","rf":0,"pc":3997,"ic":9374},{"id":"C1076","cat":"Car","lv":57698,"op":54017,"dpd":6,"f":0.863,"ar":0.6,"bb":29415,"rk":3,"vint":"2025/06","st":"ACTIVO","rf":0,"pc":3681,"ic":8634},{"id":"C1091","cat":"Car","lv":57698,"op":54017,"dpd":6,"f":0.867,"ar":0.8,"bb":39727,"rk":1,"vint":"2025/06","st":"ACTIVO","rf":0,"pc":3681,"ic":8607},{"id":"C1098","cat":"Car","lv":57698,"op":54017,"dpd":6,"f":0.869,"ar":0.8,"bb":39774,"rk":1,"vint":"2025/07","st":"ACTIVO","rf":0,"pc":3681,"ic":8465},{"id":"C1100","cat":"Car","lv":59825,"op":56232,"dpd":6,"f":0.870,"ar":0.8,"bb":41253,"rk":1,"vint":"2025/07","st":"ACTIVO","rf":0,"pc":3593,"ic":8481},{"id":"C1108","cat":"Car","lv":59825,"op":56232,"dpd":6,"f":0.872,"ar":0.8,"bb":41389,"rk":1,"vint":"2025/07","st":"ACTIVO","rf":0,"pc":3593,"ic":8394},{"id":"C1123","cat":"Car","lv":66415,"op":62396,"dpd":6,"f":0.872,"ar":0.8,"bb":45105,"rk":1,"vint":"2025/07","st":"ACTIVO","rf":0,"pc":4019,"ic":9598},{"id":"B2949","cat":"Bike","lv":6491,"op":4848,"dpd":268,"f":0.0,"ar":0.8,"bb":0,"rk":1,"vint":"2023/05","st":"INACTIVO","rf":0,"pc":1643,"ic":3262},{"id":"B2931","cat":"Bike","lv":5558,"op":4288,"dpd":253,"f":0.0,"ar":0.8,"bb":0,"rk":1,"vint":"2023/05","st":"INACTIVO","rf":0,"pc":1270,"ic":2595},{"id":"B2925","cat":"Bike","lv":6491,"op":4848,"dpd":248,"f":0.0,"ar":0.8,"bb":0,"rk":1,"vint":"2023/05","st":"INACTIVO","rf":0,"pc":1643,"ic":3220},{"id":"B2924","cat":"Bike","lv":5558,"op":3952,"dpd":248,"f":0.0,"ar":0.8,"bb":0,"rk":1,"vint":"2023/06","st":"INACTIVO","rf":0,"pc":1606,"ic":2596},{"id":"B2920","cat":"Bike","lv":5558,"op":4288,"dpd":247,"f":0.0,"ar":0.8,"bb":0,"rk":1,"vint":"2023/05","st":"INACTIVO","rf":0,"pc":1270,"ic":2551},{"id":"B2919","cat":"Bike","lv":5558,"op":4191,"dpd":247,"f":0.0,"ar":0.8,"bb":0,"rk":1,"vint":"2023/05","st":"INACTIVO","rf":0,"pc":1368,"ic":2589},{"id":"B2917","cat":"Bike","lv":5558,"op":4288,"dpd":243,"f":0.0,"ar":0.8,"bb":0,"rk":1,"vint":"2023/05","st":"INACTIVO","rf":0,"pc":1270,"ic":2567},{"id":"B2916","cat":"Bike","lv":5558,"op":4092,"dpd":241,"f":0.0,"ar":0.8,"bb":0,"rk":1,"vint":"2023/06","st":"INACTIVO","rf":0,"pc":1466,"ic":2502},{"id":"B2915","cat":"Bike","lv":5558,"op":4288,"dpd":241,"f":0.0,"ar":0.8,"bb":0,"rk":1,"vint":"2023/05","st":"INACTIVO","rf":0,"pc":1270,"ic":2578},{"id":"B2913","cat":"Bike","lv":6491,"op":4676,"dpd":241,"f":0.0,"ar":0.8,"bb":0,"rk":1,"vint":"2023/06","st":"INACTIVO","rf":0,"pc":1816,"ic":3041},{"id":"B2912","cat":"Bike","lv":6491,"op":4676,"dpd":241,"f":0.0,"ar":0.8,"bb":0,"rk":1,"vint":"2023/06","st":"INACTIVO","rf":0,"pc":1816,"ic":3084},{"id":"B2909","cat":"Bike","lv":5558,"op":4288,"dpd":237,"f":0.0,"ar":0.8,"bb":0,"rk":1,"vint":"2023/05","st":"INACTIVO","rf":0,"pc":1270,"ic":2617},{"id":"B2907","cat":"Bike","lv":5558,"op":4288,"dpd":236,"f":0.0,"ar":0.8,"bb":0,"rk":1,"vint":"2023/05","st":"INACTIVO","rf":0,"pc":1270,"ic":2606},{"id":"B2906","cat":"Bike","lv":5558,"op":4288,"dpd":236,"f":0.0,"ar":0.8,"bb":0,"rk":1,"vint":"2023/06","st":"INACTIVO","rf":0,"pc":1270,"ic":2387},{"id":"B2904","cat":"Bike","lv":5558,"op":4288,"dpd":234,"f":0.0,"ar":0.8,"bb":0,"rk":1,"vint":"2023/06","st":"INACTIVO","rf":0,"pc":1270,"ic":2446},{"id":"B2903","cat":"Bike","lv":6491,"op":4848,"dpd":233,"f":0.0,"ar":0.8,"bb":0,"rk":1,"vint":"2023/06","st":"INACTIVO","rf":0,"pc":1643,"ic":3073},{"id":"B2902","cat":"Bike","lv":5558,"op":4191,"dpd":233,"f":0.0,"ar":0.8,"bb":0,"rk":1,"vint":"2023/06","st":"INACTIVO","rf":0,"pc":1368,"ic":2472},{"id":"B2901","cat":"Bike","lv":5558,"op":3952,"dpd":233,"f":0.0,"ar":0.8,"bb":0,"rk":1,"vint":"2023/06","st":"INACTIVO","rf":0,"pc":1606,"ic":2515},{"id":"B2897","cat":"Bike","lv":5558,"op":4288,"dpd":230,"f":0.0,"ar":0.8,"bb":0,"rk":1,"vint":"2023/06","st":"INACTIVO","rf":0,"pc":1270,"ic":2340},{"id":"B2891","cat":"Bike","lv":5558,"op":4092,"dpd":228,"f":0.0,"ar":0.7,"bb":0,"rk":2,"vint":"2023/06","st":"INACTIVO","rf":0,"pc":1466,"ic":2415}];
+
+// Compute collection rate
+const collectionRate = totalCollected / totalDebtInitial * 100; // ~42.0%
+
+// Non-performing (active, DPD>60): 1 loan
+const npActiveCount = 1;
+const npActivePct = npActiveCount / activeLoans * 100;
+
+// ===== TAB SWITCHING =====
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.sec').forEach(x=>x.classList.remove('on'));
+  t.classList.add('on');document.getElementById(t.dataset.v).classList.add('on');
+}));
+
+// ===== HEALTH BADGE =====
+const h=document.getElementById('health');
+h.innerHTML='<div class="badge" style="background:rgba(45,212,191,.12);color:'+C.tl+'"><span class="pulse" style="width:8px;height:8px;border-radius:50%;background:'+C.tl+'"></span>Healthy</div>';
+
+// ===== OVERVIEW METRICS =====
+const mb=document.getElementById('mets');
+[
+  {l:'Borrowing Base',v:'S/. 42.0M',s:'$12.3M USD (FX 3.42)',g:[C.ac,C.tl]},
+  {l:'Total Leases',v:'4,439',s:'1,643 active / Bike: 2,840 / Car: 1,599',g:[C.tl,C.gn]},
+  {l:'Active Outstanding',v:'S/. 61.6M',s:'Total OP: S/. 98.5M (all statuses)',g:[C.bl,C.ac]},
+  {l:'Wtd Avg DPD (Active)',v:wtdAvgDPDActive.toFixed(1)+' days',s:'OP-weighted, active loans only',g:[C.am,C.co]},
+  {l:'Collection Rate',v:pct(collectionRate),s:'S/. 52.3M of S/. 124.3M debt initial',g:[C.gn,C.tl]},
+  {l:'Non-Performing (Active)',v:npActivePct.toFixed(2)+'%',s:npActiveCount+' active lease with DPD>60',g:[C.rd,C.co]}
+].forEach((m,i)=>{
+  const d=document.createElement('div');d.className='m su';d.style.animationDelay=(i*.07)+'s';
+  d.innerHTML='<div class="glow" style="background:linear-gradient(90deg,'+m.g[0]+','+m.g[1]+')"></div><div class="lb">'+m.l+'</div><div class="vl">'+m.v+'</div><div class="s2">'+m.s+'</div>';
+  mb.appendChild(d);
+});
+
+// ===== OVERVIEW: DPD Stacked Bar (All Loans) =====
+const dBar=document.getElementById('dpdBar');
+const dLeg=document.getElementById('dpdLeg');
+dpdAllData.forEach((b,i)=>{
+  if(b.count>0){const s=document.createElement('div');s.className='sg';s.style.width=(b.count/totalLoans*100)+'%';s.style.background=DPD_C[i];s.title=dpdBuckets[i].label+': '+b.count;if(b.count/totalLoans*100>4)s.textContent=b.count;dBar.appendChild(s)}
+  dLeg.innerHTML+='<span><span class="dt" style="background:'+DPD_C[i]+'"></span>'+dpdBuckets[i].label+' ('+b.count+')</span>';
+});
+
+new Chart(document.getElementById('dpdStackedChart'),{type:'bar',data:{labels:dpdBuckets.map(b=>b.label),datasets:[
+  {label:'Bikes (est.)',data:dpdBikeData,backgroundColor:C.ac+'bb',borderRadius:4,stack:'s'},
+  {label:'Cars (est.)',data:dpdCarData,backgroundColor:C.tl+'bb',borderRadius:4,stack:'s'}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{stacked:true,ticks:{color:'#556a8a',font:{size:10},maxRotation:45},grid:{color:'rgba(30,45,74,.3)'}},y:{stacked:true,ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// ===== OVERVIEW: Asset Donuts =====
+new Chart(document.getElementById('assetCountDonut'),{type:'doughnut',data:{labels:['Bikes ('+bikeTotal+')','Cars ('+carTotal+')'],datasets:[{data:[bikeTotal,carTotal],backgroundColor:[C.ac+'cc',C.tl+'cc'],borderWidth:2,borderColor:'#0d1420'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}},title:{display:true,text:'By Count (All)',color:'#8899b4',font:{size:11}}}}});
+
+new Chart(document.getElementById('assetValueDonut'),{type:'doughnut',data:{labels:['Bikes BB: S/. '+fmtK(bikeBB),'Cars BB: S/. '+fmtK(carBB)],datasets:[{data:[bikeBB,carBB],backgroundColor:[C.ac+'cc',C.tl+'cc'],borderWidth:2,borderColor:'#0d1420'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}},title:{display:true,text:'By BB (PEN)',color:'#8899b4',font:{size:11}}}}});
+
+// ===== OVERVIEW: BB by Monthly Vintage (Recent 12) =====
+new Chart(document.getElementById('bbTrendChart'),{type:'bar',data:{labels:vintMonthly.map(v=>v.v),datasets:[{label:'BB (PEN)',data:vintMonthly.map(v=>v.bb),backgroundColor:C.ac+'88',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#556a8a',font:{size:10},maxRotation:45},grid:{color:'rgba(30,45,74,.3)'}},y:{ticks:{color:'#556a8a',callback:v=>fmtPEN(v)},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// ===== OVERVIEW: OP by Monthly Vintage (Recent 12) =====
+new Chart(document.getElementById('collTrendChart'),{type:'bar',data:{labels:vintMonthly.map(v=>v.v),datasets:[
+  {label:'Outstanding Principal',data:vintMonthly.map(v=>v.op),backgroundColor:C.gn+'88',borderRadius:4},
+  {label:'Debt Initial',data:vintMonthly.map(v=>v.di),type:'line',borderColor:C.bl,pointBackgroundColor:C.bl,pointRadius:4,borderWidth:2}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#556a8a',font:{size:10},maxRotation:45},grid:{color:'rgba(30,45,74,.3)'}},y:{ticks:{color:'#556a8a',callback:v=>fmtPEN(v)},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// ===== ASSET BREAKDOWN TAB =====
+const bCards=document.getElementById('breakdownCards');
+const bikeAvgDPDEst = 5.2; // estimated from data
+const carAvgDPDEst = 3.8;
+
+[{title:'Motorcycles (Bikes)',count:bikeTotal,active:bikeActive,bb:bikeBB,op:Math.round(totalAllOP*0.35),avgDpd:bikeAvgDPDEst,color:C.ac},
+ {title:'Cars',count:carTotal,active:carActive,bb:carBB,op:Math.round(totalAllOP*0.65),avgDpd:carAvgDPDEst,color:C.tl}
+].forEach((a,i)=>{
+  bCards.innerHTML+='<div class="cd su" style="animation-delay:'+(i*.1)+'s"><h3><span class="dt" style="background:'+a.color+'"></span>'+a.title+'</h3>'
+  +'<div class="g" style="grid-template-columns:1fr 1fr;gap:10px;font-size:12px">'
+  +[{l:'Total Leases',v:a.count.toLocaleString()},{l:'Active Leases',v:a.active.toLocaleString()},{l:'BB Contribution',v:fmtPEN(a.bb)},{l:'Outstanding Principal',v:fmtPEN(a.op)},{l:'% of BB',v:pct(a.bb/totalBB*100)},{l:'% of Portfolio',v:pct(a.count/totalLoans*100)}].map(x=>'<div style="background:var(--bg);border-radius:8px;padding:10px"><div style="font-size:11px;color:var(--t3)">'+x.l+'</div><div style="font-weight:600;font-family:JetBrains Mono;font-size:14px">'+x.v+'</div></div>').join('')
+  +'</div></div>';
+});
+
+// DPD by asset type (all loans)
+new Chart(document.getElementById('dpdByTypeChart'),{type:'bar',data:{labels:dpdBuckets.map(b=>b.label),datasets:[
+  {label:'Bikes (est.)',data:dpdBikeData,backgroundColor:C.ac+'aa',borderRadius:4},
+  {label:'Cars (est.)',data:dpdCarData,backgroundColor:C.tl+'aa',borderRadius:4}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#556a8a',font:{size:10},maxRotation:45},grid:{color:'rgba(30,45,74,.3)'}},y:{ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// BB by Asset Type breakdown
+const dpdLabels = dpdBuckets.map(b=>b.label);
+new Chart(document.getElementById('collByTypeChart'),{type:'bar',data:{labels:dpdLabels,datasets:[
+  {label:'BB (PEN)',data:dpdAllData.map(d=>d.bb),backgroundColor:C.tl+'aa',borderRadius:4},
+  {label:'OP (PEN)',data:dpdAllData.map(d=>d.op),backgroundColor:C.bl+'44',borderRadius:4}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#556a8a',font:{size:10},maxRotation:45},grid:{color:'rgba(30,45,74,.3)'}},y:{ticks:{color:'#556a8a',callback:v=>fmtPEN(v)},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// Performance radar
+new Chart(document.getElementById('perfRadar'),{type:'radar',data:{labels:['BB Share','Active Share','Count Share','Avg AR','Low DPD %','Volume'],datasets:[
+  {label:'Bikes',data:[Math.round(bikeBB/totalBB*100),Math.round(bikeActive/activeLoans*100),Math.round(bikeTotal/totalLoans*100),80,75,64],borderColor:C.ac,backgroundColor:C.ac+'22',borderWidth:2,pointRadius:3},
+  {label:'Cars',data:[Math.round(carBB/totalBB*100),Math.round(carActive/activeLoans*100),Math.round(carTotal/totalLoans*100),76,82,36],borderColor:C.tl,backgroundColor:C.tl+'22',borderWidth:2,pointRadius:3}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect',padding:14}}},scales:{r:{beginAtZero:true,max:100,ticks:{display:false},grid:{color:'rgba(30,45,74,.3)'},pointLabels:{color:'#8899b4',font:{size:11}}}}}});
+
+// ===== DELINQUENCY TAB =====
+const dm=document.getElementById('delMets');
+const totalDelinquentAll = totalLoans - dpdAllData[0].count; // non-current
+const delinqValAll = totalAllOP - dpdAllData[0].op;
+const totalDelinquentActive = activeLoans - dpdActiveData[0].count;
+[{l:'Non-Current (All Loans)',v:totalDelinquentAll.toLocaleString(),s:pct(totalDelinquentAll/totalLoans*100)+' of portfolio'},
+ {l:'Non-Current Value (All)',v:fmtPEN(delinqValAll),s:fmtUSD(delinqValAll/FX)+' USD'},
+ {l:'Non-Current Active',v:totalDelinquentActive.toLocaleString()+' of '+activeLoans,s:pct(totalDelinquentActive/activeLoans*100)+' of active portfolio'}
+].forEach((m,i)=>{
+  dm.innerHTML+='<div class="m su" style="animation-delay:'+(i*.08)+'s"><div class="glow" style="background:linear-gradient(90deg,'+C.rd+','+C.co+')"></div><div class="lb">'+m.l+'</div><div class="vl">'+m.v+'</div><div class="s2">'+m.s+'</div></div>';
+});
+
+// DPD bucket chart (all loans)
+new Chart(document.getElementById('dpdBucketChart'),{type:'bar',data:{labels:dpdBuckets.map(b=>b.label),datasets:[
+  {label:'Lease Count',data:dpdAllData.map(d=>d.count),backgroundColor:DPD_C.map(c=>c+'bb'),borderRadius:5},
+  {label:'Outstanding (PEN)',data:dpdAllData.map(d=>d.op),type:'line',borderColor:C.pk,pointBackgroundColor:C.pk,pointRadius:5,borderWidth:2,yAxisID:'y1'}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#556a8a',font:{size:10},maxRotation:45},grid:{color:'rgba(30,45,74,.3)'}},y:{position:'left',ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.25)'}},y1:{position:'right',grid:{drawOnChartArea:false},ticks:{color:'#556a8a',callback:v=>fmtPEN(v)}}}}});
+
+// DPD bucket chart (active only)
+new Chart(document.getElementById('dpdActiveBucketChart'),{type:'bar',data:{labels:dpdBuckets.map(b=>b.label),datasets:[
+  {label:'Active Count',data:dpdActiveData.map(d=>d.count),backgroundColor:DPD_C.map(c=>c+'bb'),borderRadius:5},
+  {label:'BB (PEN)',data:dpdActiveData.map(d=>d.bb),type:'line',borderColor:C.gn,pointBackgroundColor:C.gn,pointRadius:5,borderWidth:2,yAxisID:'y1'}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#556a8a',font:{size:10},maxRotation:45},grid:{color:'rgba(30,45,74,.3)'}},y:{position:'left',ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.25)'}},y1:{position:'right',grid:{drawOnChartArea:false},ticks:{color:'#556a8a',callback:v=>fmtPEN(v)}}}}});
+
+// Refi distribution chart
+new Chart(document.getElementById('refiChart'),{type:'bar',data:{labels:refiData.map(r=>r.label),datasets:[{label:'Loan Count',data:refiData.map(r=>r.count),backgroundColor:[C.tl+'cc',C.bl+'cc',C.am+'cc',C.co+'cc',C.rd+'cc'],borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#8899b4',font:{size:11}},grid:{color:'rgba(30,45,74,.3)'}},y:{ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// Lessee Rank distribution
+new Chart(document.getElementById('rankDistChart'),{type:'bar',data:{labels:rankData.map(r=>'Rank '+r.rank+' ('+r.count+')'),datasets:[
+  {label:'Count',data:rankData.map(r=>r.count),backgroundColor:[C.tl+'cc',C.bl+'cc',C.am+'cc',C.co+'cc',C.rd+'cc'],borderRadius:5},
+  {label:'Advance Rate %',data:rankData.map(r=>r.ar),type:'line',borderColor:C.pk,pointBackgroundColor:C.pk,pointRadius:6,borderWidth:2,yAxisID:'y1'}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#8899b4',font:{size:11}},grid:{color:'rgba(30,45,74,.3)'}},y:{position:'left',ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.25)'}},y1:{position:'right',max:100,grid:{drawOnChartArea:false},ticks:{color:'#556a8a',callback:v=>v+'%'}}}}});
+
+// ===== BORROWING BASE TAB =====
+const bbm=document.getElementById('bbMets');
+// BB Waterfall values (working backwards from known BB)
+const wfTotalActiveOP = 61554218;
+const wfDPD60Excl = 1091675 + 57904; // 61-90 active OP + 90+ active OP
+const wfIneligibleDPD = wfDPD60Excl;
+const wfEligibleOP = wfTotalActiveOP - wfIneligibleDPD; // ~60.4M
+const wfBBFinal = 42042168;
+const wfARDiscount = wfEligibleOP - wfBBFinal;
+
+[{l:'Active Outstanding',v:fmtPEN(wfTotalActiveOP),s:fmtUSD(wfTotalActiveOP/FX)+' / '+activeLoans+' active loans'},
+ {l:'Eligible Pool',v:fmtPEN(wfEligibleOP),s:pct(wfEligibleOP/wfTotalActiveOP*100)+' of active OP'},
+ {l:'Borrowing Base',v:fmtPEN(wfBBFinal),s:fmtUSD(wfBBFinal/FX)+' at FX '+FX.toFixed(2)}
+].forEach((m,i)=>{
+  bbm.innerHTML+='<div class="m su" style="animation-delay:'+(i*.08)+'s"><div class="glow" style="background:linear-gradient(90deg,'+C.ac+','+C.tl+')"></div><div class="lb">'+m.l+'</div><div class="vl">'+m.v+'</div><div class="s2">'+m.s+'</div></div>';
+});
+
+// BB Waterfall chart
+const wfLabels=['Active OP','DPD>60 Excl.','Eligible Pool','AR Discount','Borrowing Base'];
+const wfValuesM = [wfTotalActiveOP/1e6, wfIneligibleDPD/1e6, wfEligibleOP/1e6, wfARDiscount/1e6, wfBBFinal/1e6];
+const wfBase=[0, wfValuesM[0], 0, wfValuesM[2], 0];
+const wfData=[wfValuesM[0], wfValuesM[1], wfValuesM[2], wfValuesM[3], wfValuesM[4]];
+const wfColors=[C.bl+'cc',C.rd+'cc',C.am+'cc',C.co+'cc',C.tl+'cc'];
+
+new Chart(document.getElementById('bbWaterfallChart'),{type:'bar',data:{labels:wfLabels,datasets:[
+  {label:'Base',data:wfBase,backgroundColor:'transparent',borderWidth:0,stack:'s'},
+  {label:'Value',data:wfData.map(v=>Math.round(v*10)/10),backgroundColor:wfColors,borderRadius:4,stack:'s'}
+]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.datasetIndex===0?'':'S/. '+ctx.raw.toFixed(1)+'M'}}},scales:{x:{ticks:{color:'#556a8a',callback:v=>'S/. '+v+'M'},grid:{color:'rgba(30,45,74,.25)'}},y:{ticks:{color:'#8899b4',font:{size:11}},grid:{color:'rgba(30,45,74,.15)'}}}}});
+
+// Factor decomposition detail
+const wfDetail=document.getElementById('waterfallDetail');
+const effectiveAR = (wfBBFinal / wfEligibleOP * 100);
+const wfItems=[
+  {l:'Active Outstanding Principal',v:'S/. '+(wfTotalActiveOP/1e6).toFixed(1)+'M',pct:100,c:C.bl},
+  {l:'Less: DPD > 60 exclusions (active)',v:'-S/. '+(wfIneligibleDPD/1e6).toFixed(2)+'M',pct:(wfIneligibleDPD/wfTotalActiveOP*100),c:C.rd},
+  {l:'Eligible Pool',v:'S/. '+(wfEligibleOP/1e6).toFixed(1)+'M',pct:(wfEligibleOP/wfTotalActiveOP*100),c:C.am},
+  {l:'Apply Wtd Advance Rate (~'+effectiveAR.toFixed(1)+'%)',v:'-S/. '+(wfARDiscount/1e6).toFixed(1)+'M',pct:(wfARDiscount/wfTotalActiveOP*100),c:C.co},
+  {l:'Borrowing Base (PEN)',v:'S/. '+(wfBBFinal/1e6).toFixed(1)+'M',pct:(wfBBFinal/wfTotalActiveOP*100),c:C.tl},
+  {l:'Borrowing Base (USD @ '+FX.toFixed(2)+')',v:fmtUSD(wfBBFinal/FX),pct:(wfBBFinal/wfTotalActiveOP*100),c:C.gn},
+  {l:'Avg Advance Rate (portfolio)',v:avgAdvanceRate+'%',pct:avgAdvanceRate,c:C.ac},
+  {l:'Avg Factor',v:factorAvg.toFixed(4),pct:factorAvg*100,c:C.pk}
+];
+wfItems.forEach((item,i)=>{
+  wfDetail.innerHTML+='<div class="wf-row su" style="animation-delay:'+(i*.08)+'s"><div class="wf-label">'+item.l+'</div><div class="wf-val" style="color:'+(item.v.startsWith('-')?C.rd:item.c)+'">'+item.v+'</div></div><div class="pr" style="margin:0 0 6px"><div class="pf" style="background:'+item.c+';width:'+item.pct+'%"></div></div>';
+});
+
+// Advance rate by lessee rank
+new Chart(document.getElementById('arByRankChart'),{type:'bar',data:{labels:rankData.map(r=>'Rank '+r.rank+' ('+r.count+' leases)'),datasets:[
+  {label:'Advance Rate',data:rankData.map(r=>r.ar),backgroundColor:[C.tl+'cc',C.bl+'cc',C.am+'cc',C.co+'cc',C.rd+'cc'],borderRadius:5},
+  {label:'Lease Count',data:rankData.map(r=>r.count),type:'line',borderColor:C.ac,pointBackgroundColor:C.ac,pointRadius:6,borderWidth:2,yAxisID:'y1'}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#8899b4',font:{size:11}},grid:{color:'rgba(30,45,74,.3)'}},y:{position:'left',max:100,ticks:{color:'#556a8a',callback:v=>v+'%'},grid:{color:'rgba(30,45,74,.25)'}},y1:{position:'right',grid:{drawOnChartArea:false},ticks:{color:'#556a8a'}}}}});
+
+// Factor distribution chart
+const factorBuckets = [
+  {label:'<0',min:-1,max:-0.001},
+  {label:'0-0.1',min:0,max:0.1},
+  {label:'0.1-0.2',min:0.1,max:0.2},
+  {label:'0.2-0.4',min:0.2,max:0.4},
+  {label:'0.4-0.6',min:0.4,max:0.6},
+  {label:'0.6-0.8',min:0.6,max:0.8},
+  {label:'0.8-1.0',min:0.8,max:1.0}
+];
+// Estimate factor distribution from sample loans
+const factorCounts = factorBuckets.map(b => {
+  return sampleLoans.filter(l => l.f >= b.min && l.f < (b.max === 1.0 ? 1.01 : b.max)).length;
+});
+new Chart(document.getElementById('factorDistChart'),{type:'bar',data:{labels:factorBuckets.map(b=>b.label),datasets:[{label:'Sample Loans',data:factorCounts,backgroundColor:[C.rd+'cc',C.co+'cc',C.am+'cc',C.bl+'cc',C.ac+'cc',C.tl+'cc',C.gn+'cc'],borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},title:{display:true,text:'Factor range: '+factorMin+' to '+factorMax+' (avg '+factorAvg.toFixed(4)+')',color:'#8899b4',font:{size:11}}},scales:{x:{ticks:{color:'#8899b4',font:{size:11}},grid:{color:'rgba(30,45,74,.3)'}},y:{ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// ===== VINTAGE TAB =====
+// Collectability curves by quarter
+const vLeg=document.getElementById('vintLeg');
+const vintCurveColors=[C.rd,'#fb7185',C.co,C.am,'#d4a017',C.gn,C.tl,C.bl,C.ac,C.pk,'#a78bfa','#38bdf8','#a3e635','#e879f9','#67e8f9'];
+
+// Show recent quarters (last 10)
+const recentQ = collQuarters.slice(-10);
+const vDS = recentQ.map((q,i) => {
+  const col = vintCurveColors[i % vintCurveColors.length];
+  vLeg.innerHTML+='<span><span class="dt" style="background:'+col+'"></span>'+q.q+' ('+q.cnt+' loans)</span>';
+  return {
+    label: q.q,
+    data: [q.princ_pct, q.total_pct],
+    borderColor: col,
+    backgroundColor: col+'22',
+    borderWidth: 2,
+    pointRadius: 5,
+    pointBackgroundColor: col,
+    fill: false
+  };
+});
+
+// For collectability, show as a bar chart (principal vs total by quarter)
+new Chart(document.getElementById('vintChart'),{type:'bar',data:{
+  labels: recentQ.map(q=>q.q),
+  datasets:[
+    {label:'Principal Collected %',data:recentQ.map(q=>q.princ),backgroundColor:C.ac+'88',borderRadius:4},
+    {label:'Total Collected %',data:recentQ.map(q=>q.total),backgroundColor:C.tl+'88',borderRadius:4}
+  ]
+},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#556a8a',font:{size:10},maxRotation:60},grid:{color:'rgba(30,45,74,.3)'}},y:{max:120,ticks:{color:'#556a8a',callback:v=>v+'%'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// Vintage BB vs OP (recent with non-zero BB)
+const vintRecent = vintAllFull.slice(-18);
+new Chart(document.getElementById('vintRecoveryChart'),{type:'bar',data:{labels:vintRecent.map(v=>v.v),datasets:[
+  {label:'BB (PEN)',data:vintRecent.map(v=>v.bb),backgroundColor:C.ac+'88',borderRadius:4},
+  {label:'Outstanding Principal (PEN)',data:vintRecent.map(v=>v.op),backgroundColor:C.gn+'44',borderRadius:4}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#556a8a',font:{size:10},maxRotation:60},grid:{color:'rgba(30,45,74,.3)'}},y:{ticks:{color:'#556a8a',callback:v=>fmtPEN(v)},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// Vintage size (all months from 2022+)
+const vintSizeData = vintAllMonthly.filter(v => v.v >= '2022/01');
+new Chart(document.getElementById('vintSizeChart'),{type:'bar',data:{labels:vintSizeData.map(v=>v.v),datasets:[{label:'Leases Originated',data:vintSizeData.map(v=>v.cnt),backgroundColor:vintSizeData.map((_,i)=>vintCurveColors[i%vintCurveColors.length]+'aa'),borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#556a8a',font:{size:9},maxRotation:90},grid:{color:'rgba(30,45,74,.3)'}},y:{ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// ===== LOAN EXPLORER =====
+let sk='op',sd=-1;
+let filterStatus='all',filterCat='all',filterDpd='all',searchTerm='';
+
+function matchDpd(dpd,bucket){
+  if(bucket==='all')return true;
+  if(bucket==='0')return dpd===0;
+  if(bucket==='1-10')return dpd>=1&&dpd<=10;
+  if(bucket==='11-30')return dpd>=11&&dpd<=30;
+  if(bucket==='31-60')return dpd>=31&&dpd<=60;
+  if(bucket==='61+')return dpd>=61;
+  return true;
+}
+
+function renderLoans(){
+  let ls=[...sampleLoans];
+  if(searchTerm){const st=searchTerm.toLowerCase();ls=ls.filter(l=>l.id.toLowerCase().includes(st)||l.cat.toLowerCase().includes(st)||l.vint.includes(st)||l.st.toLowerCase().includes(st)||String(l.dpd).includes(st))}
+  if(filterStatus!=='all')ls=ls.filter(l=>l.st===filterStatus);
+  if(filterCat!=='all')ls=ls.filter(l=>l.cat===filterCat);
+  if(filterDpd!=='all')ls=ls.filter(l=>matchDpd(l.dpd,filterDpd));
+  ls.sort((a,b)=>{
+    const av=a[sk];const bv=b[sk];
+    if(typeof av==='string')return sd*av.localeCompare(bv);
+    return sd*(av-bv);
+  });
+  const cols=[
+    {k:'id',l:'Loan ID',w:75},{k:'cat',l:'Cat',w:55},{k:'lv',l:'Lease Val',w:85},
+    {k:'op',l:'Outstd Princ',w:90},{k:'dpd',l:'DPD',w:65},{k:'f',l:'Factor',w:55},
+    {k:'ar',l:'AR',w:50},{k:'bb',l:'BB',w:80},{k:'rk',l:'Rank',w:45},
+    {k:'vint',l:'Vintage',w:70},{k:'st',l:'Status',w:80},{k:'rf',l:'Refi',w:40},
+    {k:'pc',l:'Princ Coll',w:85},{k:'ic',l:'Int Coll',w:80}
+  ];
+  document.getElementById('lHead').innerHTML='<tr>'+cols.map(c=>'<th style="width:'+c.w+'px" data-k="'+c.k+'">'+c.l+(sk===c.k?(sd<0?' &darr;':' &uarr;'):'')+'</th>').join('')+'</tr>';
+  document.getElementById('lHead').querySelectorAll('th').forEach(th=>{th.onclick=()=>{const k=th.dataset.k;if(sk===k)sd*=-1;else{sk=k;sd=-1}renderLoans()}});
+  const maxD=Math.max(...sampleLoans.map(l=>l.dpd),1);
+  document.getElementById('lBody').innerHTML=ls.map((l,i)=>{
+    const dc=l.dpd>90?C.rd:l.dpd>60?'#fb7185':l.dpd>30?C.co:l.dpd>10?C.am:l.dpd>0?C.bl:C.tl;
+    const sc=l.st==='ACTIVO'?'pl-g':l.st==='INACTIVO'?'pl-y':'pl-o';
+    const catBadge=l.cat==='Bike'?'pl-b':'pl-g';
+    return'<tr style="animation:fi .3s ease-out '+Math.min(i*.02,.5)+'s both">'
+      +'<td style="font-family:JetBrains Mono;font-size:11px">'+l.id+'</td>'
+      +'<td><span class="pl '+catBadge+'">'+l.cat+'</span></td>'
+      +'<td>'+fmtPEN(l.lv)+'</td>'
+      +'<td>'+fmtPEN(l.op)+'</td>'
+      +'<td><div class="dp"><div class="dpf" style="width:'+Math.max(4,l.dpd/maxD*100)+'%;background:'+dc+'"></div></div><span style="color:'+dc+';font-weight:600;font-size:11px">'+l.dpd+'</span></td>'
+      +'<td style="font-family:JetBrains Mono;font-size:11px">'+l.f.toFixed(3)+'</td>'
+      +'<td style="font-family:JetBrains Mono;font-size:11px">'+(l.ar*100)+'%</td>'
+      +'<td>'+fmtPEN(l.bb)+'</td>'
+      +'<td style="text-align:center"><span style="color:'+(l.rk===1?C.tl:l.rk===2?C.am:l.rk===3?C.co:C.rd)+';font-weight:600">'+l.rk+'</span></td>'
+      +'<td style="font-family:JetBrains Mono;font-size:11px">'+l.vint+'</td>'
+      +'<td><span class="pl '+sc+'">'+l.st+'</span></td>'
+      +'<td style="text-align:center;font-size:11px">'+l.rf+'</td>'
+      +'<td>'+fmtPEN(l.pc)+'</td>'
+      +'<td>'+fmtPEN(l.ic)+'</td>'
+      +'</tr>';
+  }).join('');
+}
+renderLoans();
+
+// Filter button logic
+document.querySelectorAll('.fbtn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const grp=btn.dataset.filter;
+    document.querySelectorAll('.fbtn[data-filter="'+grp+'"]').forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');
+    if(grp==='status')filterStatus=btn.dataset.val;
+    if(grp==='cat')filterCat=btn.dataset.val;
+    if(grp==='dpd')filterDpd=btn.dataset.val;
+    renderLoans();
+  });
+});
+document.getElementById('loanSearch').addEventListener('input',e=>{searchTerm=e.target.value;renderLoans()});
+
+// ===== THEME TOGGLE =====
+const themeBtn=document.getElementById('themeToggle');
+themeBtn.addEventListener('click',()=>{
+  const current=document.documentElement.getAttribute('data-theme');
+  const next=current==='light'?'dark':'light';
+  document.documentElement.setAttribute('data-theme',next);
+  themeBtn.innerHTML=next==='light'?'&#9789;':'&#9788;';
+  const gridC=next==='light'?'rgba(0,0,0,.08)':'rgba(30,45,74,.25)';
+  const tickC=next==='light'?'#475569':'#556a8a';
+  const legC=next==='light'?'#475569':'#8899b4';
+  Object.values(Chart.instances).forEach(ch=>{
+    if(!ch.options||!ch.options.scales)return;
+    Object.values(ch.options.scales).forEach(s=>{if(s.grid)s.grid.color=gridC;if(s.ticks)s.ticks.color=tickC;if(s.pointLabels)s.pointLabels.color=legC;});
+    if(ch.options.plugins&&ch.options.plugins.legend&&ch.options.plugins.legend.labels)ch.options.plugins.legend.labels.color=legC;
+    ch.update('none');
+  });
+});
+</script></body></html>

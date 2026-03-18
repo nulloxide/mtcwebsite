@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Early Warning Detection | Portfolio Stress Monitoring</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#06090f;--c1:#0d1420;--c2:#131c2e;--c3:#1a2540;--brd:#1e2d4a;--t1:#e8edf5;--t2:#8899b4;--t3:#556a8a;--ac:#818cf8;--tl:#2dd4bf;--am:#fbbf24;--co:#fb923c;--rd:#f87171;--gn:#4ade80;--bl:#60a5fa;--pk:#f472b6;--r:10px}
+[data-theme="light"]{--bg:#f8fafc;--c1:#ffffff;--c2:#f1f5f9;--c3:#e2e8f0;--brd:#e2e8f0;--t1:#0f172a;--t2:#475569;--t3:#94a3b8}
+#themeToggle{position:absolute;top:20px;right:28px;background:var(--c1);border:1px solid var(--brd);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:14px;z-index:10;color:var(--t1);transition:all .2s}
+#themeToggle:hover{border-color:var(--ac)}
+body{background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;overflow-x:hidden}
+.w{max-width:1440px;margin:0 auto;padding:20px 28px}
+h1{font-size:26px;font-weight:700;letter-spacing:-.4px}
+.hdr{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:4px;padding-bottom:16px;border-bottom:1px solid var(--brd)}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:600}
+.g{display:grid;gap:14px;margin-bottom:20px}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g6{grid-template-columns:repeat(6,1fr)}
+@media(max-width:1200px){.g6{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:1000px){.g2{grid-template-columns:1fr}}
+@media(max-width:700px){.g6{grid-template-columns:repeat(2,1fr)}}
+.cd{background:var(--c1);border:1px solid var(--brd);border-radius:var(--r);padding:18px 22px}
+.cd h3{font-size:14px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.ch{position:relative;width:100%;height:280px}
+@keyframes su{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fi{from{opacity:0}to{opacity:1}}
+.su{animation:su .5s ease-out both}.fi{animation:fi .6s ease-out both}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.pulse{animation:pulse 2.5s infinite}
+@keyframes heartbeat{0%,100%{transform:scale(1);opacity:1}15%{transform:scale(1.15);opacity:.9}30%{transform:scale(1);opacity:1}45%{transform:scale(1.1);opacity:.9}60%{transform:scale(1);opacity:1}}
+.heartbeat{animation:heartbeat 2s infinite}
+
+/* Metric cards */
+.metric-card{background:var(--c1);border:1px solid var(--brd);border-radius:var(--r);padding:16px 18px;text-align:center;transition:border-color .3s}
+.metric-card .mc-label{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.metric-card .mc-value{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;margin-bottom:4px}
+.metric-card .mc-delta{font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:3px}
+.mc-bad{color:var(--rd)}.mc-warn{color:var(--am)}.mc-ok{color:var(--gn)}
+
+/* Scrubber */
+.scrubber-wrap{background:var(--c1);border:1px solid var(--brd);border-radius:var(--r);padding:16px 22px;margin-bottom:20px}
+.scrubber-wrap label{font-size:12px;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;display:block;margin-bottom:8px}
+.scrubber-row{display:flex;align-items:center;gap:16px}
+.scrubber-date{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;min-width:140px;color:var(--ac)}
+input[type=range]{flex:1;-webkit-appearance:none;background:transparent;height:6px}
+input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:linear-gradient(90deg,var(--tl),var(--am),var(--rd))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--ac);border:3px solid var(--bg);margin-top:-7px;cursor:pointer;box-shadow:0 0 10px rgba(129,140,248,.5)}
+input[type=range]::-moz-range-track{height:6px;border-radius:3px;background:linear-gradient(90deg,var(--tl),var(--am),var(--rd))}
+input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--ac);border:3px solid var(--bg);cursor:pointer}
+.scrubber-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--t3);margin-top:4px;padding:0 2px}
+
+/* Alert timeline */
+.timeline-wrap{background:var(--c1);border:1px solid var(--brd);border-radius:var(--r);padding:18px 22px;margin-top:20px}
+.timeline-wrap h3{font-size:14px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.timeline{position:relative;padding-left:24px}
+.timeline::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:2px;background:var(--brd)}
+.tl-item{position:relative;margin-bottom:14px;padding-left:20px;opacity:0;transform:translateX(-10px);transition:all .4s ease-out}
+.tl-item.visible{opacity:1;transform:translateX(0)}
+.tl-dot{position:absolute;left:-20px;top:4px;width:12px;height:12px;border-radius:50%;border:2px solid var(--bg)}
+.tl-date{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;margin-bottom:2px}
+.tl-msg{font-size:12px;color:var(--t2);line-height:1.4}
+.tl-sev{display:inline-block;padding:1px 8px;border-radius:10px;font-size:10px;font-weight:600;margin-left:8px}
+
+.status-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+</style></head><body>
+<div class="w" style="position:relative">
+<button id="themeToggle">&#9788;</button>
+<div class="hdr">
+<div>
+<h1 style="background:linear-gradient(135deg,#818cf8,#f87171);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Early Warning Detection System</h1>
+<p style="color:var(--t3);font-size:12px;margin-top:3px">Real-Time Portfolio Stress Monitoring &middot; Sub-Prime Consumer Lending &middot; Demonstrating Early Signal Detection</p>
+</div>
+<div id="statusBadge"></div>
+</div>
+
+<!-- Key Risk Metrics -->
+<div class="g g6 su" style="margin-top:16px;margin-bottom:16px">
+<div class="metric-card" id="mcCollRate"><div class="mc-label">Collection Rate</div><div class="mc-value" id="mcCollRateVal">--</div><div class="mc-delta" id="mcCollRateDelta"></div></div>
+<div class="metric-card" id="mc30DPD"><div class="mc-label">30+ DPD Rate</div><div class="mc-value" id="mc30DPDVal">--</div><div class="mc-delta" id="mc30DPDDelta"></div></div>
+<div class="metric-card" id="mc60DPD"><div class="mc-label">60+ DPD Rate</div><div class="mc-value" id="mc60DPDVal">--</div><div class="mc-delta" id="mc60DPDDelta"></div></div>
+<div class="metric-card" id="mcNetLoss"><div class="mc-label">Net Loss Rate</div><div class="mc-value" id="mcNetLossVal">--</div><div class="mc-delta" id="mcNetLossDelta"></div></div>
+<div class="metric-card" id="mcAvgDPD"><div class="mc-label">Avg DPD</div><div class="mc-value" id="mcAvgDPDVal">--</div><div class="mc-delta" id="mcAvgDPDDelta"></div></div>
+<div class="metric-card" id="mcBBUtil"><div class="mc-label">BB Utilization</div><div class="mc-value" id="mcBBUtilVal">--</div><div class="mc-delta" id="mcBBUtilDelta"></div></div>
+</div>
+
+<!-- Timeline Scrubber -->
+<div class="scrubber-wrap su">
+<label>Timeline Scrubber &mdash; drag to travel through time</label>
+<div class="scrubber-row">
+<span class="scrubber-date" id="scrubDate">Jan 1, 2026</span>
+<input type="range" id="scrubber" min="0" max="89" value="89" step="1">
+</div>
+<div class="scrubber-labels"><span>Jan 1</span><span>Jan 15</span><span>Feb 1</span><span>Feb 15</span><span>Mar 1</span><span>Mar 15</span><span>Mar 31</span></div>
+</div>
+
+<!-- Charts Row 1 -->
+<div class="g g2">
+<div class="cd su" style="animation-delay:.05s"><h3><span style="color:var(--ac)">&#9679;</span> Collections vs Expected <span id="collRateAnnotation" style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:500;color:var(--tl)"></span></h3><div class="ch"><canvas id="collectionsChart"></canvas></div></div>
+<div class="cd su" style="animation-delay:.1s"><h3><span style="color:var(--tl)">&#9679;</span> DPD Migration</h3><div class="ch"><canvas id="dpdChart"></canvas></div></div>
+</div>
+<!-- Charts Row 2 -->
+<div class="g g2">
+<div class="cd su" style="animation-delay:.15s"><h3><span style="color:var(--bl)">&#9679;</span> Borrowing Base + Outstanding Principal</h3><div class="ch"><canvas id="bbChart"></canvas></div></div>
+<div class="cd su" style="animation-delay:.2s"><h3><span style="color:var(--pk)">&#9679;</span> Cash Velocity &amp; ACH Returns</h3><div class="ch"><canvas id="cvChart"></canvas></div></div>
+</div>
+<!-- Charts Row 3 -->
+<div class="g g2">
+<div class="cd su" style="animation-delay:.25s"><h3><span style="color:var(--co)">&#9679;</span> Roll Rate Trends</h3><div class="ch"><canvas id="rollRateChart"></canvas></div></div>
+<div class="cd su" style="animation-delay:.3s"><h3><span style="color:var(--gn)">&#9679;</span> Payment Channel Breakdown</h3><div class="ch"><canvas id="payChannelChart"></canvas></div></div>
+</div>
+
+<!-- Alert Timeline -->
+<div class="timeline-wrap su" style="animation-delay:.35s">
+<h3><span class="heartbeat" style="color:var(--rd)">&#9679;</span> Alert Timeline</h3>
+<div class="timeline" id="alertTimeline"></div>
+</div>
+</div>
+
+<script>
+// ── Date helpers ──
+const START = new Date(2026, 0, 1);
+function dayToDate(d) { const dt = new Date(START); dt.setDate(dt.getDate() + d); return dt; }
+function fmtDate(dt) {
+  const m = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return m[dt.getMonth()] + ' ' + dt.getDate() + ', ' + dt.getFullYear();
+}
+function shortDate(dt) {
+  const m = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return m[dt.getMonth()] + ' ' + dt.getDate();
+}
+function dayOfWeek(d) { return dayToDate(d).getDay(); } // 0=Sun, 6=Sat
+function dayOfMonth(d) { return dayToDate(d).getDate(); }
+
+// ── Seed-able pseudo-random for reproducible noise ──
+let seed = 42;
+function srand() { seed = (seed * 16807 + 0) % 2147483647; return (seed - 1) / 2147483646; }
+function noise(amp) { return (srand() - 0.5) * 2 * amp; }
+function resetSeed(s) { seed = s; }
+
+// ── Generate 90 days of data ──
+const DAYS = 90;
+const labels = [];
+for (let i = 0; i < DAYS; i++) labels.push(shortDate(dayToDate(i)));
+
+// ============================
+// Panel 1: Collections vs Expected (realistic sub-prime patterns)
+// ============================
+resetSeed(42);
+const dailySched = [], dailyActual = [], scheduled = [], actual = [];
+let cumSched = 0, cumActual = 0;
+for (let i = 0; i < DAYS; i++) {
+  const dow = dayOfWeek(i);
+  const dom = dayOfMonth(i);
+  // Base daily scheduled: ~$280K weekday
+  let base = 280;
+  // Weekend reduction (ACH doesn't process weekends)
+  if (dow === 0) base = 45 + noise(8);       // Sunday: minimal (auto-pay posting)
+  else if (dow === 6) base = 65 + noise(10);  // Saturday: small
+  else base = 280 + noise(12);
+  // 1st and 15th of month spikes (sub-prime pay cycle)
+  if ((dom === 1 || dom === 15) && dow > 0 && dow < 6) base += 120 + noise(15);
+  // Month-end ACH batch spike (28th-31st)
+  if (dom >= 28 && dow > 0 && dow < 6) base += 55 + noise(10);
+  // Beginning of month concentration (2nd-5th)
+  if (dom >= 2 && dom <= 5 && dow > 0 && dow < 6) base += 35 + noise(8);
+
+  dailySched.push(Math.max(20, base));
+  cumSched += dailySched[i];
+  scheduled.push(Math.round(cumSched));
+
+  // Actual collection rate - subtle degradation
+  let rate;
+  if (i < 30) {
+    // First month: very close tracking, occasional missed ACH batch
+    rate = 0.998 + noise(0.005);
+    // Simulate an occasional ACH batch failure day (subtle)
+    if (i === 18 || i === 23) rate -= 0.015;
+  } else if (i < 45) {
+    // Weeks 5-6: slight drift, a few more missed batches
+    rate = 0.995 - (i - 30) / 15 * 0.008 + noise(0.006);
+    if (i === 35 || i === 40) rate -= 0.02;
+  } else if (i < 60) {
+    // Weeks 7-8: noticeable widening
+    const drift = (i - 45) / 15 * 0.035;
+    rate = 0.988 - drift + noise(0.005);
+  } else {
+    // Weeks 9-13: accelerating degradation
+    const drift = 0.035 + (i - 60) / 30 * 0.055;
+    rate = 0.988 - drift + noise(0.004);
+  }
+  dailyActual.push(dailySched[i] * Math.max(0.86, rate));
+  cumActual += dailyActual[i];
+  actual.push(Math.round(cumActual));
+}
+const threshold95 = scheduled.map(s => Math.round(s * 0.95));
+
+// Collection rate at each day
+const collectionRates = [];
+for (let i = 0; i < DAYS; i++) {
+  collectionRates.push(actual[i] / scheduled[i] * 100);
+}
+
+// ============================
+// Panel 2: DPD Migration (weekly, 13 weeks) - Sub-prime realistic
+// ============================
+resetSeed(101);
+const weeks = 13;
+const weekLabels = [];
+for (let w = 0; w < weeks; w++) weekLabels.push('Week ' + (w + 1));
+const dpdCurrent = [], dpd1_30 = [], dpd31_60 = [], dpd61_90 = [], dpd90p = [];
+for (let w = 0; w < weeks; w++) {
+  let cur, d1, d2, d3, d4;
+  if (w < 5) {
+    // Stable sub-prime baseline
+    cur = 68.0 + noise(0.5);
+    d1 = 19.0 + noise(0.4);
+    d2 = 7.5 + noise(0.25);
+    d3 = 3.2 + noise(0.15);
+    d4 = 2.3 + noise(0.1);
+  } else if (w < 8) {
+    // Early degradation: roll-rate acceleration 30->60
+    const t = (w - 5) / 3;
+    cur = 68.0 - t * 3.5 + noise(0.4);
+    d1 = 19.0 + t * 1.0 + noise(0.3);
+    d2 = 7.5 + t * 2.2 + noise(0.2);
+    d3 = 3.2 + t * 0.8 + noise(0.12);
+    d4 = 2.3 + t * 0.3 + noise(0.08);
+  } else {
+    // Accelerating degradation
+    const t = (w - 8) / 5;
+    cur = 64.5 - t * 6.0 + noise(0.35);
+    d1 = 20.0 + t * 1.5 + noise(0.25);
+    d2 = 9.7 + t * 3.0 + noise(0.2);
+    d3 = 4.0 + t * 2.0 + noise(0.12);
+    d4 = 2.6 + t * 1.2 + noise(0.08);
+  }
+  const tot = cur + d1 + d2 + d3 + d4;
+  dpdCurrent.push(+(cur/tot*100).toFixed(1));
+  dpd1_30.push(+(d1/tot*100).toFixed(1));
+  dpd31_60.push(+(d2/tot*100).toFixed(1));
+  dpd61_90.push(+(d3/tot*100).toFixed(1));
+  dpd90p.push(+(d4/tot*100).toFixed(1));
+}
+
+// ============================
+// Panel 3: Borrowing Base + Outstanding Principal + Interest Reserve
+// ============================
+resetSeed(200);
+const bbData = [], outstandingData = [], interestReserve = [], covenantMin = [];
+for (let i = 0; i < DAYS; i++) {
+  let bb, outstanding, ir;
+  if (i < 35) {
+    bb = 24.5 + noise(0.12);
+    outstanding = 38.0 + noise(0.15);
+    ir = 2.8 + noise(0.04);
+  } else if (i < 55) {
+    const t = (i - 35) / 20;
+    bb = 24.5 - t * 0.9 + noise(0.1);
+    outstanding = 38.0 + t * 0.3 + noise(0.12); // Outstanding grows slightly (new originations)
+    ir = 2.8 - t * 0.3 + noise(0.03);
+  } else if (i < 70) {
+    const t = (i - 55) / 15;
+    bb = 23.6 - t * 1.8 + noise(0.08); // Advance rate haircuts kick in
+    outstanding = 38.3 - t * 0.2 + noise(0.1);
+    ir = 2.5 - t * 0.5 + noise(0.03);
+  } else {
+    const t = (i - 70) / 20;
+    bb = 21.8 - t * 2.5 + noise(0.06); // Sharp drop after advance rate reduction
+    outstanding = 38.1 - t * 0.5 + noise(0.08);
+    ir = 2.0 - t * 0.6 + noise(0.02);
+  }
+  bbData.push(+Math.max(18, bb).toFixed(2));
+  outstandingData.push(+outstanding.toFixed(2));
+  interestReserve.push(+Math.max(0.8, ir).toFixed(2));
+  covenantMin.push(20);
+}
+
+// ============================
+// Panel 4: Cash Velocity Index + ACH Return Rate
+// ============================
+resetSeed(300);
+const cvData = [], achReturnRate = [], cvThreshold = [];
+for (let i = 0; i < DAYS; i++) {
+  let cv, achr;
+  if (i < 35) {
+    cv = 100 + noise(2.5);
+    achr = 3.0 + noise(0.3);
+  } else if (i < 50) {
+    const t = (i - 35) / 15;
+    cv = 100 - t * 3 + noise(2.0);
+    achr = 3.0 + t * 1.2 + noise(0.25);
+  } else if (i < 65) {
+    const t = (i - 50) / 15;
+    cv = 97 - t * 4 + noise(1.8);
+    achr = 4.2 + t * 1.5 + noise(0.3);
+  } else {
+    const t = (i - 65) / 25;
+    cv = 93 - t * 7 + noise(1.5);
+    achr = 5.7 + t * 3.5 + noise(0.35);
+  }
+  cvData.push(+Math.max(80, cv).toFixed(1));
+  achReturnRate.push(+Math.max(1.5, achr).toFixed(2));
+  cvThreshold.push(90);
+}
+
+// ============================
+// Panel 5: Roll Rate Trends (weekly)
+// ============================
+resetSeed(400);
+const rrCur_130 = [], rr130_3160 = [], rr3160_6190 = [], rr6190_90p = [];
+for (let w = 0; w < weeks; w++) {
+  let r1, r2, r3, r4;
+  if (w < 5) {
+    // Stable: baseline roll rates
+    r1 = 2.8 + noise(0.3);   // Current -> 1-30d
+    r2 = 17.5 + noise(1.0);  // 1-30 -> 31-60
+    r3 = 28.0 + noise(1.5);  // 31-60 -> 61-90
+    r4 = 42.0 + noise(2.0);  // 61-90 -> 90+
+  } else if (w < 8) {
+    const t = (w - 5) / 3;
+    r1 = 2.8 + t * 0.8 + noise(0.25);
+    r2 = 17.5 + t * 4.5 + noise(0.8);   // Key signal: 1-30 -> 31-60 accelerating
+    r3 = 28.0 + t * 3.0 + noise(1.2);
+    r4 = 42.0 + t * 2.0 + noise(1.5);
+  } else {
+    const t = (w - 8) / 5;
+    r1 = 3.6 + t * 1.5 + noise(0.2);
+    r2 = 22.0 + t * 6.0 + noise(0.7);
+    r3 = 31.0 + t * 5.0 + noise(1.0);
+    r4 = 44.0 + t * 4.0 + noise(1.2);
+  }
+  rrCur_130.push(+Math.max(1, r1).toFixed(1));
+  rr130_3160.push(+Math.max(10, r2).toFixed(1));
+  rr3160_6190.push(+Math.max(18, r3).toFixed(1));
+  rr6190_90p.push(+Math.max(30, r4).toFixed(1));
+}
+
+// ============================
+// Panel 6: Payment Channel Breakdown (weekly)
+// ============================
+resetSeed(500);
+const payACH = [], payDebit = [], payCheck = [], payCash = [];
+for (let w = 0; w < weeks; w++) {
+  let ach, deb, chk, csh;
+  if (w < 5) {
+    ach = 72.0 + noise(0.5);
+    deb = 18.0 + noise(0.3);
+    chk = 7.0 + noise(0.2);
+    csh = 3.0 + noise(0.1);
+  } else {
+    const t = (w - 5) / 8;
+    ach = 72.0 - t * 9.0 + noise(0.4);
+    deb = 18.0 + t * 4.0 + noise(0.3);
+    chk = 7.0 + t * 4.0 + noise(0.2);
+    csh = 3.0 + t * 1.0 + noise(0.1);
+  }
+  const tot = ach + deb + chk + csh;
+  payACH.push(+(ach/tot*100).toFixed(1));
+  payDebit.push(+(deb/tot*100).toFixed(1));
+  payCheck.push(+(chk/tot*100).toFixed(1));
+  payCash.push(+(csh/tot*100).toFixed(1));
+}
+
+// ============================
+// Key Risk Metrics (per day)
+// ============================
+resetSeed(600);
+const kpiCollRate = [], kpi30DPD = [], kpi60DPD = [], kpiNetLoss = [], kpiAvgDPD = [], kpiBBUtil = [];
+for (let i = 0; i < DAYS; i++) {
+  const t35 = Math.max(0, (i - 35) / 55); // 0 at day 35, ~1 at day 90
+  const t50 = Math.max(0, (i - 50) / 40);
+
+  let cr = 98.2 - t35 * 6.1 + noise(0.15);
+  let d30 = 14.3 + t35 * 7.5 + noise(0.2);
+  let d60 = 6.8 + t50 * 5.6 + noise(0.15);
+  let nl = 0.8 + t50 * 1.6 + noise(0.05);
+  let avgd = 8.2 + t35 * 6.4 + noise(0.2);
+  // BB utilization = outstanding / BB
+  let bbU = (outstandingData[i] / bbData[i]) * 100;
+  if (i < 35) bbU = 82 + noise(0.5); // override early to be cleaner
+
+  kpiCollRate.push(+Math.max(88, cr).toFixed(1));
+  kpi30DPD.push(+Math.max(12, d30).toFixed(1));
+  kpi60DPD.push(+Math.max(5, d60).toFixed(1));
+  kpiNetLoss.push(+Math.max(0.4, nl).toFixed(2));
+  kpiAvgDPD.push(+Math.max(6, avgd).toFixed(1));
+  kpiBBUtil.push(+Math.min(99, Math.max(78, bbU)).toFixed(1));
+}
+
+// ── Alerts ──
+const alerts = [
+  { day: 35, date: 'Feb 5', msg: 'ACH return rate exceeded 4.0% threshold \u2014 3-day trend: 3.2% \u2192 3.8% \u2192 4.1%', severity: 'yellow', color: 'var(--am)' },
+  { day: 42, date: 'Feb 12', msg: 'Weekly roll rate 1-30\u219231-60 at 22.3%, above 20% threshold', severity: 'yellow', color: 'var(--am)' },
+  { day: 46, date: 'Feb 16', msg: 'Collection rate 96.8% \u2014 below 97% monitoring threshold', severity: 'yellow', color: 'var(--am)' },
+  { day: 50, date: 'Feb 20', msg: '30+ DPD rate crossed 17%, up from 14.3% baseline \u2014 Watch', severity: 'orange', color: 'var(--co)' },
+  { day: 55, date: 'Feb 25', msg: 'Cash velocity index dropped below 95 \u2014 payment processing delays detected', severity: 'orange', color: 'var(--co)' },
+  { day: 59, date: 'Mar 1', msg: '60+ DPD rate 9.8%, up 44% from baseline 6.8% \u2014 Elevated', severity: 'orange', color: 'var(--co)' },
+  { day: 62, date: 'Mar 4', msg: 'BB utilization at 91% \u2014 approaching 95% facility trigger', severity: 'red', color: 'var(--rd)' },
+  { day: 65, date: 'Mar 7', msg: 'Net loss rate 1.9%, 2.4x baseline \u2014 escalated to Investment Committee', severity: 'red', color: 'var(--rd)' },
+  { day: 68, date: 'Mar 10', msg: 'Collection rate below 94% \u2014 formal notice to servicer issued', severity: 'red', color: 'var(--rd)' },
+  { day: 72, date: 'Mar 14', msg: 'ACH return rate 7.2% \u2014 servicer confirms system migration issues causing posting delays', severity: 'resolved', color: 'var(--bl)' },
+  { day: 75, date: 'Mar 17', msg: 'Advance rate reduced from 85% to 75% \u2014 servicer remediation plan received', severity: 'resolved', color: 'var(--bl)' },
+];
+
+// ── Build alert timeline HTML ──
+const tlEl = document.getElementById('alertTimeline');
+alerts.forEach((a, i) => {
+  const sevLabel = a.severity === 'yellow' ? 'Warning' : a.severity === 'orange' ? 'Elevated' : a.severity === 'red' ? 'Critical' : 'Resolved';
+  const bgMap = { yellow: 'rgba(251,191,36,.12)', orange: 'rgba(251,146,60,.12)', red: 'rgba(248,113,113,.12)', resolved: 'rgba(96,165,250,.12)' };
+  const colMap = { yellow: 'var(--am)', orange: 'var(--co)', red: 'var(--rd)', resolved: 'var(--bl)' };
+  tlEl.innerHTML += '<div class="tl-item" id="alert' + i + '" data-day="' + a.day + '">' +
+    '<div class="tl-dot" style="background:' + a.color + '"></div>' +
+    '<div class="tl-date" style="color:' + colMap[a.severity] + '">' + a.date + ', 2026' +
+    '<span class="tl-sev" style="background:' + bgMap[a.severity] + ';color:' + colMap[a.severity] + '">' + sevLabel + '</span></div>' +
+    '<div class="tl-msg">' + a.msg + '</div></div>';
+});
+
+// ── Chart.js defaults ──
+const gridColor = 'rgba(30,45,74,.25)';
+const tickColor = '#556a8a';
+const C = { ac: '#818cf8', tl: '#2dd4bf', am: '#fbbf24', co: '#fb923c', rd: '#f87171', gn: '#4ade80', bl: '#60a5fa', pk: '#f472b6' };
+
+// ── Chart 1: Collections vs Expected ──
+const ctx1 = document.getElementById('collectionsChart');
+const chart1 = new Chart(ctx1, {
+  type: 'line',
+  data: {
+    labels: labels,
+    datasets: [
+      {
+        label: 'Scheduled',
+        data: [...scheduled],
+        borderColor: C.ac,
+        borderWidth: 2,
+        pointRadius: 0,
+        tension: 0.3,
+        fill: false,
+        order: 1
+      },
+      {
+        label: 'Actual',
+        data: [...actual],
+        borderColor: C.tl,
+        borderWidth: 2,
+        pointRadius: 0,
+        tension: 0.3,
+        fill: false,
+        order: 2
+      },
+      {
+        label: '95% Threshold',
+        data: [...threshold95],
+        borderColor: C.rd + '88',
+        borderWidth: 1,
+        borderDash: [6, 4],
+        pointRadius: 0,
+        tension: 0.3,
+        fill: false,
+        order: 3
+      },
+      {
+        label: 'Shortfall',
+        data: [...scheduled],
+        borderColor: 'transparent',
+        borderWidth: 0,
+        pointRadius: 0,
+        tension: 0.3,
+        fill: { target: '+1', below: 'transparent', above: 'rgba(248,113,113,.15)' },
+        order: 0
+      },
+      {
+        label: '_actual_fill',
+        data: [...actual],
+        borderColor: 'transparent',
+        borderWidth: 0,
+        pointRadius: 0,
+        tension: 0.3,
+        fill: false,
+        order: 0
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'bottom', labels: { color: '#8899b4', font: { size: 11 }, usePointStyle: true, pointStyle: 'rect', padding: 10, filter: item => !item.text.startsWith('_') && item.text !== 'Shortfall' } },
+      filler: { propagate: true }
+    },
+    scales: {
+      x: { ticks: { color: tickColor, font: { size: 10 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 10 }, grid: { color: gridColor } },
+      y: { ticks: { color: tickColor, callback: v => '$' + (v / 1000).toFixed(0) + 'K' }, grid: { color: gridColor } }
+    }
+  }
+});
+
+// Shortfall plugin (red fill between scheduled and actual)
+const shortfallPlugin = {
+  id: 'shortfallFill',
+  afterDatasetsDraw(chart) {
+    const ds0 = chart.getDatasetMeta(0);
+    const ds1 = chart.getDatasetMeta(1);
+    if (!ds0.data.length || !ds1.data.length) return;
+    const ctx = chart.ctx;
+    ctx.save();
+    ctx.beginPath();
+    for (let i = 0; i < ds0.data.length; i++) {
+      const p = ds0.data[i];
+      if (!p) continue;
+      if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y);
+    }
+    for (let i = ds1.data.length - 1; i >= 0; i--) {
+      const p = ds1.data[i];
+      if (!p) continue;
+      ctx.lineTo(p.x, p.y);
+    }
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(248,113,113,.12)';
+    ctx.fill();
+    ctx.restore();
+  }
+};
+chart1.options.plugins.shortfallFill = true;
+Chart.register(shortfallPlugin);
+
+// ── Chart 2: DPD Migration ──
+const ctx2 = document.getElementById('dpdChart');
+const chart2 = new Chart(ctx2, {
+  type: 'line',
+  data: {
+    labels: weekLabels,
+    datasets: [
+      { label: 'Current', data: [...dpdCurrent], backgroundColor: C.tl + '88', borderColor: C.tl, borderWidth: 1, fill: 'origin', pointRadius: 0, tension: 0.3 },
+      { label: '1-30d', data: [...dpdCurrent].map((v, i) => v + dpd1_30[i]), backgroundColor: C.bl + '88', borderColor: C.bl, borderWidth: 1, fill: '-1', pointRadius: 0, tension: 0.3 },
+      { label: '31-60d', data: [...dpdCurrent].map((v, i) => v + dpd1_30[i] + dpd31_60[i]), backgroundColor: C.am + '88', borderColor: C.am, borderWidth: 1, fill: '-1', pointRadius: 0, tension: 0.3 },
+      { label: '61-90d', data: [...dpdCurrent].map((v, i) => v + dpd1_30[i] + dpd31_60[i] + dpd61_90[i]), backgroundColor: C.co + '88', borderColor: C.co, borderWidth: 1, fill: '-1', pointRadius: 0, tension: 0.3 },
+      { label: '90+', data: [...dpdCurrent].map((v, i) => v + dpd1_30[i] + dpd31_60[i] + dpd61_90[i] + dpd90p[i]), backgroundColor: C.rd + '88', borderColor: C.rd, borderWidth: 1, fill: '-1', pointRadius: 0, tension: 0.3 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'bottom', labels: { color: '#8899b4', font: { size: 11 }, usePointStyle: true, pointStyle: 'rect', padding: 10 } },
+      filler: { propagate: false }
+    },
+    scales: {
+      x: { ticks: { color: tickColor, font: { size: 10 } }, grid: { color: gridColor } },
+      y: { min: 0, max: 100, ticks: { color: tickColor, callback: v => v + '%' }, grid: { color: gridColor } }
+    }
+  }
+});
+
+// ── Chart 3: Borrowing Base + Outstanding + Interest Reserve ──
+const ctx3 = document.getElementById('bbChart');
+const chart3 = new Chart(ctx3, {
+  type: 'line',
+  data: {
+    labels: labels,
+    datasets: [
+      {
+        label: 'Outstanding Principal ($M)',
+        data: [...outstandingData],
+        borderColor: C.co,
+        borderWidth: 2,
+        pointRadius: 0,
+        tension: 0.3,
+        fill: false
+      },
+      {
+        label: 'Borrowing Base ($M)',
+        data: [...bbData],
+        borderColor: C.bl,
+        borderWidth: 2,
+        pointRadius: 0,
+        tension: 0.3,
+        fill: { target: 0, above: 'rgba(248,113,113,.08)', below: 'rgba(96,165,250,.06)' }
+      },
+      {
+        label: 'Interest Reserve ($M)',
+        data: [...interestReserve],
+        borderColor: C.tl,
+        borderWidth: 1.5,
+        pointRadius: 0,
+        tension: 0.3,
+        borderDash: [4, 3],
+        fill: false,
+        yAxisID: 'y1'
+      },
+      {
+        label: 'Covenant Minimum ($20M)',
+        data: [...covenantMin],
+        borderColor: C.rd + '88',
+        borderWidth: 1,
+        borderDash: [6, 4],
+        pointRadius: 0,
+        fill: false
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'bottom', labels: { color: '#8899b4', font: { size: 11 }, usePointStyle: true, pointStyle: 'rect', padding: 10 } }
+    },
+    scales: {
+      x: { ticks: { color: tickColor, font: { size: 10 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 10 }, grid: { color: gridColor } },
+      y: { min: 16, max: 42, ticks: { color: tickColor, callback: v => '$' + v + 'M' }, grid: { color: gridColor } },
+      y1: { position: 'right', min: 0, max: 4, ticks: { color: C.tl, callback: v => '$' + v + 'M' }, grid: { drawOnChartArea: false } }
+    }
+  }
+});
+
+// ── Chart 4: Cash Velocity + ACH Return Rate ──
+const ctx4 = document.getElementById('cvChart');
+const chart4 = new Chart(ctx4, {
+  type: 'line',
+  data: {
+    labels: labels,
+    datasets: [
+      {
+        label: 'Cash Velocity Index',
+        data: [...cvData],
+        borderColor: C.pk,
+        borderWidth: 2,
+        pointRadius: 0,
+        tension: 0.3,
+        fill: { target: 'origin', above: 'rgba(244,114,182,.06)' },
+        yAxisID: 'y'
+      },
+      {
+        label: 'CVI Threshold (90)',
+        data: [...cvThreshold],
+        borderColor: C.rd + '88',
+        borderWidth: 1,
+        borderDash: [6, 4],
+        pointRadius: 0,
+        fill: false,
+        yAxisID: 'y'
+      },
+      {
+        label: 'ACH Return Rate %',
+        data: [...achReturnRate],
+        borderColor: C.am,
+        borderWidth: 2,
+        pointRadius: 0,
+        tension: 0.3,
+        fill: false,
+        yAxisID: 'y1'
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'bottom', labels: { color: '#8899b4', font: { size: 11 }, usePointStyle: true, pointStyle: 'rect', padding: 10 } }
+    },
+    scales: {
+      x: { ticks: { color: tickColor, font: { size: 10 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 10 }, grid: { color: gridColor } },
+      y: { min: 80, max: 110, ticks: { color: tickColor }, grid: { color: gridColor }, title: { display: true, text: 'CVI', color: tickColor, font: { size: 10 } } },
+      y1: { position: 'right', min: 0, max: 12, ticks: { color: C.am, callback: v => v + '%' }, grid: { drawOnChartArea: false }, title: { display: true, text: 'ACH Return %', color: C.am, font: { size: 10 } } }
+    }
+  }
+});
+
+// ── Chart 5: Roll Rate Trends ──
+const ctx5 = document.getElementById('rollRateChart');
+const chart5 = new Chart(ctx5, {
+  type: 'line',
+  data: {
+    labels: weekLabels,
+    datasets: [
+      {
+        label: 'Current \u2192 1-30d',
+        data: [...rrCur_130],
+        borderColor: C.bl,
+        borderWidth: 2,
+        pointRadius: 2,
+        pointBackgroundColor: C.bl,
+        tension: 0.3,
+        fill: false,
+        yAxisID: 'y1'
+      },
+      {
+        label: '1-30 \u2192 31-60d',
+        data: [...rr130_3160],
+        borderColor: C.am,
+        borderWidth: 2.5,
+        pointRadius: 3,
+        pointBackgroundColor: C.am,
+        tension: 0.3,
+        fill: false
+      },
+      {
+        label: '31-60 \u2192 61-90d',
+        data: [...rr3160_6190],
+        borderColor: C.co,
+        borderWidth: 2,
+        pointRadius: 2,
+        pointBackgroundColor: C.co,
+        tension: 0.3,
+        fill: false
+      },
+      {
+        label: '61-90 \u2192 90+',
+        data: [...rr6190_90p],
+        borderColor: C.rd,
+        borderWidth: 2,
+        pointRadius: 2,
+        pointBackgroundColor: C.rd,
+        tension: 0.3,
+        fill: false
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'bottom', labels: { color: '#8899b4', font: { size: 11 }, usePointStyle: true, pointStyle: 'rect', padding: 10 } }
+    },
+    scales: {
+      x: { ticks: { color: tickColor, font: { size: 10 } }, grid: { color: gridColor } },
+      y: { min: 10, max: 55, ticks: { color: tickColor, callback: v => v + '%' }, grid: { color: gridColor }, title: { display: true, text: 'Roll Rate %', color: tickColor, font: { size: 10 } } },
+      y1: { position: 'right', min: 0, max: 8, ticks: { color: C.bl, callback: v => v + '%' }, grid: { drawOnChartArea: false }, title: { display: true, text: 'Cur \u2192 1-30 %', color: C.bl, font: { size: 10 } } }
+    }
+  }
+});
+
+// ── Chart 6: Payment Channel Breakdown ──
+const ctx6 = document.getElementById('payChannelChart');
+const chart6 = new Chart(ctx6, {
+  type: 'line',
+  data: {
+    labels: weekLabels,
+    datasets: [
+      { label: 'ACH', data: [...payACH], backgroundColor: C.bl + '88', borderColor: C.bl, borderWidth: 1, fill: 'origin', pointRadius: 0, tension: 0.3 },
+      { label: 'Debit Card', data: payACH.map((v, i) => v + payDebit[i]), backgroundColor: C.tl + '88', borderColor: C.tl, borderWidth: 1, fill: '-1', pointRadius: 0, tension: 0.3 },
+      { label: 'Check/MO', data: payACH.map((v, i) => v + payDebit[i] + payCheck[i]), backgroundColor: C.am + '88', borderColor: C.am, borderWidth: 1, fill: '-1', pointRadius: 0, tension: 0.3 },
+      { label: 'Cash', data: payACH.map((v, i) => v + payDebit[i] + payCheck[i] + payCash[i]), backgroundColor: C.co + '88', borderColor: C.co, borderWidth: 1, fill: '-1', pointRadius: 0, tension: 0.3 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'bottom', labels: { color: '#8899b4', font: { size: 11 }, usePointStyle: true, pointStyle: 'rect', padding: 10 } },
+      filler: { propagate: false }
+    },
+    scales: {
+      x: { ticks: { color: tickColor, font: { size: 10 } }, grid: { color: gridColor } },
+      y: { min: 0, max: 100, ticks: { color: tickColor, callback: v => v + '%' }, grid: { color: gridColor } }
+    }
+  }
+});
+
+const allCharts = [chart1, chart2, chart3, chart4, chart5, chart6];
+
+// ── Scrubber logic ──
+const scrubber = document.getElementById('scrubber');
+const scrubDateEl = document.getElementById('scrubDate');
+const statusBadge = document.getElementById('statusBadge');
+const collRateAnnotation = document.getElementById('collRateAnnotation');
+
+function getStatus(day) {
+  if (day < 35) return { label: 'MONITORING', color: C.gn, bg: 'rgba(74,222,128,.12)' };
+  if (day < 50) return { label: 'WARNING', color: C.am, bg: 'rgba(251,191,36,.12)' };
+  if (day < 62) return { label: 'ELEVATED', color: C.co, bg: 'rgba(251,146,60,.12)' };
+  return { label: 'CRITICAL', color: C.rd, bg: 'rgba(248,113,113,.12)' };
+}
+
+function updateMetricCard(id, value, baseline, unit, invertBad) {
+  const valEl = document.getElementById(id + 'Val');
+  const deltaEl = document.getElementById(id + 'Delta');
+  const suffix = unit || '';
+  valEl.textContent = value + suffix;
+
+  const diff = value - baseline;
+  const pct = baseline !== 0 ? Math.abs(diff / baseline * 100).toFixed(1) : 0;
+  const arrow = diff > 0 ? '\u25B2' : diff < 0 ? '\u25BC' : '';
+  const isGood = invertBad ? diff < 0 : diff > 0;
+  const cls = Math.abs(diff) < 0.01 ? 'mc-ok' : isGood ? 'mc-ok' : 'mc-bad';
+
+  if (Math.abs(diff) < 0.01) {
+    deltaEl.innerHTML = '<span class="mc-ok">Baseline</span>';
+  } else {
+    deltaEl.innerHTML = '<span class="' + cls + '">' + arrow + ' ' + pct + '% from baseline</span>';
+  }
+
+  // Border highlight for bad metrics
+  const card = document.getElementById(id);
+  if (cls === 'mc-bad' && Math.abs(diff / baseline) > 0.15) {
+    card.style.borderColor = 'rgba(248,113,113,.4)';
+  } else if (cls === 'mc-bad') {
+    card.style.borderColor = 'rgba(251,191,36,.3)';
+  } else {
+    card.style.borderColor = '';
+  }
+}
+
+function updateDashboard(day) {
+  const dt = dayToDate(day);
+  scrubDateEl.textContent = fmtDate(dt);
+
+  // Status badge
+  const st = getStatus(day);
+  const pulseClass = day >= 62 ? 'heartbeat' : 'pulse';
+  statusBadge.innerHTML = '<div class="badge" style="background:' + st.bg + ';color:' + st.color + '"><span class="' + pulseClass + '" style="width:10px;height:10px;border-radius:50%;background:' + st.color + ';display:inline-block"></span>' + st.label + '</div>';
+
+  const n = day + 1;
+
+  // -- Metric cards --
+  updateMetricCard('mcCollRate', kpiCollRate[day], 98.2, '%', true);
+  updateMetricCard('mc30DPD', kpi30DPD[day], 14.3, '%', false);
+  updateMetricCard('mc60DPD', kpi60DPD[day], 6.8, '%', false);
+  updateMetricCard('mcNetLoss', kpiNetLoss[day], 0.80, '%', false);
+  updateMetricCard('mcAvgDPD', kpiAvgDPD[day], 8.2, 'd', false);
+  updateMetricCard('mcBBUtil', kpiBBUtil[day], 82.0, '%', false);
+
+  // Collection rate annotation
+  const crNow = collectionRates[day];
+  const crColor = crNow > 97 ? C.tl : crNow > 95 ? C.am : crNow > 93 ? C.co : C.rd;
+  collRateAnnotation.textContent = 'Collection Rate: ' + crNow.toFixed(1) + '%';
+  collRateAnnotation.style.color = crColor;
+
+  // Chart 1: Collections
+  chart1.data.datasets[0].data = scheduled.slice(0, n);
+  chart1.data.datasets[1].data = actual.slice(0, n);
+  chart1.data.datasets[2].data = threshold95.slice(0, n);
+  chart1.data.datasets[3].data = scheduled.slice(0, n);
+  chart1.data.datasets[4].data = actual.slice(0, n);
+  chart1.data.labels = labels.slice(0, n);
+  chart1.update('none');
+
+  // Chart 2: DPD
+  const wk = Math.min(weeks, Math.ceil(n / 7));
+  chart2.data.labels = weekLabels.slice(0, wk);
+  chart2.data.datasets[0].data = dpdCurrent.slice(0, wk);
+  chart2.data.datasets[1].data = dpdCurrent.slice(0, wk).map((v, i) => v + dpd1_30[i]);
+  chart2.data.datasets[2].data = dpdCurrent.slice(0, wk).map((v, i) => v + dpd1_30[i] + dpd31_60[i]);
+  chart2.data.datasets[3].data = dpdCurrent.slice(0, wk).map((v, i) => v + dpd1_30[i] + dpd31_60[i] + dpd61_90[i]);
+  chart2.data.datasets[4].data = dpdCurrent.slice(0, wk).map((v, i) => v + dpd1_30[i] + dpd31_60[i] + dpd61_90[i] + dpd90p[i]);
+  chart2.update('none');
+
+  // Chart 3: BB + Outstanding
+  chart3.data.datasets[0].data = outstandingData.slice(0, n);
+  chart3.data.datasets[1].data = bbData.slice(0, n);
+  chart3.data.datasets[2].data = interestReserve.slice(0, n);
+  chart3.data.datasets[3].data = covenantMin.slice(0, n);
+  chart3.data.labels = labels.slice(0, n);
+  chart3.update('none');
+
+  // Chart 4: Cash Velocity + ACH Returns
+  chart4.data.datasets[0].data = cvData.slice(0, n);
+  chart4.data.datasets[1].data = cvThreshold.slice(0, n);
+  chart4.data.datasets[2].data = achReturnRate.slice(0, n);
+  chart4.data.labels = labels.slice(0, n);
+  chart4.update('none');
+
+  // Chart 5: Roll Rates
+  chart5.data.labels = weekLabels.slice(0, wk);
+  chart5.data.datasets[0].data = rrCur_130.slice(0, wk);
+  chart5.data.datasets[1].data = rr130_3160.slice(0, wk);
+  chart5.data.datasets[2].data = rr3160_6190.slice(0, wk);
+  chart5.data.datasets[3].data = rr6190_90p.slice(0, wk);
+  chart5.update('none');
+
+  // Chart 6: Payment Channels
+  chart6.data.labels = weekLabels.slice(0, wk);
+  chart6.data.datasets[0].data = payACH.slice(0, wk);
+  chart6.data.datasets[1].data = payACH.slice(0, wk).map((v, i) => v + payDebit[i]);
+  chart6.data.datasets[2].data = payACH.slice(0, wk).map((v, i) => v + payDebit[i] + payCheck[i]);
+  chart6.data.datasets[3].data = payACH.slice(0, wk).map((v, i) => v + payDebit[i] + payCheck[i] + payCash[i]);
+  chart6.update('none');
+
+  // Alerts
+  document.querySelectorAll('.tl-item').forEach(el => {
+    const alertDay = parseInt(el.dataset.day);
+    if (day >= alertDay) {
+      el.classList.add('visible');
+    } else {
+      el.classList.remove('visible');
+    }
+  });
+}
+
+scrubber.addEventListener('input', () => updateDashboard(parseInt(scrubber.value)));
+
+// Initialize at full view
+updateDashboard(89);
+
+// ===== THEME TOGGLE =====
+const themeBtn=document.getElementById('themeToggle');
+themeBtn.addEventListener('click',()=>{
+  const current=document.documentElement.getAttribute('data-theme');
+  const next=current==='light'?'dark':'light';
+  document.documentElement.setAttribute('data-theme',next);
+  themeBtn.innerHTML=next==='light'?'&#9789;':'&#9788;';
+  const gridC=next==='light'?'rgba(0,0,0,.08)':'rgba(30,45,74,.25)';
+  const tickC=next==='light'?'#475569':'#556a8a';
+  const legC=next==='light'?'#475569':'#8899b4';
+  allCharts.forEach(ch=>{
+    if(!ch.options||!ch.options.scales)return;
+    Object.values(ch.options.scales).forEach(s=>{if(s.grid)s.grid.color=gridC;if(s.ticks)s.ticks.color=tickC;});
+    if(ch.options.plugins&&ch.options.plugins.legend&&ch.options.plugins.legend.labels)ch.options.plugins.legend.labels.color=legC;
+    ch.update('none');
+  });
+});
+</script></body></html>

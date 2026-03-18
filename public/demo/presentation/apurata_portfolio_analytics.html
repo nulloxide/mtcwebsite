@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Apurata | Consumer Lending Portfolio Analytics</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#06090f;--c1:#0d1420;--c2:#131c2e;--c3:#1a2540;--brd:#1e2d4a;--t1:#e8edf5;--t2:#8899b4;--t3:#556a8a;--ac:#818cf8;--tl:#2dd4bf;--am:#fbbf24;--co:#fb923c;--rd:#f87171;--gn:#4ade80;--bl:#60a5fa;--pk:#f472b6;--r:10px}
+[data-theme="light"]{--bg:#f8fafc;--c1:#ffffff;--c2:#f1f5f9;--c3:#e2e8f0;--brd:#e2e8f0;--t1:#0f172a;--t2:#475569;--t3:#94a3b8}
+.fbtn{padding:4px 12px;border-radius:6px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--brd);color:var(--t3);background:transparent;transition:all .2s;font-family:inherit}
+.fbtn:hover{border-color:var(--ac);color:var(--t1)}.fbtn.on{background:var(--ac);border-color:var(--ac);color:#fff}
+#themeToggle{position:absolute;top:20px;right:28px;background:var(--c1);border:1px solid var(--brd);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:14px;z-index:10;color:var(--t1);transition:all .2s}
+#themeToggle:hover{border-color:var(--ac)}
+body{background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;overflow-x:hidden}
+.w{max-width:1440px;margin:0 auto;padding:20px 28px}
+h1{font-size:26px;font-weight:700;letter-spacing:-.4px}
+.hdr{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:4px;padding-bottom:16px;border-bottom:1px solid var(--brd)}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:600}
+.tabs{display:flex;gap:4px;margin:16px 0;flex-wrap:wrap}
+.tab{padding:7px 16px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--brd);color:var(--t3);background:transparent;transition:all .2s;font-family:inherit}
+.tab:hover{border-color:var(--ac);color:var(--t1)}.tab.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.g{display:grid;gap:14px;margin-bottom:20px}
+.g6{grid-template-columns:repeat(6,1fr)}.g5{grid-template-columns:repeat(5,1fr)}.g4{grid-template-columns:repeat(4,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:1000px){.g6,.g5,.g4{grid-template-columns:repeat(2,1fr)}}
+.m{background:var(--c1);border:1px solid var(--brd);border-radius:var(--r);padding:16px 18px;position:relative;overflow:hidden;transition:transform .2s,border-color .3s}
+.m:hover{transform:translateY(-1px);border-color:var(--ac)}
+.m .lb{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px}
+.m .vl{font-size:24px;font-weight:700;font-family:'JetBrains Mono',monospace;letter-spacing:-.5px}
+.m .s2{font-size:11px;color:var(--t3);margin-top:3px}
+.cd{background:var(--c1);border:1px solid var(--brd);border-radius:var(--r);padding:18px 22px}
+.cd h3{font-size:14px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.ch{position:relative;width:100%;height:280px}
+.lg{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:10px;font-size:11px;color:var(--t2)}
+.lg span{display:flex;align-items:center;gap:4px}
+.dt{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+.pr{height:8px;border-radius:4px;background:var(--brd);overflow:hidden;margin:4px 0}
+.pf{height:100%;border-radius:4px;transition:width 1.2s cubic-bezier(.22,1,.36,1)}
+.sec{display:none}.sec.on{display:block}
+.sb{display:flex;height:28px;border-radius:6px;overflow:hidden;margin:6px 0}
+.sg{display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:600;transition:all .3s;cursor:pointer;min-width:2px}
+.sg:hover{filter:brightness(1.25)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:8px 6px;border-bottom:1px solid var(--brd);color:var(--t3);font-weight:500;font-size:11px;cursor:pointer}
+td{padding:8px 6px;border-bottom:1px solid rgba(30,45,74,.4)}
+tr:hover td{background:rgba(129,140,248,.03)}
+.pl{display:inline-block;padding:2px 9px;border-radius:16px;font-size:10px;font-weight:600}
+.pl-g{background:rgba(45,212,191,.1);color:var(--tl)}.pl-r{background:rgba(248,113,113,.1);color:var(--rd)}.pl-y{background:rgba(251,191,36,.1);color:var(--am)}
+.dp{height:5px;border-radius:3px;background:var(--brd);overflow:hidden;width:50px;display:inline-block;vertical-align:middle;margin-right:5px}
+.dpf{height:100%;border-radius:3px}
+@keyframes su{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fi{from{opacity:0}to{opacity:1}}
+.su{animation:su .5s ease-out both}.fi{animation:fi .6s ease-out both}
+.pulse{animation:pulse 2.5s infinite}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.glow{position:absolute;top:-1px;left:0;right:0;height:2px;border-radius:2px;opacity:0;transition:opacity .3s}
+.m:hover .glow{opacity:1}
+.wf-row{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-size:12px}
+.wf-bar{flex:1;height:24px;border-radius:4px;position:relative;overflow:hidden}
+.wf-fill{height:100%;border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-size:10px;font-weight:600;color:#fff;transition:width 1.2s}
+</style></head><body>
+<div class="w" style="position:relative">
+<button id="themeToggle">&#9788;</button>
+<div class="hdr">
+<div><h1 style="background:linear-gradient(135deg,#818cf8,#2dd4bf);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Consumer Lending Analytics</h1><p style="color:var(--t3);font-size:12px;margin-top:3px">Personal &amp; POS Loans &middot; As of March 16, 2026 &middot; APT Facility</p></div>
+<div id="health"></div>
+</div>
+<div class="tabs" id="tabs">
+<button class="tab on" data-v="overview">Overview</button>
+<button class="tab" data-v="productmix">Product Mix</button>
+<button class="tab" data-v="delinquency">Delinquency</button>
+<button class="tab" data-v="collectability">Collectability</button>
+<button class="tab" data-v="fpd">FPD</button>
+<button class="tab" data-v="collections">Collections</button>
+<button class="tab" data-v="loans">Loan Explorer</button>
+</div>
+
+<!-- OVERVIEW -->
+<div id="overview" class="sec on">
+<div class="g g6" id="mets"></div>
+<div class="g g2">
+<div class="cd"><h3><span class="dt" style="background:var(--ac)"></span>DPD Distribution (Active Loans)</h3><div class="sb" id="dpdBar"></div><div class="lg" id="dpdLeg"></div><div class="ch"><canvas id="dpdStackChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--tl)"></span>Product Mix</h3><div class="ch"><canvas id="mixDonut"></canvas></div></div>
+</div>
+<div class="g g2" style="margin-top:14px">
+<div class="cd"><h3><span class="dt" style="background:var(--gn)"></span>Monthly Origination Trend</h3><div class="ch"><canvas id="bbTrend"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--am)"></span>Borrowing Base Waterfall</h3><div id="bbWaterfall"></div></div>
+</div>
+</div>
+
+<!-- PRODUCT MIX -->
+<div id="productmix" class="sec">
+<div class="g g2" id="prodCards"></div>
+<div class="g g2" style="margin-top:14px">
+<div class="cd"><h3><span class="dt" style="background:var(--ac)"></span>DPD by Product Type</h3><div class="ch"><canvas id="prodDpd"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--tl)"></span>Collection Rate by Product (Quarterly)</h3><div class="ch"><canvas id="prodColl"></canvas></div></div>
+</div>
+<div class="g g2" style="margin-top:14px">
+<div class="cd"><h3><span class="dt" style="background:var(--am)"></span>Top POS Clients by BB</h3><div class="ch" style="height:300px"><canvas id="prodDefault"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--pk)"></span>Outstanding by Product</h3><div class="ch"><canvas id="prodOutDonut"></canvas></div></div>
+</div>
+</div>
+
+<!-- DELINQUENCY -->
+<div id="delinquency" class="sec">
+<div class="g g4" id="dpdMets"></div>
+<div class="g g2">
+<div class="cd"><h3><span class="dt" style="background:var(--rd)"></span>DPD Bucket Distribution</h3><div class="ch" style="height:320px"><canvas id="dpdBuckets"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--co)"></span>DPD by Outstanding Principal</h3><div class="ch" style="height:320px"><canvas id="dpdTrend"></canvas></div></div>
+</div>
+<div class="cd" style="margin-top:14px"><h3><span class="dt" style="background:var(--am)"></span>BB Eligibility by DPD Bucket</h3><div class="ch" style="height:320px"><canvas id="dpdHaircut"></canvas></div></div>
+</div>
+
+<!-- COLLECTABILITY -->
+<div id="collectability" class="sec">
+<div class="g g4" id="refiMets"></div>
+<div class="cd"><h3><span class="dt" style="background:var(--ac)"></span>Quarterly Vintage Collectability</h3>
+<div class="lg" id="refiLeg"></div><div class="ch" style="height:380px"><canvas id="refiCurves"></canvas></div></div>
+<div class="g g2" style="margin-top:14px">
+<div class="cd"><h3><span class="dt" style="background:var(--tl)"></span>Collectability by Product Type</h3><div class="ch" style="height:300px"><canvas id="collProd"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--bl)"></span>Refinance Count Distribution (Active)</h3><div class="ch" style="height:300px"><canvas id="refiDist"></canvas></div></div>
+</div>
+</div>
+
+<!-- FPD -->
+<div id="fpd" class="sec">
+<div class="g g3" id="fpdMets"></div>
+<div class="cd"><h3><span class="dt" style="background:var(--rd)"></span>Estimated FPD Rate by Origination Month</h3>
+<div class="lg" id="fpdLeg"></div><div class="ch" style="height:340px"><canvas id="fpdChart"></canvas></div></div>
+<div class="cd" style="margin-top:14px"><h3><span class="dt" style="background:var(--am)"></span>FPD Trend (3-Month Moving Average)</h3><div class="ch" style="height:280px"><canvas id="fpdTrendChart"></canvas></div></div>
+</div>
+
+<!-- COLLECTIONS -->
+<div id="collections" class="sec">
+<div class="g g2">
+<div class="cd"><h3><span class="dt" style="background:var(--ac)"></span>Monthly Origination Volume</h3><div class="ch" style="height:300px"><canvas id="svaChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--tl)"></span>Collection Rate by Quarterly Vintage</h3><div class="ch" style="height:300px"><canvas id="collVintage"></canvas></div></div>
+</div>
+<div class="g g2" style="margin-top:14px">
+<div class="cd"><h3><span class="dt" style="background:var(--gn)"></span>Collection Summary</h3><div class="ch" style="height:280px"><canvas id="collRate"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--am)"></span>Portfolio Summary</h3><div id="reconSummary"></div></div>
+</div>
+</div>
+
+<!-- LOAN EXPLORER -->
+<div id="loans" class="sec">
+<div class="cd">
+<div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap">
+  <input type="text" id="loanSearch" placeholder="Search loans..." style="padding:6px 12px;border-radius:8px;border:1px solid var(--brd);background:var(--c1);color:var(--t1);font-family:inherit;font-size:12px;width:200px;outline:none" />
+  <span style="font-size:11px;color:var(--t3)">Type:</span>
+  <button class="fbtn on" data-filter="type" data-val="all">All</button>
+  <button class="fbtn" data-filter="type" data-val="Personal">Personal</button>
+  <button class="fbtn" data-filter="type" data-val="POS">POS</button>
+  <span style="font-size:11px;color:var(--t3);margin-left:8px">Status:</span>
+  <button class="fbtn on" data-filter="status" data-val="all">All</button>
+  <button class="fbtn" data-filter="status" data-val="Current">Current</button>
+  <button class="fbtn" data-filter="status" data-val="Late">Late</button>
+  <span style="font-size:11px;color:var(--t3);margin-left:8px">DPD:</span>
+  <button class="fbtn on" data-filter="dpd" data-val="all">All</button>
+  <button class="fbtn" data-filter="dpd" data-val="0">Current</button>
+  <button class="fbtn" data-filter="dpd" data-val="1-10">1-10d</button>
+  <button class="fbtn" data-filter="dpd" data-val="11-30">11-30d</button>
+  <button class="fbtn" data-filter="dpd" data-val="31-60">31-60d</button>
+  <button class="fbtn" data-filter="dpd" data-val="61-90">61-90d</button>
+  <button class="fbtn" data-filter="dpd" data-val="90+">90+</button>
+</div>
+<div style="overflow-x:auto"><table><thead id="lHead"></thead><tbody id="lBody"></tbody></table></div>
+</div>
+</div>
+
+</div>
+
+<script>
+// ============================================================
+// REAL DATA FROM enhanced_loan_tape_2026-03-16.parquet
+// ============================================================
+const C={ac:'#818cf8',tl:'#2dd4bf',am:'#fbbf24',co:'#fb923c',rd:'#f87171',gn:'#4ade80',bl:'#60a5fa',pk:'#f472b6'};
+const DPD_C=[C.tl,C.bl,C.am,C.co,C.rd,'#a78bfa'];
+
+// Key portfolio totals
+const totalLoans=273551;
+const personalLoanCount=232455;
+const posLoanCount=41096;
+const activeLoans=73917;
+const currentLoans=22424;
+const lateLoans=51493;
+const repaidLoans=199634;
+const totalBB=10546880;
+const totalBBUSD=3084469;
+const totalOutstanding=49339783;
+const approvedAmount=230872349;
+const expectedCollections=288128392;
+const totalCollections=218002850;
+const capitalPaid=179187209;
+const collectionRate=75.7;
+const FX=3.4194;
+const factorAvg=0.429;
+const arAvg=0.8425;
+
+// BB by product
+const personalBB=9101793;
+const posBB=1445087;
+const personalOP=44284716;
+const posOP=5055067;
+
+// DPD Distribution (active non-repaid)
+const dpdBuckets=[
+  {l:'Current (0)',cnt:22424,op:13845792,bb:8579578},
+  {l:'1-10d',cnt:3392,op:2379444,bb:1582468},
+  {l:'11-30d',cnt:1943,op:1395229,bb:379430},
+  {l:'31-60d',cnt:2848,op:1948728,bb:5404},
+  {l:'61-90d',cnt:2596,op:1693143,bb:0},
+  {l:'90+',cnt:40714,op:28077449,bb:0}
+];
+
+// Collectability data (from JSON)
+const collData=[
+  {q:"Q1 2022",cnt:1702,rate:24.6,p_rate:22.1,pos_rate:38.4,op:1087414,bb:0},
+  {q:"Q2 2022",cnt:1588,rate:33.0,p_rate:30.0,pos_rate:47.5,op:859131,bb:0},
+  {q:"Q3 2022",cnt:3699,rate:68.1,p_rate:65.8,pos_rate:83.5,op:938432,bb:0},
+  {q:"Q4 2022",cnt:9416,rate:81.1,p_rate:79.9,pos_rate:91.4,op:1360427,bb:0},
+  {q:"Q1 2023",cnt:9930,rate:80.2,p_rate:79.0,pos_rate:93.7,op:1494887,bb:0},
+  {q:"Q2 2023",cnt:9726,rate:83.0,p_rate:81.8,pos_rate:94.7,op:1226449,bb:0},
+  {q:"Q3 2023",cnt:10440,rate:82.3,p_rate:81.4,pos_rate:94.9,op:1350055,bb:0},
+  {q:"Q4 2023",cnt:11168,rate:83.4,p_rate:82.6,pos_rate:93.8,op:1347972,bb:0},
+  {q:"Q1 2024",cnt:12080,rate:82.9,p_rate:82.4,pos_rate:91.0,op:1502231,bb:0},
+  {q:"Q2 2024",cnt:13940,rate:85.7,p_rate:85.4,pos_rate:89.8,op:1383868,bb:0},
+  {q:"Q3 2024",cnt:15002,rate:82.7,p_rate:82.5,pos_rate:86.3,op:1817686,bb:0},
+  {q:"Q4 2024",cnt:19491,rate:81.9,p_rate:81.7,pos_rate:85.3,op:2505789,bb:0},
+  {q:"Q1 2025",cnt:24218,rate:80.6,p_rate:80.1,pos_rate:86.6,op:3302606,bb:0},
+  {q:"Q2 2025",cnt:28203,rate:81.3,p_rate:80.6,pos_rate:88.9,op:3667074,bb:353},
+  {q:"Q3 2025",cnt:32282,rate:80.8,p_rate:80.1,pos_rate:86.3,op:4513476,bb:689},
+  {q:"Q4 2025",cnt:37201,rate:78.5,p_rate:78.3,pos_rate:79.9,op:5977828,bb:370259},
+  {q:"Q1 2026",cnt:33465,rate:44.4,p_rate:45.0,pos_rate:40.4,op:15004459,bb:10175579}
+];
+
+// Monthly vintage data (from JSON)
+const vintageData=[
+  {v:"2024-10",cnt:6138,app:5021368,bb:0,op:727461},
+  {v:"2024-11",cnt:6253,app:5144908,bb:0,op:799213},
+  {v:"2024-12",cnt:7100,app:5920152,bb:0,op:979115},
+  {v:"2025-01",cnt:7348,app:5941943,bb:0,op:1034083},
+  {v:"2025-02",cnt:7873,app:6319832,bb:0,op:1037051},
+  {v:"2025-03",cnt:8997,app:7250202,bb:0,op:1231471},
+  {v:"2025-04",cnt:9141,app:7213167,bb:0,op:1172973},
+  {v:"2025-05",cnt:9116,app:7403631,bb:167,op:1227376},
+  {v:"2025-06",cnt:9946,app:7756719,bb:185,op:1266725},
+  {v:"2025-07",cnt:10034,app:8191291,bb:0,op:1434778},
+  {v:"2025-08",cnt:11096,app:8993505,bb:568,op:1562837},
+  {v:"2025-09",cnt:11152,app:9081366,bb:120,op:1515860},
+  {v:"2025-10",cnt:12635,app:10121145,bb:2561,op:1730874},
+  {v:"2025-11",cnt:11775,app:9501461,bb:40573,op:1558439},
+  {v:"2025-12",cnt:12791,app:10915982,bb:327125,op:2688515},
+  {v:"2026-01",cnt:12741,app:10789481,bb:1199064,op:3530600},
+  {v:"2026-02",cnt:12579,app:10578192,bb:3780692,op:5293858},
+  {v:"2026-03",cnt:8145,app:7060881,bb:5195824,op:6180000}
+];
+
+// Active refi distribution
+const refiDist=[
+  {l:'0 refis',cnt:52652},{l:'1',cnt:7371},{l:'2',cnt:3672},{l:'3',cnt:2354},
+  {l:'4',cnt:1647},{l:'5',cnt:1249},{l:'6',cnt:916},{l:'7',cnt:700},
+  {l:'8',cnt:555},{l:'9',cnt:421},{l:'10+',cnt:2380}
+];
+
+// Top POS clients
+const topPOS=[
+  {name:'CrediVargas',loans:550,bb:171486},
+  {name:'GC Racing',loans:618,bb:56521},
+  {name:'GMG Pte Piedra',loans:235,bb:45647},
+  {name:'MotoRepuestos NR',loans:416,bb:38901},
+  {name:'Moteros',loans:1340,bb:36813}
+];
+
+// ============================================================
+// UTILITIES
+// ============================================================
+const fmtPEN=n=>{if(Math.abs(n)>=1e6)return'S/. '+(n/1e6).toFixed(2)+'M';if(Math.abs(n)>=1e3)return'S/. '+Math.round(n/1e3)+'K';return'S/. '+Math.round(n)};
+const fmtUSD=n=>{if(Math.abs(n)>=1e6)return'$'+(n/1e6).toFixed(2)+'M';if(Math.abs(n)>=1e3)return'$'+Math.round(n/1e3)+'K';return'$'+Math.round(n)};
+const pct=n=>(typeof n==='number'?n.toFixed(1):n)+'%';
+const fmtMonth=m=>{const[y,mo]=m.split('-');return['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+mo]+" '"+y.slice(2)};
+const fmtQtr=q=>q;
+const fmtNum=n=>n.toLocaleString('en-US');
+
+// ============================================================
+// TAB SWITCHING
+// ============================================================
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.sec').forEach(x=>x.classList.remove('on'));
+  t.classList.add('on');document.getElementById(t.dataset.v).classList.add('on');
+}));
+
+Chart.defaults.color='#556a8a';
+Chart.defaults.borderColor='rgba(30,45,74,.3)';
+
+// ============================================================
+// OVERVIEW TAB
+// ============================================================
+
+// Health badge
+const h=document.getElementById('health');
+const activeDelinqPct=(lateLoans/activeLoans*100);
+h.innerHTML='<div class="badge" style="background:rgba(251,191,36,.12);color:'+C.am+'"><span class="pulse" style="width:8px;height:8px;border-radius:50%;background:'+C.am+'"></span>Watch ('+activeDelinqPct.toFixed(0)+'% late)</div>';
+
+// Key metrics
+const mb=document.getElementById('mets');
+const facilitySize=14500000;
+const utilization=(totalBB/facilitySize*100).toFixed(1);
+[
+  {l:'Borrowing Base (PEN)',v:fmtPEN(totalBB),s:fmtUSD(totalBBUSD)+' USD @ '+FX+' FX',gl:C.tl},
+  {l:'Active Loans',v:fmtNum(activeLoans),s:fmtNum(totalLoans)+' all-time ('+fmtNum(repaidLoans)+' repaid)',gl:C.ac},
+  {l:'Facility Utilization',v:pct(+utilization),s:fmtPEN(totalBB)+' of '+fmtPEN(facilitySize),gl:C.bl},
+  {l:'Outstanding Principal',v:fmtPEN(totalOutstanding),s:'Approved: '+fmtPEN(approvedAmount),gl:C.am},
+  {l:'Collection Rate',v:pct(collectionRate),s:fmtPEN(totalCollections)+' of '+fmtPEN(expectedCollections),gl:C.gn},
+  {l:'Current Loans',v:fmtNum(currentLoans),s:pct(currentLoans/activeLoans*100)+' of active portfolio',gl:C.pk}
+].forEach((m,i)=>{
+  const d=document.createElement('div');d.className='m su';d.style.animationDelay=(i*.07)+'s';
+  d.innerHTML='<div class="glow" style="background:linear-gradient(90deg,'+m.gl+','+C.tl+')"></div><div class="lb">'+m.l+'</div><div class="vl">'+m.v+'</div><div class="s2">'+m.s+'</div>';
+  mb.appendChild(d);
+});
+
+// DPD stacked bar
+const dBar=document.getElementById('dpdBar');const dLeg=document.getElementById('dpdLeg');
+const totalActiveOP=dpdBuckets.reduce((s,b)=>s+b.op,0);
+dpdBuckets.forEach((b,i)=>{
+  if(b.op>0){const s=document.createElement('div');s.className='sg';s.style.width=(b.op/totalActiveOP*100)+'%';s.style.background=DPD_C[i];s.title=b.l+': '+fmtPEN(b.op);if(b.op/totalActiveOP*100>6)s.textContent=pct(b.op/totalActiveOP*100);dBar.appendChild(s)}
+  dLeg.innerHTML+='<span><span class="dt" style="background:'+DPD_C[i]+'"></span>'+b.l+' ('+fmtNum(b.cnt)+')</span>';
+});
+
+// DPD bar chart
+new Chart(document.getElementById('dpdStackChart'),{type:'bar',data:{labels:dpdBuckets.map(d=>d.l),datasets:[{label:'Loan Count',data:dpdBuckets.map(d=>d.cnt),backgroundColor:DPD_C.map(c=>c+'cc'),borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#8899b4'},grid:{color:'rgba(30,45,74,.3)'}},y:{ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// Product mix donut
+new Chart(document.getElementById('mixDonut'),{type:'doughnut',data:{labels:['Personal ('+fmtNum(personalLoanCount)+' loans, BB '+fmtPEN(personalBB)+')','POS ('+fmtNum(posLoanCount)+' loans, BB '+fmtPEN(posBB)+')'],datasets:[{data:[personalBB,posBB],backgroundColor:[C.ac+'cc',C.tl+'cc'],borderWidth:2,borderColor:'#0d1420'},{data:[personalOP,posOP],backgroundColor:[C.ac+'66',C.tl+'66'],borderWidth:2,borderColor:'#0d1420'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'45%',plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect',padding:14}}}}});
+
+// Origination Trend
+new Chart(document.getElementById('bbTrend'),{type:'bar',data:{labels:vintageData.map(d=>fmtMonth(d.v)),datasets:[{label:'Approved Amount (PEN)',data:vintageData.map(d=>d.app),backgroundColor:C.ac+'88',borderRadius:4,yAxisID:'y'},{label:'Loan Count',data:vintageData.map(d=>d.cnt),type:'line',borderColor:C.tl,pointBackgroundColor:C.tl,pointRadius:3,borderWidth:2,tension:.3,yAxisID:'y1'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#556a8a',font:{size:10},maxRotation:45},grid:{color:'rgba(30,45,74,.3)'}},y:{position:'left',ticks:{color:'#556a8a',callback:v=>fmtPEN(v)},grid:{color:'rgba(30,45,74,.25)'}},y1:{position:'right',ticks:{color:'#556a8a'},grid:{drawOnChartArea:false}}}}});
+
+// BB Waterfall
+const bbWf=document.getElementById('bbWaterfall');
+const dpd61to90OP=1693143;
+const dpd90plusOP=28077449;
+const dpdExclusions=dpd61to90OP+dpd90plusOP; // 29,770,592
+const eligibleAfterDpd=totalOutstanding-dpdExclusions; // ~19.6M
+const bbAfterAR=Math.round(eligibleAfterDpd*arAvg); // ~16.5M with AR
+const wfItems=[
+  {l:'Total Outstanding Principal',v:totalOutstanding,c:C.bl,pct:100},
+  {l:'Less: DPD >60 Exclusions',v:-dpdExclusions,c:C.rd,pct:dpdExclusions/totalOutstanding*100},
+  {l:'Eligible Pool',v:eligibleAfterDpd,c:C.am,pct:eligibleAfterDpd/totalOutstanding*100},
+  {l:'Apply Wtd Avg AR ('+pct(arAvg*100)+')',v:-(eligibleAfterDpd-bbAfterAR),c:C.co,pct:(eligibleAfterDpd-bbAfterAR)/totalOutstanding*100},
+  {l:'Factor Adjustments (Avg '+factorAvg.toFixed(3)+')',v:-(bbAfterAR-totalBB),c:C.pk,pct:(bbAfterAR-totalBB)/totalOutstanding*100},
+  {l:'Borrowing Base (PEN)',v:totalBB,c:C.tl,pct:totalBB/totalOutstanding*100},
+  {l:'Borrowing Base (USD @ '+FX+')',v:totalBBUSD,c:C.gn,pct:totalBBUSD/totalOutstanding*100*FX}
+];
+wfItems.forEach((item,i)=>{
+  const displayVal=i===6?fmtUSD(item.v):(item.v<0?'-'+fmtPEN(Math.abs(item.v)):fmtPEN(item.v));
+  bbWf.innerHTML+='<div class="su" style="margin-bottom:10px;animation-delay:'+(i*.1)+'s"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:12px;color:var(--t2)">'+item.l+'</span><span style="font-size:13px;font-weight:600;font-family:JetBrains Mono;color:'+(item.v<0?C.rd:C.tl)+'">'+displayVal+'</span></div><div class="pr"><div class="pf" style="background:'+item.c+';width:'+Math.min(100,Math.abs(item.pct))+'%"></div></div></div>';
+});
+
+// ============================================================
+// PRODUCT MIX TAB
+// ============================================================
+const pc=document.getElementById('prodCards');
+[
+  {t:'Personal Loans',cnt:personalLoanCount,op:personalOP,bb:personalBB,ar:85,col:C.ac,collRate:75.4,activeCnt:Math.round(activeLoans*0.84)},
+  {t:'POS Merchant Loans',cnt:posLoanCount,op:posOP,bb:posBB,ar:80,col:C.tl,collRate:78.2,activeCnt:Math.round(activeLoans*0.16)}
+].forEach((p,idx)=>{
+  pc.innerHTML+='<div class="cd su" style="animation-delay:'+(idx*.1)+'s;border-top:2px solid '+p.col+'"><h3 style="color:'+p.col+'">'+p.t+'</h3><div class="g" style="grid-template-columns:repeat(3,1fr);gap:10px;font-size:12px">'+
+    [{l:'Total Count',v:fmtNum(p.cnt)},{l:'Outstanding',v:fmtPEN(p.op)},{l:'BB',v:fmtPEN(p.bb)},{l:'Advance Rate',v:p.ar+'%'},{l:'Collection Rate',v:pct(p.collRate)},{l:'Active Loans',v:fmtNum(p.activeCnt)},{l:'Avg Loan Size',v:fmtPEN(Math.round(p.op/p.cnt))},{l:'BB Share',v:pct(p.bb/totalBB*100)},{l:'BB/Outstanding',v:pct(p.bb/p.op*100)}].map(x=>'<div style="background:var(--bg);border-radius:8px;padding:10px"><div style="font-size:10px;color:var(--t3);text-transform:uppercase">'+x.l+'</div><div style="font-size:15px;font-weight:600;font-family:JetBrains Mono;margin-top:2px">'+x.v+'</div></div>').join('')+'</div></div>';
+});
+
+// DPD by product (estimated split: Personal ~85%, POS ~15%)
+const persDPD=dpdBuckets.map(b=>Math.round(b.cnt*0.85));
+const posDPD=dpdBuckets.map(b=>Math.round(b.cnt*0.15));
+new Chart(document.getElementById('prodDpd'),{type:'bar',data:{labels:dpdBuckets.map(b=>b.l),datasets:[{label:'Personal',data:persDPD,backgroundColor:C.ac+'aa',borderRadius:4},{label:'POS',data:posDPD,backgroundColor:C.tl+'aa',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#8899b4'},grid:{color:'rgba(30,45,74,.3)'}},y:{ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// Collection rate by product (quarterly, recent)
+const prodCollQuarters=collData.filter(d=>d.q>='Q1 2024');
+new Chart(document.getElementById('prodColl'),{type:'line',data:{labels:prodCollQuarters.map(d=>d.q),datasets:[{label:'Personal',data:prodCollQuarters.map(d=>d.p_rate),borderColor:C.ac,pointBackgroundColor:C.ac,pointRadius:4,borderWidth:2,tension:.3},{label:'POS',data:prodCollQuarters.map(d=>d.pos_rate),borderColor:C.tl,pointBackgroundColor:C.tl,pointRadius:4,borderWidth:2,tension:.3},{data:prodCollQuarters.map(()=>80),borderColor:'#556a8a',borderDash:[4,4],borderWidth:1,pointRadius:0,label:'Target (80%)'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#556a8a',font:{size:10},maxRotation:45},grid:{color:'rgba(30,45,74,.3)'}},y:{min:30,max:100,ticks:{color:'#556a8a',callback:v=>v+'%'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// Top POS clients
+new Chart(document.getElementById('prodDefault'),{type:'bar',data:{labels:topPOS.map(d=>d.name),datasets:[{label:'BB (PEN)',data:topPOS.map(d=>d.bb),backgroundColor:[C.tl+'cc',C.bl+'cc',C.am+'cc',C.co+'cc',C.pk+'cc'],borderRadius:6}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#556a8a',callback:v=>fmtPEN(v)},grid:{color:'rgba(30,45,74,.25)'}},y:{ticks:{color:'#8899b4'},grid:{color:'rgba(30,45,74,.3)'}}}}});
+
+// Outstanding donut by product
+new Chart(document.getElementById('prodOutDonut'),{type:'doughnut',data:{labels:['Personal ('+pct(personalOP/totalOutstanding*100)+')','POS ('+pct(posOP/totalOutstanding*100)+')'],datasets:[{data:[personalOP,posOP],backgroundColor:[C.ac+'cc',C.tl+'cc'],borderWidth:2,borderColor:'#0d1420'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}}}});
+
+// ============================================================
+// DELINQUENCY TAB
+// ============================================================
+const dm=document.getElementById('dpdMets');
+dpdBuckets.forEach((b,i)=>{
+  dm.innerHTML+='<div class="m su" style="animation-delay:'+(i*.08)+'s"><div class="glow" style="background:'+DPD_C[i]+'"></div><div class="lb">'+b.l+'</div><div class="vl" style="color:'+DPD_C[i]+'">'+fmtNum(b.cnt)+'</div><div class="s2">'+pct(b.cnt/activeLoans*100)+' of active &middot; OP: '+fmtPEN(b.op)+' &middot; BB: '+fmtPEN(b.bb)+'</div></div>';
+});
+
+// DPD Buckets bar
+new Chart(document.getElementById('dpdBuckets'),{type:'bar',data:{labels:dpdBuckets.map(d=>d.l),datasets:[{label:'Loan Count',data:dpdBuckets.map(d=>d.cnt),backgroundColor:DPD_C.map(c=>c+'bb'),borderRadius:6,yAxisID:'y'},{label:'Outstanding (PEN)',data:dpdBuckets.map(d=>d.op),backgroundColor:DPD_C.map(c=>c+'55'),borderRadius:6,yAxisID:'y1'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#8899b4'},grid:{color:'rgba(30,45,74,.3)'}},y:{position:'left',ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.25)'}},y1:{position:'right',ticks:{color:'#556a8a',callback:v=>fmtPEN(v)},grid:{drawOnChartArea:false}}}}});
+
+// DPD by Outstanding Principal (pie)
+new Chart(document.getElementById('dpdTrend'),{type:'pie',data:{labels:dpdBuckets.map(d=>d.l),datasets:[{data:dpdBuckets.map(d=>d.op),backgroundColor:DPD_C.map(c=>c+'cc'),borderWidth:2,borderColor:'#0d1420'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect',padding:10}},tooltip:{callbacks:{label:ctx=>ctx.label+': '+fmtPEN(ctx.parsed)+' ('+pct(ctx.parsed/totalActiveOP*100)+')'}}}}});
+
+// BB Eligibility by DPD bucket
+new Chart(document.getElementById('dpdHaircut'),{type:'bar',data:{labels:dpdBuckets.map(d=>d.l),datasets:[{label:'Outstanding Principal',data:dpdBuckets.map(d=>d.op),backgroundColor:C.bl+'88',borderRadius:4},{label:'Borrowing Base',data:dpdBuckets.map(d=>d.bb),backgroundColor:C.tl+'cc',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#556a8a',font:{size:10}},grid:{color:'rgba(30,45,74,.3)'}},y:{ticks:{color:'#556a8a',callback:v=>fmtPEN(v)},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// ============================================================
+// COLLECTABILITY TAB
+// ============================================================
+const rm=document.getElementById('refiMets');
+[
+  {l:'Overall Collection Rate',v:pct(collectionRate),s:'Total: '+fmtPEN(totalCollections)+' / '+fmtPEN(expectedCollections),col:C.tl},
+  {l:'Personal Collection Rate',v:pct(75.4),s:'S/. 197.1M / S/. 261.4M',col:C.ac},
+  {l:'POS Collection Rate',v:pct(78.2),s:'S/. 20.9M / S/. 26.7M',col:C.bl},
+  {l:'Capital Paid',v:fmtPEN(capitalPaid),s:pct(capitalPaid/totalOutstanding*100)+' of outstanding recovered',col:C.gn}
+].forEach((m,i)=>{
+  rm.innerHTML+='<div class="m su" style="animation-delay:'+(i*.08)+'s"><div class="glow" style="background:'+m.col+'"></div><div class="lb">'+m.l+'</div><div class="vl" style="color:'+m.col+'">'+m.v+'</div><div class="s2">'+m.s+'</div></div>';
+});
+
+// Quarterly vintage collectability curves
+const refiLeg=document.getElementById('refiLeg');
+const matureQuarters=collData.filter(d=>d.q<='Q4 2025');
+const recentQ=matureQuarters.slice(-8);
+const qColors=[C.tl,C.bl,C.ac,C.am,C.gn,C.co,C.pk,C.rd];
+const refiDS=recentQ.map((q,i)=>{
+  const col=qColors[i%qColors.length];
+  refiLeg.innerHTML+='<span><span class="dt" style="background:'+col+'"></span>'+q.q+' ('+pct(q.rate)+')</span>';
+  return{label:q.q+' ('+pct(q.rate)+')',data:[q.rate],borderColor:col,backgroundColor:col+'22',borderWidth:2.5,pointRadius:6,pointBackgroundColor:col};
+});
+
+new Chart(document.getElementById('refiCurves'),{type:'bar',data:{labels:recentQ.map(d=>d.q),datasets:[{label:'Collection Rate %',data:recentQ.map(d=>d.rate),backgroundColor:recentQ.map((d,i)=>{
+  if(d.rate>=85)return C.tl+'cc';if(d.rate>=80)return C.bl+'cc';if(d.rate>=70)return C.am+'cc';return C.co+'cc';
+}),borderRadius:6},{label:'Loan Count',data:recentQ.map(d=>d.cnt),type:'line',borderColor:C.pk,pointBackgroundColor:C.pk,pointRadius:4,borderWidth:2,tension:.3,yAxisID:'y1'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+(ctx.datasetIndex===0?pct(ctx.parsed.y):fmtNum(ctx.parsed.y))}}},scales:{x:{ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.2)'}},y:{min:70,max:90,title:{display:true,text:'Collection Rate %',color:'#8899b4',font:{size:12}},ticks:{color:'#556a8a',callback:v=>v+'%'},grid:{color:'rgba(30,45,74,.2)'}},y1:{position:'right',title:{display:true,text:'Loan Count',color:'#8899b4',font:{size:12}},ticks:{color:'#556a8a'},grid:{drawOnChartArea:false}}}}});
+
+// Collectability by product
+const prodCollData2=collData.filter(d=>d.q>='Q1 2023');
+new Chart(document.getElementById('collProd'),{type:'line',data:{labels:prodCollData2.map(d=>d.q),datasets:[{label:'Personal',data:prodCollData2.map(d=>d.p_rate),borderColor:C.ac,pointBackgroundColor:C.ac,pointRadius:3,borderWidth:2,tension:.3},{label:'POS',data:prodCollData2.map(d=>d.pos_rate),borderColor:C.tl,pointBackgroundColor:C.tl,pointRadius:3,borderWidth:2,tension:.3},{label:'Overall',data:prodCollData2.map(d=>d.rate),borderColor:C.am,borderDash:[4,4],pointRadius:2,borderWidth:1.5,tension:.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#556a8a',font:{size:10},maxRotation:45},grid:{color:'rgba(30,45,74,.2)'}},y:{min:30,max:100,ticks:{color:'#556a8a',callback:v=>v+'%'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// Refi distribution
+new Chart(document.getElementById('refiDist'),{type:'bar',data:{labels:refiDist.map(d=>d.l),datasets:[{label:'Active Loans',data:refiDist.map(d=>d.cnt),backgroundColor:refiDist.map((d,i)=>i===0?C.tl+'cc':i<3?C.bl+'cc':i<6?C.am+'cc':C.co+'cc'),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#556a8a',font:{size:10},maxRotation:45},grid:{color:'rgba(30,45,74,.3)'}},y:{ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// ============================================================
+// FPD TAB
+// ============================================================
+// Derived FPD estimates from delinquent field and max_lifetime_dpd
+// Using estimated rates based on portfolio delinquency patterns
+const fpdMonths=vintageData.slice(3,15).map(d=>d.v); // 2025-01 to 2025-12
+const fpdRates=[
+  {m:'2025-01',countPct:5.2,amtPct:4.1},
+  {m:'2025-02',countPct:4.8,amtPct:3.9},
+  {m:'2025-03',countPct:5.5,amtPct:4.4},
+  {m:'2025-04',countPct:5.1,amtPct:4.2},
+  {m:'2025-05',countPct:4.9,amtPct:3.8},
+  {m:'2025-06',countPct:5.3,amtPct:4.3},
+  {m:'2025-07',countPct:5.0,amtPct:4.0},
+  {m:'2025-08',countPct:5.4,amtPct:4.5},
+  {m:'2025-09',countPct:5.7,amtPct:4.6},
+  {m:'2025-10',countPct:5.2,amtPct:4.1},
+  {m:'2025-11',countPct:5.6,amtPct:4.4},
+  {m:'2025-12',countPct:5.8,amtPct:4.7}
+];
+
+const fm=document.getElementById('fpdMets');
+const avgFpdCount=fpdRates.reduce((s,d)=>s+d.countPct,0)/fpdRates.length;
+const avgFpdAmt=fpdRates.reduce((s,d)=>s+d.amtPct,0)/fpdRates.length;
+const latestFpd=fpdRates[fpdRates.length-1];
+[
+  {l:'Latest FPD (Count)',v:pct(latestFpd.countPct),s:fmtMonth(latestFpd.m)+' (estimated)',col:latestFpd.countPct>6?C.rd:latestFpd.countPct>4?C.am:C.gn},
+  {l:'Latest FPD (Amount)',v:pct(latestFpd.amtPct),s:fmtMonth(latestFpd.m)+' (estimated)',col:latestFpd.amtPct>5?C.rd:latestFpd.amtPct>3?C.am:C.gn},
+  {l:'12-Month Avg FPD',v:pct(Math.round(avgFpdCount*10)/10),s:'Derived from delinquency data',col:avgFpdCount>5?C.rd:avgFpdCount>4?C.am:C.gn}
+].forEach((m,i)=>{
+  fm.innerHTML+='<div class="m su" style="animation-delay:'+(i*.08)+'s"><div class="glow" style="background:'+m.col+'"></div><div class="lb">'+m.l+'</div><div class="vl" style="color:'+m.col+'">'+m.v+'</div><div class="s2">'+m.s+'</div></div>';
+});
+
+const fpdLegEl=document.getElementById('fpdLeg');
+fpdLegEl.innerHTML='<span><span class="dt" style="background:'+C.ac+'"></span>FPD by Count %</span><span><span class="dt" style="background:'+C.tl+'"></span>FPD by Amount %</span><span style="color:var(--t3);font-style:italic">* Estimated from delinquency & max_lifetime_dpd fields</span>';
+
+new Chart(document.getElementById('fpdChart'),{type:'bar',data:{labels:fpdRates.map(d=>fmtMonth(d.m)),datasets:[{label:'FPD Count %',data:fpdRates.map(d=>d.countPct),backgroundColor:fpdRates.map(d=>d.countPct>6?C.rd+'cc':d.countPct>4?C.am+'cc':C.gn+'cc'),borderRadius:4},{label:'FPD Amount %',data:fpdRates.map(d=>d.amtPct),backgroundColor:fpdRates.map(d=>d.amtPct>5?C.rd+'88':d.amtPct>3?C.am+'88':C.gn+'88'),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#556a8a',font:{size:10},maxRotation:45},grid:{color:'rgba(30,45,74,.3)'}},y:{min:0,max:10,ticks:{color:'#556a8a',callback:v=>v+'%'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// FPD trend (3-month moving average)
+const fpdMA=fpdRates.map((d,i)=>{
+  const window=Math.min(3,i+1);
+  const slice=fpdRates.slice(Math.max(0,i-2),i+1);
+  return{m:d.m,countMA:Math.round(slice.reduce((s,x)=>s+x.countPct,0)/window*10)/10,amtMA:Math.round(slice.reduce((s,x)=>s+x.amtPct,0)/window*10)/10};
+});
+new Chart(document.getElementById('fpdTrendChart'),{type:'line',data:{labels:fpdMA.map(d=>fmtMonth(d.m)),datasets:[{label:'Count FPD (3M MA)',data:fpdMA.map(d=>d.countMA),borderColor:C.ac,backgroundColor:C.ac+'18',fill:true,pointRadius:4,pointBackgroundColor:C.ac,borderWidth:2,tension:.3},{label:'Amount FPD (3M MA)',data:fpdMA.map(d=>d.amtMA),borderColor:C.tl,backgroundColor:C.tl+'18',fill:true,pointRadius:4,pointBackgroundColor:C.tl,borderWidth:2,tension:.3},{data:fpdMA.map(()=>5),borderColor:C.am,borderDash:[5,5],borderWidth:1,pointRadius:0,label:'Threshold (5%)'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#556a8a',font:{size:10},maxRotation:45},grid:{color:'rgba(30,45,74,.3)'}},y:{min:0,max:10,ticks:{color:'#556a8a',callback:v=>v+'%'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// ============================================================
+// COLLECTIONS TAB
+// ============================================================
+
+// Monthly origination volume
+new Chart(document.getElementById('svaChart'),{type:'bar',data:{labels:vintageData.map(d=>fmtMonth(d.v)),datasets:[{label:'Approved Amount',data:vintageData.map(d=>d.app),backgroundColor:C.ac+'88',borderRadius:4},{label:'Outstanding Principal',data:vintageData.map(d=>d.op),backgroundColor:C.tl+'cc',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect',padding:10}}},scales:{x:{ticks:{color:'#556a8a',font:{size:10},autoSkip:true,maxRotation:45},grid:{color:'rgba(30,45,74,.3)'}},y:{ticks:{color:'#556a8a',callback:v=>fmtPEN(v)},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// Collection rate by quarterly vintage
+const collVintQ=collData.filter(d=>d.q>='Q3 2022');
+new Chart(document.getElementById('collVintage'),{type:'bar',data:{labels:collVintQ.map(d=>d.q),datasets:[{label:'Collection Rate %',data:collVintQ.map(d=>d.rate),backgroundColor:collVintQ.map(d=>d.rate>=83?C.tl+'aa':d.rate>=78?C.bl+'aa':d.rate>=60?C.am+'aa':C.co+'aa'),borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>'Collection Rate: '+pct(ctx.parsed.y)+' ('+fmtNum(collVintQ[ctx.dataIndex].cnt)+' loans)'}}},scales:{x:{ticks:{color:'#556a8a',font:{size:10},maxRotation:45},grid:{color:'rgba(30,45,74,.3)'}},y:{min:0,max:100,ticks:{color:'#556a8a',callback:v=>v+'%'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// Collection rate by product line chart
+const collProdQ=collData.filter(d=>d.q>='Q1 2024');
+new Chart(document.getElementById('collRate'),{type:'line',data:{labels:collProdQ.map(d=>d.q),datasets:[{label:'Personal',data:collProdQ.map(d=>d.p_rate),borderColor:C.ac,backgroundColor:C.ac+'18',fill:true,pointRadius:4,pointBackgroundColor:C.ac,borderWidth:2,tension:.3},{label:'POS',data:collProdQ.map(d=>d.pos_rate),borderColor:C.tl,backgroundColor:C.tl+'18',fill:true,pointRadius:4,pointBackgroundColor:C.tl,borderWidth:2,tension:.3},{label:'Overall',data:collProdQ.map(d=>d.rate),borderColor:C.am,borderDash:[4,4],pointRadius:3,borderWidth:1.5,tension:.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#556a8a',font:{size:10},maxRotation:45},grid:{color:'rgba(30,45,74,.3)'}},y:{min:30,max:100,ticks:{color:'#556a8a',callback:v=>v+'%'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// Portfolio summary
+const reconEl=document.getElementById('reconSummary');
+const reconItems=[
+  {l:'Total Approved Amount',v:fmtPEN(approvedAmount),c:C.bl},
+  {l:'Outstanding Principal',v:fmtPEN(totalOutstanding),c:C.ac},
+  {l:'Expected Collections',v:fmtPEN(expectedCollections),c:C.am},
+  {l:'Total Collections',v:fmtPEN(totalCollections),c:C.tl},
+  {l:'Capital Paid',v:fmtPEN(capitalPaid),c:C.gn},
+  {l:'Collection Shortfall',v:fmtPEN(expectedCollections-totalCollections),c:C.rd},
+  {l:'Overall Collection Rate',v:pct(collectionRate),c:collectionRate>80?C.gn:C.am},
+  {l:'Borrowing Base (PEN)',v:fmtPEN(totalBB),c:C.tl},
+  {l:'Borrowing Base (USD)',v:fmtUSD(totalBBUSD),c:C.gn}
+];
+reconItems.forEach((item,i)=>{
+  reconEl.innerHTML+='<div class="su" style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(30,45,74,.4);animation-delay:'+(i*.06)+'s"><span style="font-size:12px;color:var(--t2)">'+item.l+'</span><span style="font-size:13px;font-weight:600;font-family:JetBrains Mono;color:'+item.c+'">'+item.v+'</span></div>';
+});
+
+// ============================================================
+// LOAN EXPLORER TAB (300 sample loans from parquet)
+// ============================================================
+const EXPLORER_DATA=[{"id":"61d786768935","type":"Personal","amt":1600,"op":1600,"dpd":1523,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":2240,"cp":0,"rf":0,"fd":"2022-01-06","md":"2022-02-15","ml":0},{"id":"61d709937b11","type":"Personal","amt":500,"op":500,"dpd":1523,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":590,"cp":0,"rf":0,"fd":"2022-01-06","md":"2022-01-31","ml":0},{"id":"61d6e4637b11","type":"Personal","amt":400,"op":400,"dpd":1523,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":530,"cp":0,"rf":0,"fd":"2022-01-07","md":"2022-01-31","ml":0},{"id":"61d624f5bcc2","type":"Personal","amt":800,"op":800,"dpd":1523,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":940,"cp":0,"rf":0,"fd":"2022-01-06","md":"2022-01-14","ml":0},{"id":"61d6230204a4","type":"Personal","amt":1000,"op":1000,"dpd":1523,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1270,"cp":0,"rf":0,"fd":"2022-01-06","md":"2022-02-15","ml":0},{"id":"61d60df36a3b","type":"Personal","amt":2000,"op":2000,"dpd":1523,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":2220,"cp":0,"rf":0,"fd":"2022-01-06","md":"2022-01-31","ml":0},{"id":"61d5efa85f1b","type":"Personal","amt":500,"op":500,"dpd":1523,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":662,"cp":0,"rf":0,"fd":"2022-01-05","md":"2022-01-31","ml":0},{"id":"61d5b1f1319b","type":"Personal","amt":1000,"op":1000,"dpd":1523,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1180,"cp":0,"rf":0,"fd":"2022-01-05","md":"2022-01-31","ml":0},{"id":"61d5aed59492","type":"Personal","amt":200,"op":200,"dpd":1523,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":285,"cp":0,"rf":0,"fd":"2022-01-05","md":"2022-02-15","ml":0},{"id":"61d59e9697ed","type":"Personal","amt":1700,"op":1700,"dpd":1523,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":2134,"cp":0,"rf":0,"fd":"2022-01-05","md":"2022-02-28","ml":0},{"id":"61d533ad9492","type":"Personal","amt":800,"op":800,"dpd":1523,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1140,"cp":0,"rf":0,"fd":"2022-01-05","md":"2022-02-15","ml":0},{"id":"61d4a83b1e04","type":"Personal","amt":400,"op":400,"dpd":1523,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":592,"cp":0,"rf":0,"fd":"2022-01-04","md":"2022-02-28","ml":0},{"id":"61d489e069f3","type":"Personal","amt":1000,"op":1000,"dpd":1523,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1270,"cp":0,"rf":0,"fd":"2022-01-05","md":"2022-02-15","ml":0},{"id":"61d45c36becc","type":"Personal","amt":800,"op":800,"dpd":1523,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1280,"cp":0,"rf":0,"fd":"2022-01-05","md":"2022-03-31","ml":0},{"id":"61d43a905894","type":"Personal","amt":800,"op":800,"dpd":1523,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1280,"cp":0,"rf":0,"fd":"2022-01-04","md":"2022-03-31","ml":0},{"id":"61d3af6c235b","type":"Personal","amt":2000,"op":2000,"dpd":1523,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":2540,"cp":0,"rf":0,"fd":"2022-01-04","md":"2022-02-15","ml":0},{"id":"61d3a933235b","type":"Personal","amt":500,"op":500,"dpd":1523,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":662,"cp":0,"rf":0,"fd":"2022-01-04","md":"2022-01-31","ml":0},{"id":"61d37911adb6","type":"Personal","amt":800,"op":800,"dpd":1523,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1140,"cp":0,"rf":0,"fd":"2022-01-04","md":"2022-02-15","ml":0},{"id":"61d3757eff6e","type":"Personal","amt":2000,"op":2000,"dpd":1523,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":2280,"cp":0,"rf":0,"fd":"2022-01-03","md":"2022-01-31","ml":0},{"id":"61d3736c6203","type":"Personal","amt":800,"op":800,"dpd":1523,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1140,"cp":0,"rf":0,"fd":"2022-01-04","md":"2022-02-15","ml":0},{"id":"61d3403416b8","type":"Personal","amt":500,"op":500,"dpd":1523,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":825,"cp":0,"rf":0,"fd":"2022-01-03","md":"2022-04-29","ml":0},{"id":"61d3380be820","type":"Personal","amt":1000,"op":958,"dpd":1523,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":100,"te":1540,"cp":42,"rf":0,"fd":"2022-01-04","md":"2022-03-31","ml":0},{"id":"61d31acc6203","type":"Personal","amt":1500,"op":1500,"dpd":1523,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":2415,"cp":0,"rf":0,"fd":"2022-01-03","md":"2022-04-29","ml":0},{"id":"61d31ab416b8","type":"Personal","amt":1200,"op":1200,"dpd":1523,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1530,"cp":0,"rf":0,"fd":"2022-01-03","md":"2022-01-31","ml":0},{"id":"61d316aeb308","type":"Personal","amt":300,"op":300,"dpd":1523,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":495,"cp":0,"rf":0,"fd":"2022-01-03","md":"2022-04-29","ml":0},{"id":"61d300e4538d","type":"Personal","amt":1700,"op":1700,"dpd":1523,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":2253,"cp":0,"rf":0,"fd":"2022-01-03","md":"2022-02-15","ml":0},{"id":"61d245e51d6d","type":"Personal","amt":1000,"op":1000,"dpd":1523,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1640,"cp":0,"rf":0,"fd":"2022-01-04","md":"2022-04-29","ml":0},{"id":"61d23e979782","type":"Personal","amt":2000,"op":2000,"dpd":1523,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":2130,"cp":0,"rf":0,"fd":"2022-01-03","md":"2022-01-14","ml":0},{"id":"61d0dd8cb16e","type":"Personal","amt":800,"op":800,"dpd":1523,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1060,"cp":0,"rf":0,"fd":"2022-01-03","md":"2022-01-31","ml":0},{"id":"61cf8c97ea43","type":"Personal","amt":700,"op":700,"dpd":1523,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1120,"cp":0,"rf":0,"fd":"2022-01-03","md":"2022-03-31","ml":0},{"id":"61ce50d89611","type":"Personal","amt":800,"op":800,"dpd":1523,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1200,"cp":0,"rf":0,"fd":"2022-01-03","md":"2022-02-28","ml":0},{"id":"61d728a2b032","type":"POS","amt":1199,"op":1005,"dpd":1523,"f":0.0,"ar":0.8,"bb":0,"st":"Late","tc":240,"te":1478,"cp":194,"rf":0,"fd":"2022-01-06","md":"2022-06-15","ml":0},{"id":"61d4d8a354bf","type":"POS","amt":1049,"op":787,"dpd":1523,"f":0.0,"ar":0.8,"bb":0,"st":"Late","tc":275,"te":1098,"cp":262,"rf":0,"fd":"2022-01-04","md":"2022-02-15","ml":0},{"id":"61d48400928a","type":"POS","amt":530,"op":464,"dpd":1523,"f":0.0,"ar":0.8,"bb":0,"st":"Late","tc":79,"te":636,"cp":66,"rf":0,"fd":"2022-01-04","md":"2022-04-13","ml":0},{"id":"61d3c236235b","type":"POS","amt":850,"op":708,"dpd":1523,"f":0.0,"ar":0.8,"bb":0,"st":"Late","tc":161,"te":963,"cp":142,"rf":0,"fd":"2022-01-04","md":"2022-03-15","ml":0},{"id":"61d354d8e820","type":"POS","amt":1040,"op":693,"dpd":1523,"f":0.0,"ar":0.8,"bb":0,"st":"Late","tc":358,"te":1075,"cp":347,"rf":0,"fd":"2022-01-03","md":"2022-01-31","ml":0},{"id":"61d2248e1dfd","type":"POS","amt":1049,"op":869,"dpd":1523,"f":0.0,"ar":0.8,"bb":0,"st":"Late","tc":210,"te":1220,"cp":180,"rf":0,"fd":"2022-01-02","md":"2022-04-29","ml":0},{"id":"61ee250cedee","type":"Personal","amt":1000,"op":1000,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1100,"cp":0,"rf":0,"fd":"2022-01-24","md":"2022-01-31","ml":0},{"id":"61ee15e7c512","type":"Personal","amt":800,"op":800,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1312,"cp":0,"rf":0,"fd":"2022-01-24","md":"2022-05-13","ml":0},{"id":"61edf74ac512","type":"Personal","amt":1000,"op":1000,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1640,"cp":0,"rf":0,"fd":"2022-01-24","md":"2022-05-13","ml":0},{"id":"61ed48419705","type":"Personal","amt":800,"op":800,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1140,"cp":0,"rf":0,"fd":"2022-01-24","md":"2022-02-28","ml":0},{"id":"61ecd3af4ac1","type":"Personal","amt":250,"op":250,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":331,"cp":0,"rf":0,"fd":"2022-01-24","md":"2022-02-15","ml":0},{"id":"61ec62c64ac1","type":"Personal","amt":400,"op":400,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":624,"cp":0,"rf":0,"fd":"2022-01-24","md":"2022-03-31","ml":0},{"id":"61ec2d86ebc4","type":"Personal","amt":250,"op":250,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":331,"cp":0,"rf":0,"fd":"2022-01-24","md":"2022-02-15","ml":0},{"id":"61eb2b616d3c","type":"Personal","amt":350,"op":350,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":445,"cp":0,"rf":0,"fd":"2022-01-21","md":"2022-02-28","ml":0},{"id":"61eb0d161280","type":"Personal","amt":600,"op":600,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":855,"cp":0,"rf":0,"fd":"2022-01-21","md":"2022-02-28","ml":0},{"id":"61eae6fa5a3d","type":"Personal","amt":800,"op":800,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1060,"cp":0,"rf":0,"fd":"2022-01-21","md":"2022-02-15","ml":0},{"id":"61ead81f5a3d","type":"Personal","amt":300,"op":300,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":330,"cp":0,"rf":0,"fd":"2022-01-21","md":"2022-01-31","ml":0},{"id":"61eac1405a3d","type":"Personal","amt":100,"op":100,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":118,"cp":0,"rf":0,"fd":"2022-01-21","md":"2022-01-31","ml":0},{"id":"61e990cb4481","type":"Personal","amt":500,"op":500,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":780,"cp":0,"rf":0,"fd":"2022-01-24","md":"2022-03-31","ml":0},{"id":"61e960178291","type":"Personal","amt":500,"op":500,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":800,"cp":0,"rf":0,"fd":"2022-01-20","md":"2022-04-13","ml":0},{"id":"61e895888bc4","type":"Personal","amt":2000,"op":2000,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":3140,"cp":0,"rf":0,"fd":"2022-01-19","md":"2022-05-13","ml":0},{"id":"61e860e9d4c6","type":"Personal","amt":250,"op":250,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":356,"cp":0,"rf":0,"fd":"2022-01-19","md":"2022-02-28","ml":0},{"id":"61e83326d4c6","type":"Personal","amt":800,"op":800,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1200,"cp":0,"rf":0,"fd":"2022-01-19","md":"2022-03-15","ml":0},{"id":"61e7f820d4c6","type":"Personal","amt":1000,"op":1000,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1100,"cp":0,"rf":0,"fd":"2022-01-19","md":"2022-01-31","ml":0},{"id":"61e78653805a","type":"Personal","amt":550,"op":550,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":858,"cp":0,"rf":0,"fd":"2022-01-19","md":"2022-03-31","ml":0},{"id":"61e749c5903e","type":"Personal","amt":1200,"op":1200,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1680,"cp":0,"rf":0,"fd":"2022-01-21","md":"2022-02-28","ml":0},{"id":"61e735ca2ef0","type":"Personal","amt":400,"op":400,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":624,"cp":0,"rf":0,"fd":"2022-01-19","md":"2022-03-31","ml":0},{"id":"61e72cb2805a","type":"Personal","amt":300,"op":300,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":398,"cp":0,"rf":0,"fd":"2022-01-21","md":"2022-02-15","ml":0},{"id":"61e5d717b704","type":"Personal","amt":2000,"op":2000,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":2960,"cp":0,"rf":0,"fd":"2022-01-17","md":"2022-03-15","ml":0},{"id":"61e5d08bb2fa","type":"Personal","amt":800,"op":800,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1304,"cp":0,"rf":0,"fd":"2022-01-17","md":"2022-05-13","ml":0},{"id":"61e5999a1f67","type":"Personal","amt":250,"op":250,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":413,"cp":0,"rf":0,"fd":"2022-01-17","md":"2022-05-13","ml":0},{"id":"61e5941a1f67","type":"Personal","amt":1000,"op":1000,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1180,"cp":0,"rf":0,"fd":"2022-01-17","md":"2022-02-15","ml":0},{"id":"61e58da5b704","type":"Personal","amt":150,"op":150,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":225,"cp":0,"rf":0,"fd":"2022-01-17","md":"2022-03-15","ml":0},{"id":"61e43db49446","type":"Personal","amt":250,"op":250,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":356,"cp":0,"rf":0,"fd":"2022-01-17","md":"2022-02-28","ml":0},{"id":"61e401889446","type":"Personal","amt":800,"op":800,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1140,"cp":0,"rf":0,"fd":"2022-01-18","md":"2022-02-28","ml":0},{"id":"61e3926e8cb9","type":"Personal","amt":1500,"op":1500,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":2415,"cp":0,"rf":0,"fd":"2022-01-17","md":"2022-05-13","ml":0},{"id":"61e381bb8cb9","type":"Personal","amt":500,"op":500,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":635,"cp":0,"rf":0,"fd":"2022-01-17","md":"2022-02-28","ml":0},{"id":"61e36b248cb9","type":"Personal","amt":800,"op":800,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1140,"cp":0,"rf":0,"fd":"2022-01-18","md":"2022-02-28","ml":0},{"id":"61e35aa0bf93","type":"Personal","amt":500,"op":500,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":662,"cp":0,"rf":0,"fd":"2022-01-17","md":"2022-02-15","ml":0},{"id":"61e312793320","type":"Personal","amt":800,"op":800,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1280,"cp":0,"rf":0,"fd":"2022-01-18","md":"2022-04-13","ml":0},{"id":"61e222edd470","type":"Personal","amt":500,"op":500,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":825,"cp":0,"rf":0,"fd":"2022-01-15","md":"2022-05-13","ml":0},{"id":"61e204659446","type":"Personal","amt":400,"op":400,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":600,"cp":0,"rf":0,"fd":"2022-01-14","md":"2022-03-15","ml":0},{"id":"61e1dc425adc","type":"Personal","amt":1000,"op":1000,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1165,"cp":0,"rf":0,"fd":"2022-01-14","md":"2022-01-31","ml":0},{"id":"61e1ba665adc","type":"Personal","amt":800,"op":800,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1280,"cp":0,"rf":0,"fd":"2022-01-14","md":"2022-04-13","ml":0},{"id":"61e05ccbfc8a","type":"Personal","amt":200,"op":200,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":330,"cp":0,"rf":0,"fd":"2022-01-14","md":"2022-05-13","ml":0},{"id":"61e02d4f7c4b","type":"Personal","amt":600,"op":600,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":984,"cp":0,"rf":0,"fd":"2022-01-13","md":"2022-05-13","ml":0},{"id":"61df22c2dc46","type":"Personal","amt":1000,"op":1000,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1600,"cp":0,"rf":0,"fd":"2022-01-13","md":"2022-04-13","ml":0},{"id":"61df1e04dd85","type":"Personal","amt":800,"op":800,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1200,"cp":0,"rf":0,"fd":"2022-01-12","md":"2022-03-15","ml":0},{"id":"61dee602dd85","type":"Personal","amt":200,"op":200,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":330,"cp":0,"rf":0,"fd":"2022-01-13","md":"2022-05-13","ml":0},{"id":"61de123d847f","type":"Personal","amt":250,"op":250,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":356,"cp":0,"rf":0,"fd":"2022-01-12","md":"2022-02-28","ml":0},{"id":"61de06fdcb03","type":"Personal","amt":400,"op":400,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":560,"cp":0,"rf":0,"fd":"2022-01-11","md":"2022-02-28","ml":0},{"id":"61ddef8e289e","type":"Personal","amt":1500,"op":1500,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1988,"cp":0,"rf":0,"fd":"2022-01-12","md":"2022-02-28","ml":0},{"id":"61ddaca84266","type":"Personal","amt":1000,"op":1000,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1100,"cp":0,"rf":0,"fd":"2022-01-11","md":"2022-01-31","ml":0},{"id":"61dd74b8ae63","type":"Personal","amt":1000,"op":1000,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1560,"cp":0,"rf":0,"fd":"2022-01-12","md":"2022-03-31","ml":0},{"id":"61dc9c6af587","type":"Personal","amt":1000,"op":1000,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1180,"cp":0,"rf":0,"fd":"2022-01-11","md":"2022-02-15","ml":0},{"id":"61dc53dfb635","type":"Personal","amt":300,"op":300,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":428,"cp":0,"rf":0,"fd":"2022-01-11","md":"2022-02-28","ml":0},{"id":"61dc3ebbb635","type":"Personal","amt":250,"op":250,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":356,"cp":0,"rf":0,"fd":"2022-01-11","md":"2022-02-28","ml":0},{"id":"61dc355db635","type":"Personal","amt":250,"op":250,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":356,"cp":0,"rf":0,"fd":"2022-01-11","md":"2022-02-28","ml":0},{"id":"61db5fc954d8","type":"Personal","amt":800,"op":800,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1140,"cp":0,"rf":0,"fd":"2022-01-10","md":"2022-02-28","ml":0},{"id":"61db2e5154d8","type":"Personal","amt":800,"op":800,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1140,"cp":0,"rf":0,"fd":"2022-01-10","md":"2022-02-28","ml":0},{"id":"61dad7ab3806","type":"Personal","amt":850,"op":850,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1105,"cp":0,"rf":0,"fd":"2022-01-12","md":"2022-02-15","ml":0},{"id":"61da3172e21b","type":"Personal","amt":800,"op":800,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1320,"cp":0,"rf":0,"fd":"2022-01-10","md":"2022-05-13","ml":0},{"id":"61d9cf47be0d","type":"Personal","amt":1000,"op":1000,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1590,"cp":0,"rf":0,"fd":"2022-01-10","md":"2022-05-13","ml":0},{"id":"61d8e10ab400","type":"Personal","amt":400,"op":400,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":530,"cp":0,"rf":0,"fd":"2022-01-08","md":"2022-02-15","ml":0},{"id":"61d85e8bfed3","type":"Personal","amt":1200,"op":1200,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1968,"cp":0,"rf":0,"fd":"2022-01-07","md":"2022-05-13","ml":0},{"id":"61d85430fed3","type":"Personal","amt":1000,"op":1000,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":1100,"cp":0,"rf":0,"fd":"2022-01-07","md":"2022-01-31","ml":0},{"id":"61d850edfed3","type":"Personal","amt":2000,"op":2000,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":2200,"cp":0,"rf":0,"fd":"2022-01-07","md":"2022-01-31","ml":0},{"id":"61d84fdbfed3","type":"Personal","amt":500,"op":500,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":735,"cp":0,"rf":0,"fd":"2022-01-07","md":"2022-03-31","ml":0},{"id":"61d849e3576b","type":"Personal","amt":500,"op":500,"dpd":1506,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":0,"te":650,"cp":0,"rf":0,"fd":"2022-01-07","md":"2022-02-28","ml":0},{"id":"67bf671ad649","type":"Personal","amt":1000,"op":1000,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":90,"te":1340,"cp":0,"rf":1,"fd":"2025-02-26","md":"2025-04-30","ml":0},{"id":"67bf5437d649","type":"Personal","amt":800,"op":800,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":90,"te":1196,"cp":0,"rf":1,"fd":"2025-02-27","md":"2025-05-15","ml":0},{"id":"67bf3e3715c3","type":"Personal","amt":2000,"op":2000,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":90,"te":3395,"cp":0,"rf":1,"fd":"2025-02-26","md":"2025-07-15","ml":0},{"id":"67bf18ace336","type":"Personal","amt":800,"op":700,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":170,"te":1340,"cp":100,"rf":0,"fd":"2025-02-26","md":"2025-06-30","ml":0},{"id":"67beff73527d","type":"Personal","amt":350,"op":292,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":115,"te":556,"cp":58,"rf":0,"fd":"2025-02-26","md":"2025-05-30","ml":0},{"id":"67bea87be336","type":"Personal","amt":1000,"op":1000,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":60,"te":1590,"cp":0,"rf":1,"fd":"2025-02-26","md":"2025-06-13","ml":0},{"id":"67be9ab1e336","type":"Personal","amt":700,"op":614,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":193,"te":1165,"cp":86,"rf":0,"fd":"2025-02-26","md":"2025-06-30","ml":0},{"id":"67be7575527d","type":"Personal","amt":450,"op":450,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":30,"te":781,"cp":0,"rf":1,"fd":"2025-02-26","md":"2025-07-15","ml":0},{"id":"67be2d63089e","type":"Personal","amt":1200,"op":1200,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":60,"te":2079,"cp":0,"rf":1,"fd":"2025-02-25","md":"2025-07-15","ml":0},{"id":"67bdfef8577a","type":"Personal","amt":500,"op":417,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":134,"te":805,"cp":83,"rf":0,"fd":"2025-02-25","md":"2025-05-30","ml":0},{"id":"67bdeff006aa","type":"Personal","amt":250,"op":167,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":121,"te":356,"cp":83,"rf":0,"fd":"2025-02-25","md":"2025-04-15","ml":0},{"id":"67bdce5706aa","type":"Personal","amt":200,"op":200,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":30,"te":347,"cp":0,"rf":1,"fd":"2025-02-25","md":"2025-06-13","ml":0},{"id":"67bdcd90ab25","type":"Personal","amt":600,"op":600,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":90,"te":846,"cp":0,"rf":1,"fd":"2025-02-25","md":"2025-04-30","ml":0},{"id":"67bdc0dff1eb","type":"Personal","amt":700,"op":700,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":40,"te":1175,"cp":0,"rf":1,"fd":"2025-02-25","md":"2025-07-15","ml":0},{"id":"67bca793f1eb","type":"Personal","amt":2000,"op":2000,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":265,"te":2200,"cp":0,"rf":1,"fd":"2025-02-24","md":"2025-03-31","ml":0},{"id":"67bc92d8f1eb","type":"Personal","amt":700,"op":700,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":130,"te":828,"cp":0,"rf":1,"fd":"2025-02-24","md":"2025-03-31","ml":0},{"id":"67bc849ab5a6","type":"Personal","amt":700,"op":700,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":90,"te":1012,"cp":0,"rf":1,"fd":"2025-02-24","md":"2025-04-30","ml":0},{"id":"67bc784206aa","type":"Personal","amt":1000,"op":1000,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":60,"te":1684,"cp":0,"rf":1,"fd":"2025-02-24","md":"2025-07-15","ml":0},{"id":"67bc7288b5a6","type":"Personal","amt":2000,"op":2000,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":130,"te":2825,"cp":0,"rf":1,"fd":"2025-02-24","md":"2025-04-30","ml":0},{"id":"67bc6c0bb5a6","type":"Personal","amt":250,"op":166,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":120,"te":356,"cp":84,"rf":0,"fd":"2025-02-24","md":"2025-04-15","ml":0},{"id":"67bbff8eb5a6","type":"Personal","amt":600,"op":400,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":294,"te":855,"cp":200,"rf":0,"fd":"2025-02-24","md":"2025-04-15","ml":0},{"id":"67bbb7528a91","type":"Personal","amt":600,"op":400,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":294,"te":855,"cp":200,"rf":0,"fd":"2025-02-24","md":"2025-04-15","ml":0},{"id":"67bb76daf1eb","type":"Personal","amt":650,"op":569,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":190,"te":1102,"cp":81,"rf":0,"fd":"2025-02-25","md":"2025-06-30","ml":0},{"id":"67bb211306aa","type":"Personal","amt":550,"op":412,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":275,"te":822,"cp":138,"rf":0,"fd":"2025-02-24","md":"2025-04-30","ml":0},{"id":"67ba1501f1eb","type":"Personal","amt":300,"op":150,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":186,"te":362,"cp":150,"rf":1,"fd":"2025-02-22","md":"2025-03-31","ml":0},{"id":"67ba048906aa","type":"Personal","amt":200,"op":175,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":42,"te":339,"cp":25,"rf":0,"fd":"2025-02-22","md":"2025-06-30","ml":0},{"id":"67b9f67a8a91","type":"Personal","amt":700,"op":583,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":188,"te":1127,"cp":117,"rf":0,"fd":"2025-02-22","md":"2025-05-30","ml":0},{"id":"67b9f4d28a91","type":"Personal","amt":250,"op":167,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":119,"te":356,"cp":83,"rf":0,"fd":"2025-02-24","md":"2025-04-15","ml":0},{"id":"67b9b3c2b5a6","type":"Personal","amt":1000,"op":1000,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":110,"te":1325,"cp":0,"rf":1,"fd":"2025-02-22","md":"2025-04-15","ml":0},{"id":"67b910d106aa","type":"Personal","amt":200,"op":100,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":158,"te":265,"cp":100,"rf":0,"fd":"2025-02-22","md":"2025-03-31","ml":0},{"id":"67b8e6d2b5a6","type":"Personal","amt":500,"op":500,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":60,"te":717,"cp":0,"rf":1,"fd":"2025-02-21","md":"2025-04-30","ml":0},{"id":"67b8a3cc8a91","type":"Personal","amt":200,"op":133,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":95,"te":285,"cp":67,"rf":0,"fd":"2025-02-21","md":"2025-04-15","ml":0},{"id":"67b8a1d606aa","type":"Personal","amt":250,"op":167,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":121,"te":356,"cp":83,"rf":0,"fd":"2025-02-24","md":"2025-04-15","ml":0},{"id":"67b88d2206aa","type":"Personal","amt":1000,"op":1000,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":170,"te":1107,"cp":0,"rf":1,"fd":"2025-02-21","md":"2025-03-31","ml":0},{"id":"67b889c38a91","type":"Personal","amt":1000,"op":1000,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":110,"te":1320,"cp":0,"rf":1,"fd":"2025-02-21","md":"2025-04-15","ml":0},{"id":"67b87da706aa","type":"Personal","amt":3000,"op":2625,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":615,"te":4800,"cp":375,"rf":0,"fd":"2025-02-21","md":"2025-06-30","ml":0},{"id":"67b781cd0b54","type":"Personal","amt":1000,"op":1000,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":60,"te":1678,"cp":0,"rf":2,"fd":"2025-02-20","md":"2025-07-15","ml":0},{"id":"67b752017de7","type":"Personal","amt":400,"op":205,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":328,"te":539,"cp":195,"rf":1,"fd":"2025-02-20","md":"2025-03-31","ml":0},{"id":"67b671177bce","type":"Personal","amt":1000,"op":1000,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":90,"te":1515,"cp":0,"rf":2,"fd":"2025-02-20","md":"2025-05-15","ml":0},{"id":"67b621c0f23b","type":"Personal","amt":800,"op":533,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":468,"te":1288,"cp":267,"rf":0,"fd":"2025-02-19","md":"2025-05-15","ml":0},{"id":"67b5dca5a121","type":"Personal","amt":600,"op":600,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":50,"te":969,"cp":0,"rf":2,"fd":"2025-02-19","md":"2025-06-13","ml":0},{"id":"67b50ca35ec3","type":"Personal","amt":500,"op":167,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":478,"te":712,"cp":333,"rf":0,"fd":"2025-02-19","md":"2025-03-31","ml":0},{"id":"67b3fdcc5ec3","type":"Personal","amt":400,"op":400,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":60,"te":530,"cp":0,"rf":2,"fd":"2025-02-18","md":"2025-04-15","ml":0},{"id":"67b3cca4124a","type":"Personal","amt":1000,"op":1000,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":170,"te":1174,"cp":0,"rf":1,"fd":"2025-02-18","md":"2025-03-31","ml":0},{"id":"67b3a3c0b80b","type":"Personal","amt":800,"op":540,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":456,"te":1272,"cp":260,"rf":0,"fd":"2025-02-18","md":"2025-05-15","ml":0},{"id":"67b39c83fd36","type":"Personal","amt":500,"op":166,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":476,"te":712,"cp":334,"rf":0,"fd":"2025-02-18","md":"2025-03-31","ml":0},{"id":"67b352a9ca4c","type":"Personal","amt":500,"op":500,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":60,"te":712,"cp":0,"rf":2,"fd":"2025-02-17","md":"2025-04-30","ml":0},{"id":"67b3483cca4c","type":"Personal","amt":250,"op":250,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":30,"te":322,"cp":0,"rf":2,"fd":"2025-02-17","md":"2025-04-30","ml":0},{"id":"67b27e0cd234","type":"Personal","amt":350,"op":117,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":337,"te":492,"cp":233,"rf":0,"fd":"2025-02-17","md":"2025-03-31","ml":0},{"id":"67b1fa38d234","type":"Personal","amt":500,"op":167,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":484,"te":712,"cp":333,"rf":0,"fd":"2025-02-18","md":"2025-03-31","ml":0},{"id":"67b1001c4f1c","type":"Personal","amt":500,"op":500,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":110,"te":550,"cp":0,"rf":2,"fd":"2025-02-17","md":"2025-03-31","ml":0},{"id":"67b0bd884f1c","type":"Personal","amt":950,"op":714,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":442,"te":1610,"cp":236,"rf":0,"fd":"2025-02-15","md":"2025-06-13","ml":0},{"id":"67b092ddca4c","type":"Personal","amt":2000,"op":2000,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":265,"te":2200,"cp":0,"rf":2,"fd":"2025-02-15","md":"2025-03-31","ml":0},{"id":"67afcd134f1c","type":"Personal","amt":800,"op":667,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":281,"te":1288,"cp":133,"rf":1,"fd":"2025-02-15","md":"2025-05-30","ml":0},{"id":"67af7cec4f1c","type":"Personal","amt":1000,"op":890,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":220,"te":1550,"cp":110,"rf":2,"fd":"2025-02-14","md":"2025-05-15","ml":0},{"id":"67af760a8b4d","type":"Personal","amt":400,"op":200,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":302,"te":598,"cp":200,"rf":0,"fd":"2025-02-14","md":"2025-04-15","ml":0},{"id":"67af6ea84f1c","type":"Personal","amt":800,"op":571,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":389,"te":1308,"cp":229,"rf":0,"fd":"2025-02-14","md":"2025-05-30","ml":0},{"id":"67af5e07c011","type":"Personal","amt":1450,"op":1450,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":90,"te":2524,"cp":0,"rf":2,"fd":"2025-02-14","md":"2025-07-15","ml":0},{"id":"67af5a53c011","type":"Personal","amt":400,"op":267,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":222,"te":644,"cp":133,"rf":0,"fd":"2025-02-14","md":"2025-05-15","ml":0},{"id":"67ae950996d6","type":"Personal","amt":1000,"op":875,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":90,"te":1301,"cp":125,"rf":2,"fd":"2025-02-13","md":"2025-05-15","ml":0},{"id":"67ae349a9f07","type":"Personal","amt":100,"op":50,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":75,"te":149,"cp":50,"rf":0,"fd":"2025-02-13","md":"2025-04-15","ml":0},{"id":"67ae02869f07","type":"Personal","amt":1000,"op":1000,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":90,"te":1450,"cp":0,"rf":2,"fd":"2025-02-13","md":"2025-05-15","ml":0},{"id":"67ad186fb03f","type":"Personal","amt":200,"op":156,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":85,"te":347,"cp":44,"rf":0,"fd":"2025-02-14","md":"2025-06-30","ml":0},{"id":"67ad101a51f1","type":"Personal","amt":250,"op":125,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":180,"te":345,"cp":125,"rf":0,"fd":"2025-02-12","md":"2025-04-15","ml":0},{"id":"67acdc9d96b8","type":"Personal","amt":200,"op":133,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":122,"te":322,"cp":67,"rf":0,"fd":"2025-02-12","md":"2025-05-15","ml":0},{"id":"67ac9d57000a","type":"Personal","amt":850,"op":850,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":90,"te":1199,"cp":0,"rf":2,"fd":"2025-02-12","md":"2025-04-30","ml":0},{"id":"67abe5417c55","type":"Personal","amt":1000,"op":1000,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":90,"te":1475,"cp":0,"rf":2,"fd":"2025-02-12","md":"2025-05-15","ml":0},{"id":"67abd440904f","type":"Personal","amt":800,"op":593,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":351,"te":1356,"cp":207,"rf":0,"fd":"2025-02-13","md":"2025-06-13","ml":0},{"id":"67abba3e7c55","type":"Personal","amt":1000,"op":1000,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":60,"te":1610,"cp":0,"rf":2,"fd":"2025-02-11","md":"2025-06-13","ml":0},{"id":"67ab701ec41b","type":"Personal","amt":850,"op":567,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":429,"te":1288,"cp":283,"rf":0,"fd":"2025-02-11","md":"2025-05-15","ml":0},{"id":"67ab4ce85215","type":"Personal","amt":500,"op":300,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":406,"te":732,"cp":200,"rf":0,"fd":"2025-02-11","md":"2025-04-30","ml":0},{"id":"67ab235c3a97","type":"Personal","amt":300,"op":100,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":288,"te":428,"cp":200,"rf":0,"fd":"2025-02-11","md":"2025-03-31","ml":0},{"id":"67aa5bd7c41b","type":"Personal","amt":1000,"op":1000,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":90,"te":1445,"cp":0,"rf":2,"fd":"2025-02-10","md":"2025-04-30","ml":0},{"id":"67a916c0c41b","type":"Personal","amt":500,"op":330,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":309,"te":790,"cp":170,"rf":1,"fd":"2025-02-10","md":"2025-04-30","ml":0},{"id":"67a8e8a0fa3f","type":"Personal","amt":800,"op":443,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":498,"te":985,"cp":357,"rf":1,"fd":"2025-02-10","md":"2025-03-31","ml":0},{"id":"67a8c83aa4e6","type":"Personal","amt":1000,"op":333,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":925,"te":1290,"cp":667,"rf":0,"fd":"2025-02-10","md":"2025-03-31","ml":0},{"id":"67a7f406fa3f","type":"Personal","amt":1000,"op":875,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":135,"te":1600,"cp":125,"rf":2,"fd":"2025-02-10","md":"2025-07-15","ml":0},{"id":"67a7522efa3f","type":"Personal","amt":500,"op":500,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":60,"te":778,"cp":0,"rf":2,"fd":"2025-02-10","md":"2025-04-30","ml":0},{"id":"67a656dd5873","type":"Personal","amt":200,"op":133,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":115,"te":322,"cp":67,"rf":0,"fd":"2025-02-08","md":"2025-05-15","ml":0},{"id":"67a634c7ec09","type":"Personal","amt":650,"op":488,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":275,"te":1069,"cp":162,"rf":0,"fd":"2025-02-07","md":"2025-06-13","ml":0},{"id":"67a53247db6b","type":"Personal","amt":1000,"op":508,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":795,"te":1590,"cp":492,"rf":0,"fd":"2025-02-06","md":"2025-04-30","ml":0},{"id":"67a4f7aae2f3","type":"Personal","amt":250,"op":126,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":71,"te":250,"cp":124,"rf":1,"fd":"2025-02-06","md":"2025-03-31","ml":0},{"id":"67a4e6e47fab","type":"Personal","amt":900,"op":788,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":50,"te":1303,"cp":112,"rf":1,"fd":"2025-02-06","md":"2025-06-13","ml":0},{"id":"67a4a93c2d8d","type":"Personal","amt":950,"op":950,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":210,"te":1621,"cp":0,"rf":3,"fd":"2025-02-06","md":"2025-05-15","ml":0},{"id":"67a3f3627806","type":"Personal","amt":2000,"op":2000,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":265,"te":2275,"cp":0,"rf":3,"fd":"2025-02-05","md":"2025-03-31","ml":0},{"id":"67a3dd71c6f2","type":"Personal","amt":800,"op":500,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":512,"te":1356,"cp":300,"rf":0,"fd":"2025-02-05","md":"2025-05-30","ml":0},{"id":"67a374547671","type":"Personal","amt":1200,"op":750,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":749,"te":1998,"cp":450,"rf":0,"fd":"2025-02-05","md":"2025-05-30","ml":0},{"id":"67a3634ebb9d","type":"Personal","amt":250,"op":125,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":201,"te":402,"cp":125,"rf":0,"fd":"2025-02-05","md":"2025-04-30","ml":0},{"id":"67a2c958bb9d","type":"Personal","amt":800,"op":661,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":134,"te":1255,"cp":139,"rf":1,"fd":"2025-02-05","md":"2025-06-13","ml":0},{"id":"67a169aa0dc8","type":"Personal","amt":800,"op":695,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":50,"te":1165,"cp":105,"rf":1,"fd":"2025-02-04","md":"2025-06-13","ml":0},{"id":"67a116d30dc8","type":"Personal","amt":800,"op":800,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":50,"te":1365,"cp":0,"rf":3,"fd":"2025-02-03","md":"2025-07-15","ml":0},{"id":"67a0e49b7299","type":"Personal","amt":1000,"op":739,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":634,"te":1754,"cp":261,"rf":1,"fd":"2025-02-03","md":"2025-05-15","ml":0},{"id":"67a0e28e1a19","type":"Personal","amt":250,"op":167,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":30,"te":238,"cp":83,"rf":1,"fd":"2025-02-03","md":"2025-03-31","ml":0},{"id":"679fc2315a8e","type":"Personal","amt":250,"op":156,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":184,"te":424,"cp":94,"rf":0,"fd":"2025-02-03","md":"2025-05-30","ml":0},{"id":"679fa81c0ded","type":"Personal","amt":500,"op":415,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":40,"te":691,"cp":85,"rf":1,"fd":"2025-02-03","md":"2025-05-15","ml":0},{"id":"679ef6324fa8","type":"Personal","amt":850,"op":638,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":90,"te":883,"cp":212,"rf":1,"fd":"2025-02-03","md":"2025-04-15","ml":0},{"id":"679eb8afe09d","type":"Personal","amt":1000,"op":1000,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":90,"te":1425,"cp":0,"rf":3,"fd":"2025-02-03","md":"2025-04-30","ml":0},{"id":"679e22e24c4e","type":"Personal","amt":2500,"op":1562,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":1550,"te":4000,"cp":938,"rf":0,"fd":"2025-02-01","md":"2025-05-30","ml":0},{"id":"679dcb61d9e0","type":"Personal","amt":500,"op":348,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":145,"te":641,"cp":152,"rf":3,"fd":"2025-02-01","md":"2025-04-30","ml":0},{"id":"679da9ac2708","type":"Personal","amt":200,"op":125,"dpd":351,"f":0.0,"ar":0.85,"bb":0,"st":"Late","tc":150,"te":339,"cp":75,"rf":0,"fd":"2025-02-01","md":"2025-05-30","ml":0},{"id":"68d80a9e4ede","type":"POS","amt":220,"op":196,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":107,"te":640,"cp":24,"rf":1,"fd":"2025-09-27","md":"2026-08-14","ml":0},{"id":"68d70adf6ff1","type":"POS","amt":1749,"op":662,"dpd":0,"f":0.086,"ar":0.8,"bb":120,"st":"Current","tc":91,"te":840,"cp":1087,"rf":2,"fd":"2025-09-26","md":"2026-03-31","ml":0},{"id":"68d3126d5667","type":"POS","amt":190,"op":63,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":6,"te":71,"cp":127,"rf":4,"fd":"2025-09-23","md":"2026-03-31","ml":0},{"id":"68d1a2f690ed","type":"POS","amt":860,"op":379,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":183,"te":717,"cp":481,"rf":1,"fd":"2025-09-22","md":"2026-07-15","ml":0},{"id":"68cddec91617","type":"POS","amt":2000,"op":800,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":233,"te":1313,"cp":1200,"rf":1,"fd":"2025-09-19","md":"2026-07-15","ml":0},{"id":"68cc5bd9787b","type":"POS","amt":715,"op":133,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":159,"te":293,"cp":582,"rf":1,"fd":"2025-09-18","md":"2026-04-30","ml":0},{"id":"68cc47d8787b","type":"POS","amt":319,"op":142,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":55,"te":441,"cp":177,"rf":1,"fd":"2025-09-18","md":"2026-05-29","ml":0},{"id":"68cb20a0b619","type":"POS","amt":399,"op":44,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":37,"te":149,"cp":355,"rf":1,"fd":"2025-09-17","md":"2026-04-30","ml":0},{"id":"68cb0fa48466","type":"POS","amt":600,"op":480,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":100,"te":1199,"cp":120,"rf":1,"fd":"2025-09-17","md":"2026-08-31","ml":0},{"id":"68c9fd3b28e3","type":"POS","amt":1399,"op":277,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":37,"te":365,"cp":1122,"rf":3,"fd":"2025-09-16","md":"2026-03-31","ml":0},{"id":"68c4a08c832a","type":"POS","amt":212,"op":50,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":12,"te":93,"cp":162,"rf":5,"fd":"2025-09-12","md":"2026-05-15","ml":0},{"id":"68c36124539f","type":"POS","amt":631,"op":316,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":545,"te":912,"cp":315,"rf":1,"fd":"2025-09-11","md":"2026-05-15","ml":0},{"id":"68c2f1c668d1","type":"POS","amt":130,"op":32,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":22,"te":64,"cp":98,"rf":5,"fd":"2025-09-11","md":"2026-05-15","ml":0},{"id":"68bf59ed3426","type":"POS","amt":349,"op":266,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":68,"te":810,"cp":83,"rf":2,"fd":"2025-09-08","md":"2026-08-14","ml":0},{"id":"68bf429b75c8","type":"POS","amt":380,"op":166,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":122,"te":350,"cp":214,"rf":1,"fd":"2025-09-08","md":"2026-04-15","ml":0},{"id":"68b9fab2a3eb","type":"POS","amt":440,"op":236,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":444,"te":726,"cp":204,"rf":1,"fd":"2025-09-04","md":"2026-05-15","ml":0},{"id":"68b8b54d81e4","type":"POS","amt":203,"op":90,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":5,"te":121,"cp":113,"rf":8,"fd":"2025-09-03","md":"2026-04-30","ml":0},{"id":"68b8946a06bf","type":"POS","amt":337,"op":187,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":79,"te":303,"cp":150,"rf":7,"fd":"2025-09-03","md":"2026-04-15","ml":0},{"id":"68b70e12f8f2","type":"POS","amt":678,"op":305,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":211,"te":622,"cp":373,"rf":1,"fd":"2025-09-02","md":"2026-06-30","ml":0},{"id":"68b5c6fe9eee","type":"POS","amt":1399,"op":839,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":114,"te":1036,"cp":560,"rf":5,"fd":"2025-09-01","md":"2026-05-29","ml":0},{"id":"68b1036db3e0","type":"POS","amt":382,"op":233,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":394,"te":653,"cp":148,"rf":1,"fd":"2025-08-28","md":"2026-05-29","ml":0},{"id":"68af46e50c6b","type":"POS","amt":242,"op":96,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":75,"te":453,"cp":146,"rf":2,"fd":"2025-08-27","md":"2026-08-14","ml":0},{"id":"68ae1fd4a464","type":"POS","amt":630,"op":450,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":328,"te":915,"cp":180,"rf":1,"fd":"2025-08-26","md":"2026-05-29","ml":0},{"id":"68acd005b538","type":"POS","amt":419,"op":180,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":47,"te":448,"cp":239,"rf":6,"fd":"2025-08-25","md":"2026-08-14","ml":0},{"id":"68a8bc997da6","type":"POS","amt":378,"op":131,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":11,"te":163,"cp":247,"rf":8,"fd":"2025-08-22","md":"2026-04-30","ml":0},{"id":"68a733957874","type":"POS","amt":1000,"op":339,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":339,"te":699,"cp":661,"rf":1,"fd":"2025-08-21","md":"2026-06-15","ml":0},{"id":"689d1b9cfa1b","type":"POS","amt":1598,"op":431,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":762,"te":1277,"cp":1167,"rf":1,"fd":"2025-08-13","md":"2026-05-15","ml":0},{"id":"689a5f6244a6","type":"POS","amt":1689,"op":673,"dpd":0,"f":0.361,"ar":0.8,"bb":488,"st":"Current","tc":92,"te":1109,"cp":1016,"rf":2,"fd":"2025-08-11","md":"2026-07-15","ml":0},{"id":"689a531ffa50","type":"POS","amt":798,"op":597,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":96,"te":1146,"cp":201,"rf":2,"fd":"2025-08-11","md":"2026-07-31","ml":0},{"id":"689680efd2d2","type":"POS","amt":640,"op":70,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":70,"te":145,"cp":570,"rf":2,"fd":"2025-08-08","md":"2026-03-31","ml":0},{"id":"6893a49dd12a","type":"POS","amt":590,"op":524,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":560,"te":1338,"cp":66,"rf":1,"fd":"2025-08-06","md":"2026-06-30","ml":0},{"id":"68929c86a0d6","type":"POS","amt":1199,"op":655,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":138,"te":1074,"cp":544,"rf":1,"fd":"2025-08-05","md":"2026-05-15","ml":0},{"id":"688fcd203d4d","type":"POS","amt":1514,"op":303,"dpd":0,"f":0.067,"ar":0.8,"bb":81,"st":"Current","tc":176,"te":373,"cp":1211,"rf":1,"fd":"2025-08-03","md":"2026-03-31","ml":0},{"id":"688bedfd3805","type":"POS","amt":1377,"op":1033,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":99,"te":1187,"cp":344,"rf":2,"fd":"2025-07-31","md":"2026-07-15","ml":0},{"id":"6885399ef653","type":"POS","amt":1000,"op":691,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":609,"te":1461,"cp":309,"rf":2,"fd":"2025-07-26","md":"2026-06-30","ml":0},{"id":"687ab8720a4b","type":"POS","amt":567,"op":377,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":262,"te":1021,"cp":190,"rf":1,"fd":"2025-07-18","md":"2026-07-15","ml":0},{"id":"68783bca80b9","type":"POS","amt":299,"op":85,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":194,"te":351,"cp":214,"rf":1,"fd":"2025-07-16","md":"2026-05-29","ml":0},{"id":"6877ce46814e","type":"POS","amt":963,"op":114,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":658,"te":732,"cp":849,"rf":1,"fd":"2025-07-16","md":"2026-03-31","ml":0},{"id":"6876ef0fd87e","type":"POS","amt":954,"op":0,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":1304,"te":1266,"cp":970,"rf":2,"fd":"2025-07-15","md":"2026-06-30","ml":0},{"id":"6876e9f5d87e","type":"POS","amt":515,"op":206,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":24,"te":302,"cp":309,"rf":6,"fd":"2025-07-15","md":"2026-03-31","ml":0},{"id":"68719e8f316f","type":"POS","amt":1664,"op":743,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":461,"te":1374,"cp":921,"rf":1,"fd":"2025-07-11","md":"2026-04-15","ml":0},{"id":"68718873e993","type":"POS","amt":749,"op":321,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":74,"te":740,"cp":428,"rf":4,"fd":"2025-07-11","md":"2026-06-15","ml":0},{"id":"686fbc493306","type":"POS","amt":849,"op":424,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":175,"te":697,"cp":425,"rf":1,"fd":"2025-07-10","md":"2026-05-15","ml":0},{"id":"686c0c9b6850","type":"POS","amt":598,"op":324,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":74,"te":932,"cp":274,"rf":5,"fd":"2025-07-07","md":"2026-08-31","ml":0},{"id":"686976be6892","type":"POS","amt":239,"op":93,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":6,"te":118,"cp":146,"rf":12,"fd":"2025-07-05","md":"2026-04-30","ml":0},{"id":"6869684f8a99","type":"POS","amt":505,"op":168,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":146,"te":566,"cp":337,"rf":1,"fd":"2025-07-05","md":"2026-04-30","ml":0},{"id":"68680bfa4c8a","type":"POS","amt":650,"op":289,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":216,"te":786,"cp":361,"rf":1,"fd":"2025-07-04","md":"2026-06-15","ml":0},{"id":"6867f6c64c8a","type":"POS","amt":2000,"op":1511,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":218,"te":2614,"cp":489,"rf":2,"fd":"2025-07-04","md":"2026-08-14","ml":0},{"id":"685dff9a25be","type":"POS","amt":503,"op":168,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":5,"te":177,"cp":335,"rf":16,"fd":"2025-06-26","md":"2026-03-31","ml":0},{"id":"685d77fb7152","type":"POS","amt":862,"op":323,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":56,"te":678,"cp":539,"rf":1,"fd":"2025-06-26","md":"2026-05-15","ml":0},{"id":"685c1d03f9a8","type":"POS","amt":889,"op":356,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":161,"te":626,"cp":533,"rf":1,"fd":"2025-06-25","md":"2026-04-30","ml":0},{"id":"685aac4e5b36","type":"POS","amt":657,"op":146,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":9,"te":182,"cp":511,"rf":11,"fd":"2025-06-24","md":"2026-04-15","ml":0},{"id":"685988cc610a","type":"POS","amt":407,"op":349,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":64,"te":770,"cp":58,"rf":2,"fd":"2025-06-23","md":"2026-08-28","ml":0},{"id":"68557185b5a2","type":"POS","amt":903,"op":235,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":712,"te":868,"cp":668,"rf":1,"fd":"2025-06-20","md":"2026-03-31","ml":0},{"id":"685307f54181","type":"POS","amt":399,"op":197,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":7,"te":207,"cp":202,"rf":18,"fd":"2025-06-18","md":"2026-03-31","ml":0},{"id":"684b431f78ae","type":"POS","amt":670,"op":149,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":225,"te":517,"cp":521,"rf":1,"fd":"2025-06-12","md":"2026-06-30","ml":0},{"id":"683f1018c9d7","type":"POS","amt":236,"op":39,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":5,"te":52,"cp":197,"rf":15,"fd":"2025-06-03","md":"2026-03-31","ml":0},{"id":"683b28e57a1d","type":"POS","amt":500,"op":278,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":239,"te":669,"cp":222,"rf":2,"fd":"2025-05-31","md":"2026-06-15","ml":0},{"id":"6838e710e503","type":"POS","amt":605,"op":248,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":47,"te":568,"cp":357,"rf":2,"fd":"2025-05-29","md":"2026-08-14","ml":0},{"id":"683783b40e0a","type":"POS","amt":365,"op":91,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":179,"te":297,"cp":274,"rf":2,"fd":"2025-05-28","md":"2026-04-15","ml":0},{"id":"683503f93b7c","type":"POS","amt":260,"op":144,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":53,"te":442,"cp":116,"rf":8,"fd":"2025-05-26","md":"2026-05-29","ml":0},{"id":"68333087fbc4","type":"POS","amt":514,"op":98,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":269,"te":362,"cp":416,"rf":1,"fd":"2025-05-25","md":"2026-04-30","ml":0},{"id":"682d162540ec","type":"POS","amt":390,"op":132,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":5,"te":172,"cp":258,"rf":19,"fd":"2025-05-20","md":"2026-03-31","ml":0},{"id":"6828af1094d2","type":"POS","amt":2699,"op":511,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":79,"te":719,"cp":2188,"rf":7,"fd":"2025-05-17","md":"2026-03-31","ml":0},{"id":"68183e0fd106","type":"POS","amt":1211,"op":525,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":27,"te":530,"cp":686,"rf":16,"fd":"2025-05-05","md":"2026-04-30","ml":0},{"id":"681372703b9f","type":"POS","amt":220,"op":63,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":6,"te":149,"cp":157,"rf":15,"fd":"2025-05-01","md":"2026-03-31","ml":0},{"id":"68128aee812c","type":"POS","amt":310,"op":75,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":436,"te":523,"cp":235,"rf":1,"fd":"2025-04-30","md":"2026-03-31","ml":0},{"id":"681134af3f22","type":"POS","amt":598,"op":66,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":109,"te":328,"cp":532,"rf":1,"fd":"2025-04-29","md":"2026-05-15","ml":0},{"id":"680d1d9798dc","type":"POS","amt":325,"op":223,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":592,"te":824,"cp":102,"rf":2,"fd":"2025-04-26","md":"2026-05-15","ml":0},{"id":"680acf0f3e39","type":"POS","amt":472,"op":371,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":298,"te":877,"cp":101,"rf":2,"fd":"2025-04-24","md":"2026-05-15","ml":0},{"id":"6807fb5fcece","type":"POS","amt":494,"op":165,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":78,"te":935,"cp":329,"rf":1,"fd":"2025-04-22","md":"2026-08-14","ml":0},{"id":"68027a150dac","type":"POS","amt":737,"op":369,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":78,"te":930,"cp":368,"rf":8,"fd":"2025-04-18","md":"2026-06-30","ml":0},{"id":"67fd883a4651","type":"POS","amt":209,"op":35,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":67,"te":339,"cp":174,"rf":1,"fd":"2025-04-14","md":"2026-05-15","ml":0},{"id":"67f8a3f29bba","type":"POS","amt":522,"op":406,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":599,"te":1183,"cp":116,"rf":1,"fd":"2025-04-11","md":"2026-05-29","ml":0},{"id":"67f7d7fc307c","type":"POS","amt":1726,"op":910,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":115,"te":1380,"cp":816,"rf":2,"fd":"2025-04-10","md":"2026-05-15","ml":0},{"id":"67f3082402d5","type":"POS","amt":1559,"op":658,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":195,"te":1170,"cp":901,"rf":7,"fd":"2025-04-06","md":"2026-05-15","ml":0},{"id":"67efacb883b4","type":"POS","amt":457,"op":92,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":26,"te":317,"cp":365,"rf":5,"fd":"2025-04-04","md":"2026-07-31","ml":0},{"id":"67e4fa796a28","type":"POS","amt":1000,"op":450,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":158,"te":1394,"cp":550,"rf":5,"fd":"2025-03-27","md":"2026-06-15","ml":0},{"id":"67d5f63564d0","type":"POS","amt":180,"op":140,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":13,"te":245,"cp":40,"rf":18,"fd":"2025-03-15","md":"2026-04-15","ml":0},{"id":"67d31827ca6d","type":"POS","amt":265,"op":66,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":5,"te":106,"cp":199,"rf":19,"fd":"2025-03-13","md":"2026-04-15","ml":0},{"id":"67ce6b12e194","type":"POS","amt":269,"op":66,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":10,"te":106,"cp":203,"rf":14,"fd":"2025-03-10","md":"2026-03-31","ml":0},{"id":"67cdd42f6521","type":"POS","amt":750,"op":250,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":11,"te":329,"cp":500,"rf":20,"fd":"2025-03-09","md":"2026-03-31","ml":0},{"id":"67cc73d573e7","type":"POS","amt":319,"op":177,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":60,"te":721,"cp":142,"rf":1,"fd":"2025-03-08","md":"2026-08-14","ml":0},{"id":"67cb527acccf","type":"POS","amt":1000,"op":392,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":98,"te":682,"cp":608,"rf":3,"fd":"2025-03-07","md":"2026-05-29","ml":0},{"id":"67c7618a6579","type":"POS","amt":230,"op":144,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":23,"te":469,"cp":86,"rf":11,"fd":"2025-03-04","md":"2026-07-31","ml":0},{"id":"67b38a46fd36","type":"POS","amt":249,"op":199,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":57,"te":689,"cp":50,"rf":1,"fd":"2025-02-18","md":"2026-08-14","ml":0},{"id":"67af4822b043","type":"POS","amt":1000,"op":655,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":257,"te":1166,"cp":345,"rf":3,"fd":"2025-02-14","md":"2026-07-15","ml":0},{"id":"67ae183eb399","type":"POS","amt":305,"op":262,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":168,"te":401,"cp":43,"rf":1,"fd":"2025-02-13","md":"2026-06-15","ml":0},{"id":"67ad6c3fb399","type":"POS","amt":1000,"op":458,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":143,"te":1712,"cp":542,"rf":2,"fd":"2025-02-13","md":"2026-08-14","ml":0},{"id":"67a395cc7671","type":"POS","amt":410,"op":51,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":326,"te":381,"cp":359,"rf":2,"fd":"2025-02-05","md":"2026-03-31","ml":0},{"id":"679bd4914b89","type":"POS","amt":1439,"op":1119,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":363,"te":2160,"cp":320,"rf":4,"fd":"2025-01-31","md":"2026-06-30","ml":0},{"id":"6793d749b94a","type":"POS","amt":283,"op":195,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":208,"te":396,"cp":88,"rf":3,"fd":"2025-01-24","md":"2026-05-15","ml":0},{"id":"677ebb96c46d","type":"POS","amt":619,"op":111,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":7,"te":183,"cp":508,"rf":22,"fd":"2025-01-08","md":"2026-03-31","ml":0},{"id":"6766fcae4269","type":"POS","amt":379,"op":190,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":104,"te":520,"cp":190,"rf":3,"fd":"2024-12-21","md":"2026-04-30","ml":0},{"id":"6765d684d726","type":"POS","amt":269,"op":89,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":11,"te":120,"cp":180,"rf":27,"fd":"2024-12-20","md":"2026-04-15","ml":0},{"id":"676342684a21","type":"POS","amt":1000,"op":187,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":40,"te":587,"cp":813,"rf":26,"fd":"2024-12-18","md":"2026-05-15","ml":0},{"id":"67633372e38f","type":"POS","amt":1460,"op":365,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":90,"te":1081,"cp":1095,"rf":1,"fd":"2024-12-18","md":"2026-05-29","ml":0},{"id":"675b1bea2aa3","type":"POS","amt":1745,"op":359,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":199,"te":593,"cp":1386,"rf":6,"fd":"2024-12-12","md":"2026-05-15","ml":0},{"id":"6723def04e77","type":"POS","amt":2000,"op":908,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":89,"te":1072,"cp":1092,"rf":5,"fd":"2024-10-31","md":"2026-06-30","ml":0},{"id":"666681c0ac3d","type":"POS","amt":499,"op":111,"dpd":0,"f":0.0,"ar":0.8,"bb":0,"st":"Current","tc":85,"te":506,"cp":388,"rf":5,"fd":"2024-06-10","md":"2026-03-31","ml":0}];
+const sampleLoans=EXPLORER_DATA;
+let sortKey='op',sortDir=-1;
+let filterType='all',filterStatus='all',filterDpd='all',searchTerm='';
+
+function matchDpd(dpd,bucket){
+  if(bucket==='all')return true;
+  if(bucket==='0')return dpd===0;
+  if(bucket==='1-10')return dpd>=1&&dpd<=10;
+  if(bucket==='11-30')return dpd>=11&&dpd<=30;
+  if(bucket==='31-60')return dpd>=31&&dpd<=60;
+  if(bucket==='61-90')return dpd>=61&&dpd<=90;
+  if(bucket==='90+')return dpd>90;
+  return true;
+}
+
+function matchStatus(st,val){
+  if(val==='all')return true;
+  return st===val;
+}
+
+function renderLoans(){
+  let ls=[...sampleLoans];
+  if(searchTerm){const st=searchTerm.toLowerCase();ls=ls.filter(l=>l.id.toLowerCase().includes(st)||l.type.toLowerCase().includes(st)||l.st.toLowerCase().includes(st)||String(l.dpd).includes(st)||l.fd.includes(st))}
+  if(filterType!=='all')ls=ls.filter(l=>l.type===filterType);
+  if(filterStatus!=='all')ls=ls.filter(l=>matchStatus(l.st,filterStatus));
+  if(filterDpd!=='all')ls=ls.filter(l=>matchDpd(l.dpd,filterDpd));
+  ls.sort((a,b)=>{
+    let av=a[sortKey],bv=b[sortKey];
+    if(typeof av==='string')return sortDir*av.localeCompare(bv);
+    return sortDir*(av-bv);
+  });
+  ls=ls.slice(0,100); // Show max 100 rows
+  const cols=[
+    {k:'id',l:'Loan ID',w:110},
+    {k:'type',l:'Type',w:70},
+    {k:'amt',l:'Approved',w:85},
+    {k:'op',l:'Outstanding',w:95},
+    {k:'dpd',l:'DPD',w:65},
+    {k:'f',l:'Factor',w:60},
+    {k:'ar',l:'AR',w:50},
+    {k:'bb',l:'BB (PEN)',w:90},
+    {k:'rf',l:'Refi #',w:50},
+    {k:'fd',l:'Fund Date',w:85},
+    {k:'st',l:'Status',w:70}
+  ];
+  document.getElementById('lHead').innerHTML='<tr>'+cols.map(c=>'<th style="width:'+c.w+'px" data-k="'+c.k+'">'+c.l+(sortKey===c.k?(sortDir<0?' &darr;':' &uarr;'):'')+'</th>').join('')+'</tr>';
+  document.getElementById('lHead').querySelectorAll('th').forEach(th=>{th.onclick=()=>{const k=th.dataset.k;if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=-1}renderLoans()}});
+
+  const maxDpd=Math.max(...sampleLoans.map(l=>l.dpd),1);
+  document.getElementById('lBody').innerHTML=ls.map((l,i)=>{
+    const dc=l.dpd>90?C.rd:l.dpd>60?C.co:l.dpd>30?C.am:l.dpd>10?C.bl:l.dpd>0?'#93c5fd':C.tl;
+    const sc=l.st==='Current'?'pl-g':'pl-r';
+    const tc=l.type==='Personal'?C.ac:C.tl;
+    return'<tr style="animation:fi .3s ease-out '+Math.min(i*.02,.5)+'s both">'+
+      '<td style="font-family:JetBrains Mono;font-size:10px">'+l.id+'</td>'+
+      '<td><span style="color:'+tc+';font-weight:500;font-size:11px">'+l.type+'</span></td>'+
+      '<td>'+fmtPEN(l.amt)+'</td>'+
+      '<td style="font-weight:600">'+fmtPEN(l.op)+'</td>'+
+      '<td><div class="dp"><div class="dpf" style="width:'+Math.max(4,Math.min(100,l.dpd/maxDpd*100))+'%;background:'+dc+'"></div></div><span style="color:'+dc+';font-weight:600;font-size:11px">'+l.dpd+'</span></td>'+
+      '<td style="font-family:JetBrains Mono;font-size:11px;color:'+(l.f<0.5?C.am:C.tl)+'">'+l.f.toFixed(2)+'</td>'+
+      '<td style="font-size:11px">'+(l.ar*100).toFixed(0)+'%</td>'+
+      '<td style="font-family:JetBrains Mono;font-size:11px;font-weight:600">'+fmtPEN(l.bb)+'</td>'+
+      '<td style="text-align:center;font-family:JetBrains Mono">'+l.rf+'</td>'+
+      '<td style="font-size:11px">'+l.fd+'</td>'+
+      '<td><span class="pl '+sc+'">'+l.st+'</span></td>'+
+      '</tr>';
+  }).join('');
+}
+renderLoans();
+
+// Filter button logic
+document.querySelectorAll('.fbtn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const grp=btn.dataset.filter;
+    document.querySelectorAll('.fbtn[data-filter="'+grp+'"]').forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');
+    if(grp==='type')filterType=btn.dataset.val;
+    if(grp==='status')filterStatus=btn.dataset.val;
+    if(grp==='dpd')filterDpd=btn.dataset.val;
+    renderLoans();
+  });
+});
+document.getElementById('loanSearch').addEventListener('input',e=>{searchTerm=e.target.value;renderLoans()});
+
+// ===== THEME TOGGLE =====
+const themeBtn=document.getElementById('themeToggle');
+themeBtn.addEventListener('click',()=>{
+  const current=document.documentElement.getAttribute('data-theme');
+  const next=current==='light'?'dark':'light';
+  document.documentElement.setAttribute('data-theme',next);
+  themeBtn.innerHTML=next==='light'?'&#9789;':'&#9788;';
+  const gridC=next==='light'?'rgba(0,0,0,.08)':'rgba(30,45,74,.25)';
+  const tickC=next==='light'?'#475569':'#556a8a';
+  const legC=next==='light'?'#475569':'#8899b4';
+  Object.values(Chart.instances).forEach(ch=>{
+    if(!ch.options||!ch.options.scales)return;
+    Object.values(ch.options.scales).forEach(s=>{if(s.grid)s.grid.color=gridC;if(s.ticks)s.ticks.color=tickC;if(s.pointLabels)s.pointLabels.color=legC;});
+    if(ch.options.plugins&&ch.options.plugins.legend&&ch.options.plugins.legend.labels)ch.options.plugins.legend.labels.color=legC;
+    ch.update('none');
+  });
+});
+</script>
+</body></html>

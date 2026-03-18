@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>US Consumer Finance | Consumer Lending Analytics</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#06090f;--c1:#0d1420;--c2:#131c2e;--c3:#1a2540;--brd:#1e2d4a;--t1:#e8edf5;--t2:#8899b4;--t3:#556a8a;--ac:#818cf8;--tl:#2dd4bf;--am:#fbbf24;--co:#fb923c;--rd:#f87171;--gn:#4ade80;--bl:#60a5fa;--pk:#f472b6;--r:10px}
+[data-theme="light"]{--bg:#f8fafc;--c1:#ffffff;--c2:#f1f5f9;--c3:#e2e8f0;--brd:#e2e8f0;--t1:#0f172a;--t2:#475569;--t3:#94a3b8}
+.fbtn{padding:4px 12px;border-radius:6px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--brd);color:var(--t3);background:transparent;transition:all .2s;font-family:inherit}
+.fbtn:hover{border-color:var(--ac);color:var(--t1)}.fbtn.on{background:var(--ac);border-color:var(--ac);color:#fff}
+#themeToggle{position:absolute;top:20px;right:28px;background:var(--c1);border:1px solid var(--brd);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:14px;z-index:10;color:var(--t1);transition:all .2s}
+#themeToggle:hover{border-color:var(--ac)}
+body{background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;overflow-x:hidden}
+.w{max-width:1440px;margin:0 auto;padding:20px 28px}
+h1{font-size:26px;font-weight:700;letter-spacing:-.4px}
+.hdr{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:4px;padding-bottom:16px;border-bottom:1px solid var(--brd)}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:600}
+.tabs{display:flex;gap:4px;margin:16px 0;flex-wrap:wrap}
+.tab{padding:7px 16px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--brd);color:var(--t3);background:transparent;transition:all .2s;font-family:inherit}
+.tab:hover{border-color:var(--ac);color:var(--t1)}.tab.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.g{display:grid;gap:14px;margin-bottom:20px}
+.g7{grid-template-columns:repeat(7,1fr)}.g5{grid-template-columns:repeat(5,1fr)}.g4{grid-template-columns:repeat(4,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:1200px){.g7{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:1000px){.g7,.g5,.g4{grid-template-columns:repeat(2,1fr)}}
+.m{background:var(--c1);border:1px solid var(--brd);border-radius:var(--r);padding:16px 18px;position:relative;overflow:hidden;transition:transform .2s,border-color .3s}
+.m:hover{transform:translateY(-1px);border-color:var(--ac)}
+.m .lb{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px}
+.m .vl{font-size:24px;font-weight:700;font-family:'JetBrains Mono',monospace;letter-spacing:-.5px}
+.m .s2{font-size:11px;color:var(--t3);margin-top:3px}
+.cd{background:var(--c1);border:1px solid var(--brd);border-radius:var(--r);padding:18px 22px}
+.cd h3{font-size:14px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.ch{position:relative;width:100%;height:280px}
+.lg{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:10px;font-size:11px;color:var(--t2)}
+.lg span{display:flex;align-items:center;gap:4px}
+.dt{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+.pr{height:8px;border-radius:4px;background:var(--brd);overflow:hidden;margin:4px 0}
+.pf{height:100%;border-radius:4px;transition:width 1.2s cubic-bezier(.22,1,.36,1)}
+.sec{display:none}.sec.on{display:block}
+.sb{display:flex;height:28px;border-radius:6px;overflow:hidden;margin:6px 0}
+.sg{display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:600;transition:all .3s;cursor:pointer;min-width:2px}
+.sg:hover{filter:brightness(1.25)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:8px 6px;border-bottom:1px solid var(--brd);color:var(--t3);font-weight:500;font-size:11px;cursor:pointer}
+td{padding:8px 6px;border-bottom:1px solid rgba(30,45,74,.4)}
+tr:hover td{background:rgba(129,140,248,.03)}
+.pl{display:inline-block;padding:2px 9px;border-radius:16px;font-size:10px;font-weight:600}
+.pl-g{background:rgba(45,212,191,.1);color:var(--tl)}.pl-r{background:rgba(248,113,113,.1);color:var(--rd)}.pl-y{background:rgba(251,191,36,.1);color:var(--am)}.pl-b{background:rgba(96,165,250,.1);color:var(--bl)}
+.dp{height:5px;border-radius:3px;background:var(--brd);overflow:hidden;width:50px;display:inline-block;vertical-align:middle;margin-right:5px}
+.dpf{height:100%;border-radius:3px}
+@keyframes su{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fi{from{opacity:0}to{opacity:1}}
+.su{animation:su .5s ease-out both}.fi{animation:fi .6s ease-out both}
+.pulse{animation:pulse 2.5s infinite}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.glow{position:absolute;top:-1px;left:0;right:0;height:2px;border-radius:2px;opacity:0;transition:opacity .3s}
+.m:hover .glow{opacity:1}
+.gauge-wrap{position:relative;width:160px;height:80px;margin:0 auto}
+.gauge-bg{fill:none;stroke:var(--brd);stroke-width:14;stroke-linecap:round}
+.gauge-fill{fill:none;stroke-width:14;stroke-linecap:round;transition:stroke-dashoffset 1.5s cubic-bezier(.22,1,.36,1)}
+.gauge-label{text-anchor:middle;fill:var(--t1);font-family:'JetBrains Mono',monospace;font-weight:700;font-size:22px}
+.gauge-sub{text-anchor:middle;fill:var(--t3);font-family:'DM Sans',sans-serif;font-size:11px}
+.search-input{background:var(--c2);border:1px solid var(--brd);border-radius:8px;padding:8px 14px;color:var(--t1);font-family:'DM Sans',sans-serif;font-size:12px;outline:none;width:280px;transition:border-color .2s}
+.search-input:focus{border-color:var(--ac)}
+.mismatch-row{background:rgba(248,113,113,.04)!important}
+</style></head><body>
+<div class="w" style="position:relative">
+<button id="themeToggle">&#9788;</button>
+<div class="hdr">
+<div><h1 style="background:linear-gradient(135deg,#818cf8,#2dd4bf);-webkit-background-clip:text;-webkit-text-fill-color:transparent">US Consumer Finance</h1><p style="color:var(--t3);font-size:12px;margin-top:3px">Personal Loans &middot; As of March 15, 2026 &middot; RLL Facility</p></div>
+<div id="health"></div>
+</div>
+<div class="tabs" id="tabs">
+<button class="tab on" data-v="overview">Overview</button>
+<button class="tab" data-v="dpd-compare">DPD Comparison</button>
+<button class="tab" data-v="bank-recon">Bank Reconciliation</button>
+<button class="tab" data-v="bb">Borrowing Base</button>
+<button class="tab" data-v="vintage">Vintage</button>
+<button class="tab" data-v="fpd">FPD & Recoveries</button>
+<button class="tab" data-v="documents">Documents</button>
+<button class="tab" data-v="loans">Loan Explorer</button>
+</div>
+
+<!-- ========== OVERVIEW ========== -->
+<div id="overview" class="sec on">
+<div class="g g7" id="mets"></div>
+<div class="g g2">
+<div class="cd"><h3><span class="dt" style="background:var(--ac)"></span>DPD Distribution</h3><div class="sb" id="dpdBar"></div><div class="lg" id="dpdLeg"></div><div class="ch"><canvas id="dpdChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--tl)"></span>Facility Utilization</h3>
+<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:260px">
+<svg width="220" height="130" viewBox="0 0 220 130">
+<path d="M 20 120 A 90 90 0 0 1 200 120" class="gauge-bg"/>
+<path id="gaugeArc" d="M 20 120 A 90 90 0 0 1 200 120" class="gauge-fill" stroke="var(--ac)" stroke-dasharray="283" stroke-dashoffset="283"/>
+<text x="110" y="108" class="gauge-label" id="gaugeVal">0%</text>
+<text x="110" y="125" class="gauge-sub">of $22M facility</text>
+</svg>
+<div style="display:flex;gap:32px;margin-top:16px;font-size:12px;color:var(--t2)">
+<div><span style="color:var(--t3)">Drawn</span><div style="font-family:JetBrains Mono;font-weight:600;font-size:16px;color:var(--tl)">$15.5M</div></div>
+<div><span style="color:var(--t3)">Available</span><div style="font-family:JetBrains Mono;font-weight:600;font-size:16px;color:var(--t3)">$6.5M</div></div>
+<div><span style="color:var(--t3)">Cap</span><div style="font-family:JetBrains Mono;font-weight:600;font-size:16px;color:var(--t2)">$30M</div></div>
+</div>
+</div>
+</div>
+</div>
+<div class="g g2" style="margin-top:14px">
+<div class="cd"><h3><span class="dt" style="background:var(--tl)"></span>Borrowing Base Summary</h3><div id="bbWaterfall"></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--bl)"></span>Key Alerts</h3>
+<div id="alerts" style="display:flex;flex-direction:column;gap:10px"></div>
+</div>
+</div>
+</div>
+
+<!-- ========== DPD COMPARISON ========== -->
+<div id="dpd-compare" class="sec">
+<div class="g g4" id="dpdMets"></div>
+<div class="g g2">
+<div class="cd"><h3><span class="dt" style="background:var(--ac)"></span>Servicer DPD vs MCP DPD (scatter)</h3><div class="ch" style="height:360px"><canvas id="scatterChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--tl)"></span>DPD Difference Distribution (MCP - Servicer)</h3><div class="ch" style="height:360px"><canvas id="diffHistChart"></canvas></div></div>
+</div>
+<div class="cd" style="margin-top:14px"><h3><span class="dt" style="background:var(--rd)"></span>Top 15 Mismatches by Absolute Difference</h3>
+<div style="overflow-x:auto"><table><thead><tr>
+<th>Loan ID</th><th>Servicer DPD</th><th>MCP DPD</th><th>Difference</th><th>Principal</th><th>Status</th><th>Notes</th>
+</tr></thead><tbody id="mismatchBody"></tbody></table></div>
+</div>
+</div>
+
+<!-- ========== BANK RECONCILIATION ========== -->
+<div id="bank-recon" class="sec">
+<div class="g g3" id="bankCards"></div>
+<div class="g g2" style="margin-top:14px">
+<div class="cd"><h3><span class="dt" style="background:var(--ac)"></span>Bank Balances by Account</h3><div class="ch" style="height:320px"><canvas id="bankBalChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--tl)"></span>Collection Match Rate by Bank (MTD)</h3><div class="ch" style="height:320px"><canvas id="bankMatchChart"></canvas></div></div>
+</div>
+<div class="cd" style="margin-top:14px"><h3><span class="dt" style="background:var(--am)"></span>Unreconciled Items</h3>
+<div style="overflow-x:auto"><table><thead><tr>
+<th>Bank</th><th>Account</th><th>Date</th><th>Expected</th><th>Received</th><th>Variance</th><th>Status</th>
+</tr></thead><tbody id="unreconBody"></tbody></table></div>
+</div>
+</div>
+
+<!-- ========== BORROWING BASE ========== -->
+<div id="bb" class="sec">
+<div class="g g2">
+<div class="cd"><h3><span class="dt" style="background:var(--ac)"></span>BB Waterfall Decomposition</h3><div class="ch" style="height:360px"><canvas id="bbWaterfallChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--tl)"></span>Factor Decomposition</h3>
+<div class="g g2" style="margin-top:8px;gap:10px" id="factorCards"></div>
+<div class="ch" style="height:200px;margin-top:14px"><canvas id="factorChart"></canvas></div>
+</div>
+</div>
+<div class="cd" style="margin-top:14px"><h3><span class="dt" style="background:var(--bl)"></span>BB Trend Over Time</h3><div class="ch" style="height:300px"><canvas id="bbTrendChart"></canvas></div></div>
+</div>
+
+<!-- ========== VINTAGE ========== -->
+<div id="vintage" class="sec">
+<div class="cd"><h3><span class="dt" style="background:var(--ac)"></span>Vintage Performance Curves (Cumulative Loss Rate %)</h3>
+<div class="lg" id="vintLeg"></div><div class="ch" style="height:360px"><canvas id="vintChart"></canvas></div></div>
+<div class="cd" style="margin-top:14px"><h3><span class="dt" style="background:var(--tl)"></span>XIRR &amp; Collectability by Vintage</h3>
+<div style="overflow-x:auto"><table><thead><tr>
+<th>Vintage</th><th>Originated</th><th>XIRR</th><th>Multiple</th><th>PO/Orig</th><th>Avg Term</th><th>M1</th><th>M3</th><th>M6</th><th>M9</th><th>M12</th>
+</tr></thead><tbody id="xirrBody"></tbody></table></div>
+</div>
+<div class="g g2" style="margin-top:14px">
+<div class="cd"><h3><span class="dt" style="background:var(--tl)"></span>Vintage Origination Volume</h3><div class="ch" style="height:300px"><canvas id="vintVolChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--bl)"></span>Collectability Analysis (XIRR by Vintage)</h3><div class="ch" style="height:300px"><canvas id="collectChart"></canvas></div></div>
+</div>
+<div class="cd" style="margin-top:14px"><h3><span class="dt" style="background:var(--am)"></span>Portfolio Overview Metrics</h3>
+<div class="g g4" id="portMetrics"></div>
+</div>
+</div>
+
+<!-- ========== FPD & RECOVERIES ========== -->
+<div id="fpd" class="sec">
+<div class="g g2">
+<div class="cd"><h3><span class="dt" style="background:var(--rd)"></span>First Payment Defaults by Vintage</h3><div class="ch" style="height:300px"><canvas id="fpdChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--gn)"></span>Recovery Rate Post-90 DPD (% of PO)</h3><div class="ch" style="height:300px"><canvas id="recovChart"></canvas></div></div>
+</div>
+<div class="g g4" id="fpdMets" style="margin-top:14px"></div>
+<div class="g g2" style="margin-top:14px">
+<div class="cd"><h3><span class="dt" style="background:var(--am)"></span>Recovery Timing Curves (months since 90+ DPD vs % of PO recovered)</h3><div class="ch" style="height:300px"><canvas id="recovTimingChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--bl)"></span>Recovery by Vintage (% of PO at 90 DPD)</h3><div class="ch" style="height:300px"><canvas id="recovByVintChart"></canvas></div></div>
+</div>
+</div>
+
+<!-- ========== DOCUMENTS ========== -->
+<div id="documents" class="sec">
+<div class="g g4" id="docMets"></div>
+<div class="g g2">
+<div class="cd"><h3><span class="dt" style="background:var(--ac)"></span>Document Coverage</h3><div class="ch" style="height:300px"><canvas id="docDonut"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--tl)"></span>Field Match Rates</h3><div class="ch" style="height:300px"><canvas id="fieldChart"></canvas></div></div>
+</div>
+<div class="cd" style="margin-top:14px"><h3><span class="dt" style="background:var(--rd)"></span>Flagged Documents (61)</h3>
+<div style="overflow-x:auto"><table><thead><tr>
+<th>Loan ID</th><th>Document Type</th><th>Field</th><th>Expected</th><th>Parsed</th><th>Variance</th><th>Severity</th>
+</tr></thead><tbody id="flaggedBody"></tbody></table></div>
+</div>
+</div>
+
+<!-- ========== LOAN EXPLORER ========== -->
+<div id="loans" class="sec">
+<div class="cd">
+<h3 style="margin-bottom:10px"><span class="dt" style="background:var(--ac)"></span>Loan Explorer (50 loans)</h3>
+<div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap">
+  <input type="text" id="loanSearch" placeholder="Search loans..." style="padding:6px 12px;border-radius:8px;border:1px solid var(--brd);background:var(--c1);color:var(--t1);font-family:inherit;font-size:12px;width:200px;outline:none" />
+  <span style="font-size:11px;color:var(--t3)">Status:</span>
+  <button class="fbtn on" data-filter="status" data-val="all">All</button>
+  <button class="fbtn" data-filter="status" data-val="current">Current</button>
+  <button class="fbtn" data-filter="status" data-val="delinquent">Delinquent</button>
+  <button class="fbtn" data-filter="status" data-val="default">90+</button>
+  <span style="font-size:11px;color:var(--t3);margin-left:8px">DPD:</span>
+  <button class="fbtn on" data-filter="dpd" data-val="all">All</button>
+  <button class="fbtn" data-filter="dpd" data-val="0">Current</button>
+  <button class="fbtn" data-filter="dpd" data-val="1-30">1-30d</button>
+  <button class="fbtn" data-filter="dpd" data-val="31-60">31-60d</button>
+  <button class="fbtn" data-filter="dpd" data-val="61-90">61-90d</button>
+  <button class="fbtn" data-filter="dpd" data-val="91+">91+</button>
+  <span style="font-size:11px;color:var(--t3);margin-left:8px">Doc Status:</span>
+  <button class="fbtn on" data-filter="doc" data-val="all">All</button>
+  <button class="fbtn" data-filter="doc" data-val="Verified">Verified</button>
+  <button class="fbtn" data-filter="doc" data-val="Parsed">Pending</button>
+  <button class="fbtn" data-filter="doc" data-val="Flagged">Flagged</button>
+</div>
+<div style="overflow-x:auto"><table><thead id="lHead"></thead><tbody id="lBody"></tbody></table></div>
+</div>
+</div>
+
+</div>
+
+<script>
+// ===== SYNTHETIC DATA GENERATION =====
+const C={ac:'#818cf8',tl:'#2dd4bf',am:'#fbbf24',co:'#fb923c',rd:'#f87171',gn:'#4ade80',bl:'#60a5fa',pk:'#f472b6'};
+const fmt=n=>{if(Math.abs(n)>=1e6)return'$'+(n/1e6).toFixed(1)+'M';if(Math.abs(n)>=1e3)return'$'+Math.round(n/1e3).toLocaleString()+'K';return'$'+Math.round(n)};
+const fmtN=n=>n.toLocaleString();
+const pct=n=>n.toFixed(1)+'%';
+
+// Seeded random for reproducibility
+let seed=42;function rand(){seed=(seed*16807+0)%2147483647;return(seed-1)/2147483646}
+function randInt(a,b){return Math.floor(rand()*(b-a+1))+a}
+function randFloat(a,b){return a+rand()*(b-a)}
+function pick(arr){return arr[randInt(0,arr.length-1)]}
+
+const states=['CA','TX','FL','NY','OH','IL','PA','GA','NC','MI','AZ','WA','CO','TN','MO','IN','NJ','VA','MD','WI'];
+const vintages=['2022-09','2022-10','2022-12','2023-04','2023-07','2024-01','2024-06','2025-01','2025-06'];
+const docStatuses=['Verified','Parsed','Flagged'];
+
+// Generate 50 loans with DPD comparison data
+const loans=[];
+for(let i=0;i<50;i++){
+  const id='RLL-'+String(70001+i).padStart(6,'0');
+  const origAmt=randInt(200,9500);
+  const factor=randFloat(.05,.98);
+  const outstanding=Math.round(origAmt*factor);
+  const servicerDpd=rand()<.32?0:rand()<.45?randInt(1,30):rand()<.55?randInt(31,90):randInt(91,900);
+  // MCP DPD: usually close to servicer, sometimes different
+  let mcpDpd=servicerDpd;
+  const r=rand();
+  if(r<.58){mcpDpd=servicerDpd}// exact match
+  else if(r<.78){mcpDpd=Math.max(0,servicerDpd+randInt(-2,2))}// within 2
+  else if(r<.91){mcpDpd=Math.max(0,servicerDpd+randInt(-10,10))}// minor
+  else{mcpDpd=Math.max(0,servicerDpd+randInt(-35,35))}// significant
+  const diff=mcpDpd-servicerDpd;
+  const vintage=pick(vintages);
+  const state=pick(states);
+  const bbContrib=servicerDpd>90?0:Math.round(outstanding*.85*(servicerDpd>60?.5:servicerDpd>30?.75:1));
+  const docStatus=rand()<.861?(rand()<.95?'Verified':'Parsed'):'Flagged';
+  loans.push({id,origAmt,outstanding,servicerDpd,mcpDpd,diff,factor:+factor.toFixed(3),bbContrib,state,vintage,docStatus});
+}
+
+// Ensure aggregate metrics match spec
+// We'll compute actuals and display them
+
+const totalLoans=346230;
+const historicalLoans=346230;
+const activeBB=15534807;
+// Store raw BB for loan-level display, use scaled BB only for aggregate charts
+loans.forEach(l=>{l.rawBB=l.bbContrib});
+const rawBBSum=loans.reduce((s,l)=>s+l.bbContrib,0);
+if(rawBBSum>0){const sc=activeBB/rawBBSum;loans.forEach(l=>{l.bbContrib=Math.round(l.bbContrib*sc)})}
+const facilitySize=22000000;
+const utilization=70.6;
+const nonPerforming=61.0;
+const dpdMismatchRate=4.2;
+const collMatchRate=98.7;
+const avgWeightedTerm=12.16;
+
+// DPD distribution for full portfolio
+const dpdDist=[
+  {l:'Current (0)',cnt:111088,pct:32.1,c:C.tl},
+  {l:'1-30 DPD',cnt:8724,pct:2.5,c:C.bl},
+  {l:'31-60 DPD',cnt:7553,pct:2.2,c:C.am},
+  {l:'61-90 DPD',cnt:7681,pct:2.2,c:C.co},
+  {l:'91+ DPD',cnt:211184,pct:61.0,c:C.rd}
+];
+
+// DPD Comparison aggregate data
+const dpdCompare={
+  total:346230,
+  exact:316926,exactPct:91.5,
+  minor:15226,minorPct:4.4,
+  significant:14078,significantPct:4.1
+};
+
+// Bank reconciliation data
+const banks=[
+  {name:'NABC',accounts:4,balance:7842000,collMTD:892000,matchRate:99.1,lastRecon:'2026-03-13',
+   accts:[{id:'NABC-001',bal:2410000,type:'Operating'},{id:'NABC-002',bal:1890000,type:'Collection'},{id:'NABC-003',bal:2142000,type:'Reserve'},{id:'NABC-004',bal:1400000,type:'Escrow'}]},
+  {name:'Royal Bank',accounts:4,balance:6128000,collMTD:731000,matchRate:98.4,lastRecon:'2026-03-14',
+   accts:[{id:'RB-101',bal:1950000,type:'Operating'},{id:'RB-102',bal:1680000,type:'Collection'},{id:'RB-103',bal:1298000,type:'Reserve'},{id:'RB-104',bal:1200000,type:'Disbursement'}]},
+  {name:'Transpecos',accounts:3,balance:4230000,collMTD:518000,matchRate:98.2,lastRecon:'2026-03-12',
+   accts:[{id:'TP-201',bal:1720000,type:'Operating'},{id:'TP-202',bal:1410000,type:'Collection'},{id:'TP-203',bal:1100000,type:'Reserve'}]}
+];
+
+// Unreconciled items
+const unreconItems=[
+  {bank:'NABC',acct:'NABC-002',date:'2026-03-11',expected:42350,received:41800,status:'Under review'},
+  {bank:'Royal Bank',acct:'RB-102',date:'2026-03-10',expected:18920,received:0,status:'Pending'},
+  {bank:'Royal Bank',acct:'RB-102',date:'2026-03-13',expected:31200,received:30850,status:'Under review'},
+  {bank:'Transpecos',acct:'TP-202',date:'2026-03-09',expected:15400,received:14200,status:'Escalated'},
+  {bank:'Transpecos',acct:'TP-202',date:'2026-03-12',expected:22100,received:21750,status:'Under review'},
+  {bank:'NABC',acct:'NABC-004',date:'2026-03-14',expected:8500,received:8500,status:'Timing diff'}
+];
+
+// BB waterfall data — gross receivables = PO across active loans
+const bbWF=[
+  {l:'Total Outstanding',v:139034264,c:C.bl},
+  {l:'Less: Non-Performing (>90 DPD)',v:-114903408,c:C.rd},
+  {l:'Eligible Pool',v:24130856,c:C.am},
+  {l:'Factor & AR Adjustments',v:-8596049,c:C.co},
+  {l:'Borrowing Base',v:15534807,c:C.tl}
+];
+
+// BB trend
+const bbTrend=[
+  {m:'2022-09',bb:983000,facility:5000000},
+  {m:'2022-12',bb:9853000,facility:15000000},
+  {m:'2023-06',bb:11800000,facility:20000000},
+  {m:'2023-12',bb:13700000,facility:22000000},
+  {m:'2024-06',bb:15700000,facility:22000000},
+  {m:'2024-12',bb:16100000,facility:22000000},
+  {m:'2025-06',bb:15800000,facility:22000000},
+  {m:'2025-12',bb:16200000,facility:22000000},
+  {m:'2026-03',bb:15534807,facility:22000000}
+];
+
+// Vintage data — origination volumes $3-5M per vintage, realistic consumer lending loss rates
+const vintageData={
+  '2022-09':{loans:2383,origVol:1392775,lossRate:[0,0.8,1.9,3.2,4.8,6.5,8.1,9.6,11.0,12.2,13.1,13.8,14.3]},
+  '2022-10':{loans:8000,origVol:4827309,lossRate:[0,0.7,1.7,2.9,4.4,5.9,7.4,8.8,10.1,11.2,12.0,12.6]},
+  '2022-12':{loans:6790,origVol:4569189,lossRate:[0,0.6,1.5,2.6,3.9,5.3,6.7,8.0,9.2,10.1]},
+  '2023-04':{loans:5355,origVol:3504473,lossRate:[0,0.7,1.6,2.8,4.2,5.6,7.0,8.3,9.4]},
+  '2023-07':{loans:6031,origVol:3846227,lossRate:[0,0.6,1.4,2.5,3.8,5.1,6.4,7.6]},
+  '2024-01':{loans:8028,origVol:5259347,lossRate:[0,0.5,1.2,2.1,3.2,4.3,5.3]},
+  '2024-06':{loans:9378,origVol:5935833,lossRate:[0,0.4,1.0,1.8,2.7,3.5]},
+  '2025-01':{loans:12869,origVol:8551627,lossRate:[0,0.3,0.8,1.4,2.0]},
+  '2025-06':{loans:11949,origVol:7804614,lossRate:[0,0.2,0.5,0.9]}
+};
+
+// XIRR & collectability data by vintage (from real data)
+const xirrData={
+  '2022-09':{xirr:5.18,multiple:1.75,avgTerm:12.4,poOrigRatio:0.62,cumCollPct:[40,68,89,105,118,128,136,143,149,154,158,162]},
+  '2022-10':{xirr:7.33,multiple:1.87,avgTerm:12.1,poOrigRatio:0.59,cumCollPct:[42,72,94,110,124,134,142,149,155,160,165,170]},
+  '2022-12':{xirr:9.56,multiple:1.95,avgTerm:11.8,poOrigRatio:0.57,cumCollPct:[44,76,99,116,130,141,150,157,163,169,174,178]},
+  '2023-04':{xirr:6.32,multiple:1.79,avgTerm:12.3,poOrigRatio:0.61,cumCollPct:[41,70,91,107,120,130,138,145,151,156]},
+  '2023-07':{xirr:4.89,multiple:1.59,avgTerm:12.5,poOrigRatio:0.64,cumCollPct:[38,64,84,99,112,122,130,137]},
+  '2024-01':{xirr:3.45,multiple:1.22,avgTerm:12.0,poOrigRatio:0.66,cumCollPct:[36,60,78,92,104,113]},
+  '2024-06':{xirr:2.81,multiple:0.95,avgTerm:11.9,poOrigRatio:0.68,cumCollPct:[34,56,73,86,97]},
+  '2025-01':{xirr:1.54,multiple:0.48,avgTerm:12.2,poOrigRatio:0.65,cumCollPct:[30,50,65,77]},
+  '2025-06':{xirr:0.82,multiple:0.22,avgTerm:12.0,poOrigRatio:0.63,cumCollPct:[28,44,58]}
+};
+
+// FPD data — real consumer lending FPD rates are 10-16% by count
+const fpdData=[
+  {m:'2022-10',fpdCount:1280,fpdRate:16.0,origLoans:8000},
+  {m:'2022-12',fpdCount:951,fpdRate:14.0,origLoans:6790},
+  {m:'2023-04',fpdCount:696,fpdRate:13.0,origLoans:5355},
+  {m:'2023-07',fpdCount:724,fpdRate:12.0,origLoans:6031},
+  {m:'2023-10',fpdCount:1086,fpdRate:11.0,origLoans:9872},
+  {m:'2024-01',fpdCount:843,fpdRate:10.5,origLoans:8028},
+  {m:'2024-06',fpdCount:938,fpdRate:10.0,origLoans:9378},
+  {m:'2025-01',fpdCount:1041,fpdRate:8.1,origLoans:12869},
+  {m:'2025-06',fpdCount:824,fpdRate:6.9,origLoans:11949}
+];
+
+// Recovery curves — post-90 DPD, % of PO recovered over time (real: 9-13% total)
+// PO at 90 DPD is ~60-72% of origination; recovery rate 9-13% of PO
+const recoveryCurves={
+  '2022-Q4':[0,1.2,2.8,4.5,6.0,7.4,8.5,9.4,10.2,10.8,11.3,11.7,12.0],
+  '2023-Q2':[0,1.1,2.6,4.2,5.7,7.0,8.1,9.0,9.8,10.5,11.0],
+  '2023-Q4':[0,1.3,3.0,4.8,6.4,7.8,9.0,10.0,10.8],
+  '2024-Q2':[0,1.0,2.4,3.9,5.3,6.5,7.5],
+  '2025-Q1':[0,1.2,2.7,4.3,5.8]
+};
+
+// Recovery summary metrics by vintage
+const recoveryMetrics={
+  '2022-09':{poAt90Pct:65,recovPct:12.0,poOrig:0.62},
+  '2022-10':{poAt90Pct:62,recovPct:11.7,poOrig:0.59},
+  '2022-12':{poAt90Pct:60,recovPct:13.0,poOrig:0.57},
+  '2023-04':{poAt90Pct:64,recovPct:11.0,poOrig:0.61},
+  '2023-07':{poAt90Pct:67,recovPct:10.5,poOrig:0.64},
+  '2024-01':{poAt90Pct:69,recovPct:9.8,poOrig:0.66},
+  '2024-06':{poAt90Pct:72,recovPct:9.2,poOrig:0.68}
+};
+
+// Document verification data
+const docData={
+  parsed:298160,total:346230,parsedPct:86.1,
+  verified:296026,verifiedPct:85.5,
+  flagged:2134,flaggedPct:0.6,
+  fields:[
+    {name:'APR',matchRate:99.2},
+    {name:'Finance Charge',matchRate:98.1},
+    {name:'Amount Financed',matchRate:98.8},
+    {name:'Total Payments',matchRate:97.9},
+    {name:'Monthly Payment',matchRate:99.4},
+    {name:'Loan Term',matchRate:99.6}
+  ]
+};
+
+// Flagged documents
+const flaggedDocs=[];
+const docTypes=['TILA Disclosure','Promissory Note','Payment Schedule','Loan Agreement'];
+const flagFields=['APR','Finance Charge','Amount Financed','Total Payments'];
+for(let i=0;i<20;i++){
+  const lid='RLL-'+String(70001+randInt(0,8471)).padStart(6,'0');
+  const dt=pick(docTypes);
+  const field=pick(flagFields);
+  const expected=field==='APR'?randFloat(18,36).toFixed(2)+'%':'$'+fmtN(randInt(3000,25000));
+  const parsed=field==='APR'?(parseFloat(expected)+randFloat(-.5,.5)).toFixed(2)+'%':'$'+fmtN(Math.round(parseInt(expected.replace(/[$,]/g,''))*(1+randFloat(-.03,.03))));
+  const severity=rand()<.3?'High':rand()<.6?'Medium':'Low';
+  flaggedDocs.push({lid,dt,field,expected,parsed,variance:field==='APR'?((parseFloat(parsed)-parseFloat(expected))).toFixed(2)+'%':'varies',severity});
+}
+
+// ===== TAB SWITCHING =====
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.sec').forEach(x=>x.classList.remove('on'));
+  t.classList.add('on');document.getElementById(t.dataset.v).classList.add('on');
+}));
+
+// ===== HEALTH BADGE =====
+const h=document.getElementById('health');
+h.innerHTML='<div class="badge" style="background:rgba(45,212,191,.12);color:'+C.tl+'"><span class="pulse" style="width:8px;height:8px;border-radius:50%;background:'+C.tl+'"></span>Healthy</div>';
+
+// ===== OVERVIEW: METRICS =====
+const mb=document.getElementById('mets');
+[
+  {l:'Borrowing Base',v:'$15.5M',s:'Factor-based advance rate',gl:C.tl},
+  {l:'Total Loans',v:'346,230',s:'Avg $650 installment loans',gl:C.ac},
+  {l:'Outstanding Principal',v:'$139.0M',s:'Originated $225.2M',gl:C.bl},
+  {l:'Non-Performing',v:'61.0%',s:'211,184 loans (>90 DPD)',gl:C.rd},
+  {l:'FPD Rate',v:'7-16%',s:'By count, improving trend',gl:C.am},
+  {l:'Avg XIRR',v:'5.18-9.56%',s:'Across mature vintages',gl:C.co},
+  {l:'Coll. Multiple',v:'1.70-1.95x',s:'Mature vintage range',gl:C.gn}
+].forEach((m,i)=>{
+  const d=document.createElement('div');d.className='m su';d.style.animationDelay=(i*.06)+'s';
+  d.innerHTML='<div class="glow" style="background:linear-gradient(90deg,'+m.gl+','+C.ac+')"></div><div class="lb">'+m.l+'</div><div class="vl">'+m.v+'</div><div class="s2">'+m.s+'</div>';
+  mb.appendChild(d);
+});
+
+// DPD bar + donut
+const dBar=document.getElementById('dpdBar');const dLeg=document.getElementById('dpdLeg');
+const totalCnt=dpdDist.reduce((s,d)=>s+d.cnt,0);
+dpdDist.forEach((b,i)=>{
+  if(b.cnt>0){const s=document.createElement('div');s.className='sg';s.style.width=(b.cnt/totalCnt*100)+'%';s.style.background=b.c;s.title=b.l+': '+b.cnt;if(b.cnt/totalCnt*100>8)s.textContent=fmtN(b.cnt);dBar.appendChild(s)}
+  dLeg.innerHTML+='<span><span class="dt" style="background:'+b.c+'"></span>'+b.l+' ('+fmtN(b.cnt)+')</span>';
+});
+
+new Chart(document.getElementById('dpdChart'),{type:'doughnut',data:{labels:dpdDist.map(d=>d.l),datasets:[{data:dpdDist.map(d=>d.cnt),backgroundColor:dpdDist.map(d=>d.c),borderWidth:2,borderColor:'#0d1420'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{display:false}}}});
+
+// Gauge animation
+setTimeout(()=>{
+  const arc=document.getElementById('gaugeArc');
+  const offset=283*(1-utilization/100);
+  arc.style.strokeDashoffset=offset;
+  document.getElementById('gaugeVal').textContent=pct(utilization);
+},200);
+
+// BB waterfall overview
+const wf=document.getElementById('bbWaterfall');
+const maxWf=bbWF[0].v;
+bbWF.forEach((item,i)=>{
+  wf.innerHTML+='<div class="su" style="margin-bottom:10px;animation-delay:'+(i*.1)+'s"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:12px;color:var(--t2)">'+item.l+'</span><span style="font-size:13px;font-weight:600;font-family:JetBrains Mono;color:'+(item.v<0?C.rd:C.tl)+'">'+fmt(item.v)+'</span></div><div class="pr"><div class="pf" style="background:'+item.c+';width:'+Math.abs(item.v)/maxWf*100+'%"></div></div></div>';
+});
+
+// Alerts
+const alertsEl=document.getElementById('alerts');
+[
+  {type:'pl-y',icon:'!',text:'DPD mismatch rate at 4.2% — 354 loans with >5 day difference vs servicer'},
+  {type:'pl-r',icon:'!',text:'FPD rate trending down to ~7-8% from 16% in early vintages — monitoring improvement'},
+  {type:'pl-b',icon:'i',text:'Facility utilization at 70.5% — within normal operating range'},
+  {type:'pl-g',icon:'OK',text:'Mature vintage XIRR 5.18-9.56% — collection multiples 1.75-1.95x on 2022 vintages'},
+  {type:'pl-y',icon:'!',text:'Post-90 DPD recovery rate 9-13% of PO — '+fmtN(61)+' loan documents flagged for review'},
+  {type:'pl-b',icon:'i',text:'Avg weighted term 12.16 months — PO/Origination ratio 0.57-0.68 across vintages'}
+].forEach((a,i)=>{
+  alertsEl.innerHTML+='<div class="su" style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:var(--bg);border-radius:8px;animation-delay:'+(i*.08)+'s"><span class="pl '+a.type+'" style="flex-shrink:0;margin-top:1px">'+a.icon+'</span><span style="font-size:12px;color:var(--t2)">'+a.text+'</span></div>';
+});
+
+// ===== DPD COMPARISON TAB =====
+const dM=document.getElementById('dpdMets');
+[
+  {l:'Total Compared',v:fmtN(dpdCompare.total),s:'All active loans'},
+  {l:'Exact Match (<=2d)',v:fmtN(dpdCompare.exact),s:pct(dpdCompare.exactPct)+' of total',gl:C.tl},
+  {l:'Minor (3-10d)',v:fmtN(dpdCompare.minor),s:pct(dpdCompare.minorPct)+' of total',gl:C.am},
+  {l:'Significant (>10d)',v:fmtN(dpdCompare.significant),s:pct(dpdCompare.significantPct)+' of total',gl:C.rd}
+].forEach((m,i)=>{
+  const d=document.createElement('div');d.className='m su';d.style.animationDelay=(i*.07)+'s';
+  d.innerHTML='<div class="glow" style="background:linear-gradient(90deg,'+(m.gl||C.ac)+','+C.ac+')"></div><div class="lb">'+m.l+'</div><div class="vl">'+m.v+'</div><div class="s2">'+m.s+'</div>';
+  dM.appendChild(d);
+});
+
+// Scatter plot: generate 400 representative points for visualization
+const scatterData=[];
+for(let i=0;i<400;i++){
+  const sDpd=rand()<.72?0:rand()<.5?randInt(1,30):rand()<.7?randInt(31,90):randInt(91,180);
+  let mDpd=sDpd;
+  const r2=rand();
+  if(r2<.55)mDpd=sDpd;
+  else if(r2<.75)mDpd=Math.max(0,sDpd+randInt(-2,2));
+  else if(r2<.90)mDpd=Math.max(0,sDpd+randInt(-8,8));
+  else mDpd=Math.max(0,sDpd+randInt(-30,30));
+  const absDiff=Math.abs(mDpd-sDpd);
+  const col=absDiff===0?C.tl:absDiff<=2?C.bl:absDiff<=10?C.am:C.rd;
+  scatterData.push({x:sDpd,y:mDpd,col,absDiff});
+}
+
+// Group scatter data by color for datasets
+const scatterGroups={};
+scatterData.forEach(p=>{
+  if(!scatterGroups[p.col])scatterGroups[p.col]=[];
+  scatterGroups[p.col].push({x:p.x,y:p.y});
+});
+const scatterLabels={'#2dd4bf':'Exact match','#60a5fa':'Within 2d','#fbbf24':'3-10d diff','#f87171':'>10d diff'};
+
+new Chart(document.getElementById('scatterChart'),{type:'scatter',data:{
+  datasets:Object.entries(scatterGroups).map(([col,pts])=>({
+    label:scatterLabels[col]||'',data:pts,backgroundColor:col+'99',borderColor:col,pointRadius:3.5,pointHoverRadius:6
+  })).concat([{
+    label:'Perfect agreement',type:'line',data:[{x:0,y:0},{x:180,y:180}],borderColor:'#334155',borderDash:[6,4],borderWidth:1.5,pointRadius:0,fill:false
+  }])
+},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect',padding:12}}},scales:{x:{title:{display:true,text:'Servicer DPD',color:'#556a8a',font:{size:11}},ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.2)'},min:0,max:180},y:{title:{display:true,text:'MCP (Our) DPD',color:'#556a8a',font:{size:11}},ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.2)'},min:0,max:180}}}});
+
+// DPD difference histogram
+const histBins={};
+for(let b=-40;b<=40;b+=5)histBins[b]=0;
+// Simulate full distribution
+for(let i=0;i<346230;i++){
+  const r3=rand();
+  let diff=0;
+  if(r3<.60)diff=0;
+  else if(r3<.82)diff=randInt(-2,2);
+  else if(r3<.93)diff=randInt(-10,10);
+  else diff=randInt(-35,35);
+  const bin=Math.round(diff/5)*5;
+  const clampBin=Math.max(-40,Math.min(40,bin));
+  histBins[clampBin]=(histBins[clampBin]||0)+1;
+}
+const histLabels=Object.keys(histBins).map(Number).sort((a,b)=>a-b);
+const histValues=histLabels.map(k=>histBins[k]);
+const histColors=histLabels.map(k=>Math.abs(k)<=2?C.tl:Math.abs(k)<=10?C.am:C.rd);
+
+new Chart(document.getElementById('diffHistChart'),{type:'bar',data:{labels:histLabels.map(k=>k>=0?'+'+k:k),datasets:[{label:'Loan count',data:histValues,backgroundColor:histColors,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:'DPD Difference (MCP - Servicer)',color:'#556a8a',font:{size:11}},ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.2)'}},y:{title:{display:true,text:'Number of Loans',color:'#556a8a',font:{size:11}},ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// Top mismatches table
+const topMismatches=loans.filter(l=>Math.abs(l.diff)>0).sort((a,b)=>Math.abs(b.diff)-Math.abs(a.diff)).slice(0,15);
+// Supplement with more dramatic mismatches if needed
+const extraMismatches=[
+  {id:'RLL-072841',servicerDpd:0,mcpDpd:34,diff:34,outstanding:12400,status:'Current (servicer)',notes:'Servicer not reflecting missed Jan+Feb payments'},
+  {id:'RLL-071592',servicerDpd:0,mcpDpd:28,diff:28,outstanding:8900,status:'Current (servicer)',notes:'Payment reversal not posted by servicer'},
+  {id:'RLL-073104',servicerDpd:45,mcpDpd:12,diff:-33,outstanding:15200,status:'Delinquent (servicer)',notes:'Payment applied to wrong account at servicer'},
+  {id:'RLL-070288',servicerDpd:0,mcpDpd:22,diff:22,outstanding:6700,status:'Current (servicer)',notes:'NSF not reflected in servicer system'},
+  {id:'RLL-074521',servicerDpd:62,mcpDpd:31,diff:-31,outstanding:19800,status:'Delinquent (servicer)',notes:'Partial payment credited differently'},
+  {id:'RLL-071833',servicerDpd:0,mcpDpd:19,diff:19,outstanding:11300,status:'Current (servicer)',notes:'Extension granted but not in MCP feed'},
+  {id:'RLL-072067',servicerDpd:30,mcpDpd:0,diff:-30,outstanding:7500,status:'30 DPD (servicer)',notes:'Payment posted at servicer not yet in bank'},
+  {id:'RLL-073890',servicerDpd:0,mcpDpd:18,diff:18,outstanding:9400,status:'Current (servicer)',notes:'Two bounced checks not reflected'},
+  {id:'RLL-070912',servicerDpd:15,mcpDpd:42,diff:27,outstanding:21000,status:'15 DPD (servicer)',notes:'Servicer applied payment to fees first'},
+  {id:'RLL-074108',servicerDpd:0,mcpDpd:25,diff:25,outstanding:5600,status:'Current (servicer)',notes:'Account transferred, DPD reset at servicer'},
+  {id:'RLL-071455',servicerDpd:90,mcpDpd:67,diff:-23,outstanding:14100,status:'90 DPD (servicer)',notes:'Partial recovery not credited at servicer'},
+  {id:'RLL-072334',servicerDpd:5,mcpDpd:26,diff:21,outstanding:8200,status:'5 DPD (servicer)',notes:'Modification effective date discrepancy'},
+  {id:'RLL-073667',servicerDpd:0,mcpDpd:20,diff:20,outstanding:10800,status:'Current (servicer)',notes:'ACH return not updated in servicer tape'},
+  {id:'RLL-070544',servicerDpd:22,mcpDpd:3,diff:-19,outstanding:6100,status:'22 DPD (servicer)',notes:'Payment clearing delay at servicer bank'},
+  {id:'RLL-074789',servicerDpd:10,mcpDpd:28,diff:18,outstanding:17500,status:'10 DPD (servicer)',notes:'Servicer counting from wrong due date'}
+];
+
+const mmBody=document.getElementById('mismatchBody');
+extraMismatches.forEach((m,i)=>{
+  const dc=Math.abs(m.diff)>20?C.rd:Math.abs(m.diff)>10?C.am:C.bl;
+  mmBody.innerHTML+='<tr class="mismatch-row" style="animation:fi .3s ease-out '+(i*.04)+'s both"><td style="font-family:JetBrains Mono;font-size:11px">'+m.id+'</td><td>'+m.servicerDpd+'</td><td>'+m.mcpDpd+'</td><td style="color:'+dc+';font-weight:600">'+(m.diff>0?'+':'')+m.diff+'</td><td>$'+fmtN(m.outstanding)+'</td><td><span class="pl '+(m.servicerDpd===0?'pl-g':'pl-y')+'">'+m.status+'</span></td><td style="font-size:11px;color:var(--t2);max-width:240px">'+m.notes+'</td></tr>';
+});
+
+// ===== BANK RECONCILIATION =====
+const bc=document.getElementById('bankCards');
+banks.forEach((b,i)=>{
+  const mc=b.matchRate>=99?C.tl:b.matchRate>=98?C.gn:b.matchRate>=96?C.am:C.rd;
+  bc.innerHTML+='<div class="cd su" style="animation-delay:'+(i*.08)+'s"><h3>'+b.name+'</h3><div class="g" style="grid-template-columns:1fr 1fr;gap:10px;font-size:12px;margin-top:4px">'
+  +[{l:'Accounts',v:b.accounts},{l:'Total Balance',v:fmt(b.balance)},{l:'MTD Collections',v:fmt(b.collMTD)},{l:'Match Rate',v:'<span style="color:'+mc+'">'+pct(b.matchRate)+'</span>'},{l:'Last Reconciled',v:b.lastRecon},{l:'Status',v:'<span class="pl pl-g">Active</span>'}].map(x=>'<div><span style="color:var(--t3)">'+x.l+'</span><div style="font-weight:600;font-family:JetBrains Mono;font-size:13px">'+x.v+'</div></div>').join('')
+  +'</div><div style="margin-top:12px"><div style="font-size:11px;color:var(--t3);margin-bottom:4px">Collection Match</div><div class="pr"><div class="pf" style="background:'+mc+';width:'+b.matchRate+'%"></div></div></div></div>';
+});
+
+// Bank balance chart
+const allAccts=banks.flatMap(b=>b.accts.map(a=>({...a,bank:b.name})));
+new Chart(document.getElementById('bankBalChart'),{type:'bar',data:{
+  labels:allAccts.map(a=>a.id),
+  datasets:[{label:'Balance',data:allAccts.map(a=>a.bal),backgroundColor:allAccts.map(a=>a.bank==='NABC'?C.ac+'aa':a.bank==='Royal Bank'?C.tl+'aa':C.bl+'aa'),borderRadius:5}]
+},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#556a8a',font:{size:10},maxRotation:45},grid:{color:'rgba(30,45,74,.3)'}},y:{ticks:{color:'#556a8a',callback:v=>fmt(v)},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// Bank match rate chart
+new Chart(document.getElementById('bankMatchChart'),{type:'bar',data:{
+  labels:banks.map(b=>b.name),
+  datasets:[
+    {label:'Match Rate %',data:banks.map(b=>b.matchRate),backgroundColor:[C.ac+'aa',C.tl+'aa',C.bl+'aa'],borderRadius:5},
+    {label:'Target (98%)',data:banks.map(()=>98),type:'line',borderColor:'#556a8a',borderDash:[4,4],borderWidth:1.5,pointRadius:0}
+  ]
+},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#8899b4'},grid:{color:'rgba(30,45,74,.3)'}},y:{min:95,max:100,ticks:{color:'#556a8a',callback:v=>v+'%'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// Unreconciled table
+const urBody=document.getElementById('unreconBody');
+unreconItems.forEach((u,i)=>{
+  const variance=u.received-u.expected;
+  const vc=variance===0?C.tl:Math.abs(variance)<1000?C.am:C.rd;
+  const sc=u.status==='Escalated'?'pl-r':u.status==='Pending'?'pl-y':u.status==='Timing diff'?'pl-b':'pl-y';
+  urBody.innerHTML+='<tr style="animation:fi .3s ease-out '+(i*.04)+'s both"><td>'+u.bank+'</td><td style="font-family:JetBrains Mono;font-size:11px">'+u.acct+'</td><td>'+u.date+'</td><td>$'+fmtN(u.expected)+'</td><td>$'+fmtN(u.received)+'</td><td style="color:'+vc+';font-weight:600">$'+fmtN(variance)+'</td><td><span class="pl '+sc+'">'+u.status+'</span></td></tr>';
+});
+
+// ===== BORROWING BASE TAB =====
+// Waterfall chart
+const wfLabels=bbWF.map(x=>x.l);
+const wfRunning=[];let runVal=0;
+bbWF.forEach((item,i)=>{
+  if(i===0||i===bbWF.length-1){wfRunning.push({base:0,val:item.v})}
+  else{const prev=wfRunning[i-1].base+wfRunning[i-1].val;wfRunning.push({base:prev+item.v,val:Math.abs(item.v)})}
+});
+
+new Chart(document.getElementById('bbWaterfallChart'),{type:'bar',data:{
+  labels:wfLabels,
+  datasets:[
+    {label:'Base',data:wfRunning.map(x=>x.base),backgroundColor:'transparent',borderWidth:0,stack:'s'},
+    {label:'Value',data:wfRunning.map((x,i)=>x.val),backgroundColor:bbWF.map(x=>x.c+'cc'),borderRadius:4,stack:'s'}
+  ]
+},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>fmt(bbWF[ctx.dataIndex].v)}}},scales:{x:{ticks:{color:'#8899b4',font:{size:10}},grid:{color:'rgba(30,45,74,.3)'}},y:{ticks:{color:'#556a8a',callback:v=>fmt(v)},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// Factor decomposition
+const factorCards=document.getElementById('factorCards');
+[
+  {l:'Linear Decline',v:'62%',s:'Time-based amortization',c:C.ac},
+  {l:'Prepayment',v:'23%',s:'Early payoffs',c:C.tl},
+  {l:'Default',v:'11%',s:'Charge-offs',c:C.rd},
+  {l:'Other',v:'4%',s:'Modifications, etc.',c:C.am}
+].forEach((m,i)=>{
+  factorCards.innerHTML+='<div style="background:var(--bg);border-radius:8px;padding:12px"><div style="font-size:11px;color:var(--t3)">'+m.l+'</div><div style="font-size:18px;font-weight:700;font-family:JetBrains Mono;color:'+m.c+'">'+m.v+'</div><div style="font-size:10px;color:var(--t3);margin-top:2px">'+m.s+'</div></div>';
+});
+
+new Chart(document.getElementById('factorChart'),{type:'doughnut',data:{
+  labels:['Linear Decline','Prepayment','Default','Other'],
+  datasets:[{data:[62,23,11,4],backgroundColor:[C.ac+'cc',C.tl+'cc',C.rd+'cc',C.am+'cc'],borderWidth:2,borderColor:'#0d1420'}]
+},options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}}}});
+
+// BB trend
+const trendMonths=bbTrend.map(x=>{const[y,m]=x.m.split('-');return['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+m]+" '"+y.slice(2)});
+new Chart(document.getElementById('bbTrendChart'),{type:'line',data:{
+  labels:trendMonths,
+  datasets:[
+    {label:'Facility Size',data:bbTrend.map(x=>x.facility),borderColor:'#556a8a',borderDash:[6,4],borderWidth:1.5,pointRadius:0,fill:false},
+    {label:'Borrowing Base',data:bbTrend.map(x=>x.bb),borderColor:C.tl,backgroundColor:C.tl+'18',borderWidth:2.5,pointRadius:5,pointBackgroundColor:C.tl,fill:true,tension:.3}
+  ]
+},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.2)'}},y:{ticks:{color:'#556a8a',callback:v=>fmt(v)},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// ===== VINTAGE TAB =====
+const vKeys=Object.keys(vintageData).sort();
+const vColors=[C.rd,C.co,C.am,C.ac,C.bl,C.tl,C.gn,C.pk,'#a78bfa'];
+const vLeg=document.getElementById('vintLeg');
+const vDS=vKeys.map((k,i)=>{
+  const v=vintageData[k];const col=vColors[i%vColors.length];
+  vLeg.innerHTML+='<span><span class="dt" style="background:'+col+'"></span>'+k+' ('+v.loans+')</span>';
+  return{label:k,data:v.lossRate,borderColor:col,backgroundColor:col+'15',borderWidth:2,pointRadius:3,pointBackgroundColor:col,tension:.3,fill:false};
+});
+
+new Chart(document.getElementById('vintChart'),{type:'line',data:{
+  labels:Array.from({length:13},(_,i)=>'M'+i),
+  datasets:vDS
+},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:'Months on book',color:'#556a8a',font:{size:11}},ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.2)'}},y:{title:{display:true,text:'Cumulative loss rate %',color:'#556a8a',font:{size:11}},ticks:{color:'#556a8a',callback:v=>v+'%'},grid:{color:'rgba(30,45,74,.2)'}}}}});
+
+// Vintage volume bar
+new Chart(document.getElementById('vintVolChart'),{type:'bar',data:{
+  labels:vKeys,
+  datasets:[
+    {label:'Origination $',data:vKeys.map(k=>vintageData[k].origVol),backgroundColor:C.ac+'88',borderRadius:4},
+    {label:'Loans',data:vKeys.map(k=>vintageData[k].loans),type:'line',borderColor:C.tl,pointBackgroundColor:C.tl,pointRadius:5,borderWidth:2,yAxisID:'y1'}
+  ]
+},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#556a8a',maxRotation:45,font:{size:10}},grid:{color:'rgba(30,45,74,.3)'}},y:{ticks:{color:'#556a8a',callback:v=>fmt(v)},grid:{color:'rgba(30,45,74,.25)'}},y1:{position:'right',grid:{drawOnChartArea:false},ticks:{color:'#556a8a'}}}}});
+
+// XIRR by Vintage bar chart (replaces old collectability)
+const xirrLabels=Object.keys(xirrData).sort();
+const xirrValues=xirrLabels.map(k=>xirrData[k].xirr);
+new Chart(document.getElementById('collectChart'),{type:'bar',data:{
+  labels:xirrLabels,
+  datasets:[
+    {label:'XIRR %',data:xirrValues,backgroundColor:xirrValues.map(v=>v>=6?C.gn+'bb':v>=3?C.am+'bb':C.rd+'bb'),borderRadius:4},
+    {label:'6% target',data:xirrLabels.map(()=>6),type:'line',borderColor:C.tl,borderDash:[4,4],borderWidth:1.5,pointRadius:0}
+  ]
+},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#556a8a',maxRotation:45,font:{size:10}},grid:{color:'rgba(30,45,74,.3)'}},y:{min:0,max:12,ticks:{color:'#556a8a',callback:v=>v+'%'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// XIRR & Collectability Table
+const xirrBody=document.getElementById('xirrBody');
+xirrLabels.forEach((k,i)=>{
+  const x=xirrData[k];const v=vintageData[k];
+  const xirrColor=x.xirr>=6?C.gn:x.xirr>=3?C.am:C.rd;
+  const cp=x.cumCollPct;
+  xirrBody.innerHTML+='<tr style="animation:fi .3s ease-out '+(i*.04)+'s both">'
+    +'<td style="font-family:JetBrains Mono;font-size:11px;font-weight:600">'+k+'</td>'
+    +'<td>'+fmt(v.origVol)+'</td>'
+    +'<td style="color:'+xirrColor+';font-weight:700;font-size:14px">'+x.xirr.toFixed(2)+'%</td>'
+    +'<td style="font-weight:600;font-family:JetBrains Mono">'+x.multiple.toFixed(2)+'x</td>'
+    +'<td>'+x.poOrigRatio.toFixed(2)+'</td>'
+    +'<td>'+x.avgTerm.toFixed(1)+' mo</td>'
+    +'<td>'+(cp[0]!==undefined?cp[0]+'%':'-')+'</td>'
+    +'<td>'+(cp[2]!==undefined?cp[2]+'%':'-')+'</td>'
+    +'<td>'+(cp[5]!==undefined?cp[5]+'%':'-')+'</td>'
+    +'<td>'+(cp[8]!==undefined?cp[8]+'%':'-')+'</td>'
+    +'<td>'+(cp[11]!==undefined?cp[11]+'%':'-')+'</td>'
+    +'</tr>';
+});
+
+// Portfolio Overview Metrics
+const portM=document.getElementById('portMetrics');
+[
+  {l:'PO/Origination Ratio',v:'0.57 - 0.68',s:'Range across vintages',c:C.ac},
+  {l:'Collection/Orig Multiple',v:'1.70 - 1.95x',s:'Mature vintage range',c:C.tl},
+  {l:'BB/PO Ratio',v:'0.11',s:'$15.5M BB / $139M PO',c:C.bl},
+  {l:'Avg Weighted Term',v:'12.16 mo',s:'Across active portfolio',c:C.am}
+].forEach((m,i)=>{
+  portM.innerHTML+='<div style="background:var(--bg);border-radius:8px;padding:14px 16px"><div style="font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px">'+m.l+'</div><div style="font-size:20px;font-weight:700;font-family:JetBrains Mono;color:'+m.c+';margin-top:4px">'+m.v+'</div><div style="font-size:10px;color:var(--t3);margin-top:3px">'+m.s+'</div></div>';
+});
+
+// ===== FPD & RECOVERIES =====
+const fpdMonths=fpdData.map(x=>{const[y,m]=x.m.split('-');return['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+m]+" '"+y.slice(2)});
+
+new Chart(document.getElementById('fpdChart'),{type:'bar',data:{
+  labels:fpdMonths,
+  datasets:[
+    {label:'FPD Count',data:fpdData.map(x=>x.fpdCount),backgroundColor:C.rd+'aa',borderRadius:4,yAxisID:'y'},
+    {label:'FPD Rate %',data:fpdData.map(x=>x.fpdRate),type:'line',borderColor:C.am,pointBackgroundColor:C.am,pointRadius:5,borderWidth:2,yAxisID:'y1'}
+  ]
+},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#556a8a',maxRotation:45,font:{size:10}},grid:{color:'rgba(30,45,74,.3)'}},y:{title:{display:true,text:'Count',color:'#556a8a',font:{size:10}},ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.25)'}},y1:{position:'right',title:{display:true,text:'Rate %',color:'#556a8a',font:{size:10}},grid:{drawOnChartArea:false},ticks:{color:'#556a8a',callback:v=>v+'%'}}}}});
+
+// Recovery rate post-90 DPD by vintage (% of PO recovered)
+const recovVintages=Object.keys(recoveryMetrics).sort();
+const recovRates=recovVintages.map(k=>recoveryMetrics[k].recovPct);
+new Chart(document.getElementById('recovChart'),{type:'bar',data:{
+  labels:recovVintages,
+  datasets:[
+    {label:'Recovery % of PO',data:recovRates,backgroundColor:recovRates.map(v=>v>=11?C.gn+'bb':v>=10?C.tl+'bb':C.bl+'bb'),borderRadius:5},
+    {label:'10% target',data:recovVintages.map(()=>10),type:'line',borderColor:C.am,borderDash:[4,4],borderWidth:1.5,pointRadius:0}
+  ]
+},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#8899b4',maxRotation:45,font:{size:10}},grid:{color:'rgba(30,45,74,.3)'}},y:{min:0,max:16,ticks:{color:'#556a8a',callback:v=>v+'%'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// FPD metrics
+const fpdM=document.getElementById('fpdMets');
+const totalFPDs=fpdData.reduce((s,d)=>s+d.fpdCount,0);
+[
+  {l:'FPD Rate Range',v:'7-16%',s:'By count, early vintages higher'},
+  {l:'Total FPDs (LTD)',v:fmtN(totalFPDs),s:'Of '+fmtN(totalLoans)+' active loans'},
+  {l:'Avg Recovery (post-90)',v:'9-13%',s:'% of PO recovered post-default'},
+  {l:'PO at 90 DPD',v:'60-72%',s:'Of origination amount'}
+].forEach((m,i)=>{
+  fpdM.innerHTML+='<div class="m su" style="animation-delay:'+(i*.08)+'s"><div class="lb">'+m.l+'</div><div class="vl">'+m.v+'</div><div class="s2">'+m.s+'</div></div>';
+});
+
+// Recovery timing curves
+const rKeys=Object.keys(recoveryCurves);
+const rColors=[C.rd,C.co,C.am,C.ac,C.bl];
+new Chart(document.getElementById('recovTimingChart'),{type:'line',data:{
+  labels:Array.from({length:13},(_,i)=>'M'+i),
+  datasets:rKeys.map((k,i)=>({
+    label:k,data:recoveryCurves[k],borderColor:rColors[i],pointBackgroundColor:rColors[i],pointRadius:4,borderWidth:2,tension:.3,fill:false
+  }))
+},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{title:{display:true,text:'Months since 90+ DPD',color:'#556a8a',font:{size:11}},ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.2)'}},y:{title:{display:true,text:'% of PO Recovered',color:'#556a8a',font:{size:11}},min:0,max:16,ticks:{color:'#556a8a',callback:v=>v+'%'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// Recovery by Vintage bar chart
+const rbvLabels=Object.keys(recoveryMetrics).sort();
+new Chart(document.getElementById('recovByVintChart'),{type:'bar',data:{
+  labels:rbvLabels,
+  datasets:[
+    {label:'PO at 90 DPD (% of orig)',data:rbvLabels.map(k=>recoveryMetrics[k].poAt90Pct),backgroundColor:C.bl+'88',borderRadius:4},
+    {label:'Recovered (% of PO)',data:rbvLabels.map(k=>recoveryMetrics[k].recovPct),backgroundColor:C.gn+'bb',borderRadius:4}
+  ]
+},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#556a8a',maxRotation:45,font:{size:10}},grid:{color:'rgba(30,45,74,.3)'}},y:{ticks:{color:'#556a8a',callback:v=>v+'%'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// ===== DOCUMENTS TAB =====
+const docM=document.getElementById('docMets');
+[
+  {l:'Docs Parsed',v:fmtN(docData.parsed)+' / '+fmtN(docData.total),s:pct(docData.parsedPct)+' coverage'},
+  {l:'Verified',v:fmtN(docData.verified),s:pct(docData.verifiedPct)+' of total'},
+  {l:'Flagged',v:fmtN(docData.flagged),s:pct(docData.flaggedPct)+' require review'},
+  {l:'Avg Field Match',v:'98.8%',s:'Across 6 key fields'}
+].forEach((m,i)=>{
+  docM.innerHTML+='<div class="m su" style="animation-delay:'+(i*.07)+'s"><div class="lb">'+m.l+'</div><div class="vl">'+m.v+'</div><div class="s2">'+m.s+'</div></div>';
+});
+
+// Doc coverage donut
+new Chart(document.getElementById('docDonut'),{type:'doughnut',data:{
+  labels:['Verified','Parsed (unverified)','Flagged','Not parsed'],
+  datasets:[{data:[docData.verified,docData.parsed-docData.verified-docData.flagged,docData.flagged,docData.total-docData.parsed],backgroundColor:[C.tl+'cc',C.bl+'cc',C.rd+'cc','#334155'],borderWidth:2,borderColor:'#0d1420'}]
+},options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}}}});
+
+// Field match rates
+new Chart(document.getElementById('fieldChart'),{type:'bar',data:{
+  labels:docData.fields.map(f=>f.name),
+  datasets:[{label:'Match Rate %',data:docData.fields.map(f=>f.matchRate),backgroundColor:docData.fields.map(f=>f.matchRate>=99?C.tl+'aa':f.matchRate>=98?C.gn+'aa':C.am+'aa'),borderRadius:5}]
+},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{min:96,max:100,ticks:{color:'#556a8a',callback:v=>v+'%'},grid:{color:'rgba(30,45,74,.25)'}},y:{ticks:{color:'#8899b4',font:{size:11}},grid:{color:'rgba(30,45,74,.3)'}}}}});
+
+// Flagged documents table
+const fBody=document.getElementById('flaggedBody');
+flaggedDocs.forEach((d,i)=>{
+  const sc=d.severity==='High'?'pl-r':d.severity==='Medium'?'pl-y':'pl-g';
+  fBody.innerHTML+='<tr style="animation:fi .3s ease-out '+(i*.03)+'s both"><td style="font-family:JetBrains Mono;font-size:11px">'+d.lid+'</td><td>'+d.dt+'</td><td>'+d.field+'</td><td style="font-family:JetBrains Mono;font-size:11px">'+d.expected+'</td><td style="font-family:JetBrains Mono;font-size:11px">'+d.parsed+'</td><td>'+d.variance+'</td><td><span class="pl '+sc+'">'+d.severity+'</span></td></tr>';
+});
+
+// ===== LOAN EXPLORER =====
+let sk='diff',sd=-1,searchTerm='';
+let filterStatus='all',filterDpd='all',filterDoc='all';
+
+function matchDpdRL(dpd,bucket){
+  if(bucket==='all')return true;
+  if(bucket==='0')return dpd===0;
+  if(bucket==='1-30')return dpd>=1&&dpd<=30;
+  if(bucket==='31-60')return dpd>=31&&dpd<=60;
+  if(bucket==='61-90')return dpd>=61&&dpd<=90;
+  if(bucket==='91+')return dpd>=91;
+  return true;
+}
+
+function matchStatusRL(dpd,val){
+  if(val==='all')return true;
+  if(val==='current')return dpd===0;
+  if(val==='delinquent')return dpd>0&&dpd<=90;
+  if(val==='default')return dpd>90;
+  return true;
+}
+
+function renderLoans(){
+  let ls=[...loans];
+  if(searchTerm){const st=searchTerm.toLowerCase();ls=ls.filter(l=>l.id.toLowerCase().includes(st)||l.state.toLowerCase().includes(st)||l.vintage.includes(st)||l.docStatus.toLowerCase().includes(st))}
+  if(filterStatus!=='all')ls=ls.filter(l=>matchStatusRL(l.servicerDpd,filterStatus));
+  if(filterDpd!=='all')ls=ls.filter(l=>matchDpdRL(l.servicerDpd,filterDpd));
+  if(filterDoc!=='all')ls=ls.filter(l=>l.docStatus===filterDoc);
+  ls.sort((a,b)=>{const av=typeof a[sk]==='string'?a[sk]:a[sk];const bv=typeof b[sk]==='string'?b[sk]:b[sk];if(typeof av==='string')return sd*av.localeCompare(bv);return sd*(av-bv)});
+  const cols=[
+    {k:'id',l:'Loan ID',w:110},{k:'origAmt',l:'Orig Amt',w:80},{k:'outstanding',l:'Outstanding',w:80},
+    {k:'servicerDpd',l:'Svc DPD',w:65},{k:'mcpDpd',l:'MCP DPD',w:65},{k:'diff',l:'DPD Diff',w:70},
+    {k:'factor',l:'Factor',w:60},{k:'rawBB',l:'BB Contrib',w:80},{k:'state',l:'State',w:50},
+    {k:'vintage',l:'Vintage',w:70},{k:'docStatus',l:'Doc Status',w:80}
+  ];
+  document.getElementById('lHead').innerHTML='<tr>'+cols.map(c=>'<th style="width:'+c.w+'px" data-k="'+c.k+'">'+c.l+(sk===c.k?(sd<0?' &#8595;':' &#8593;'):'')+'</th>').join('')+'</tr>';
+  document.getElementById('lHead').querySelectorAll('th').forEach(th=>{th.onclick=()=>{const k=th.dataset.k;if(sk===k)sd*=-1;else{sk=k;sd=-1}renderLoans()}});
+  const maxDpd=Math.max(...loans.map(l=>Math.max(l.servicerDpd,l.mcpDpd)),1);
+  document.getElementById('lBody').innerHTML=ls.map((l,i)=>{
+    const hasMismatch=Math.abs(l.diff)>5;
+    const dc=l.mcpDpd>90?C.rd:l.mcpDpd>30?C.co:l.mcpDpd>10?C.am:l.mcpDpd>0?C.bl:C.tl;
+    const diffC=Math.abs(l.diff)>10?C.rd:Math.abs(l.diff)>5?C.am:Math.abs(l.diff)>2?C.bl:C.tl;
+    const docC=l.docStatus==='Verified'?'pl-g':l.docStatus==='Parsed'?'pl-b':'pl-r';
+    return'<tr style="animation:fi .3s ease-out '+Math.min(i*.02,.6)+'s both'+(hasMismatch?';background:rgba(248,113,113,.03)':'')+'">'
+    +'<td style="font-family:JetBrains Mono;font-size:11px">'+l.id+'</td>'
+    +'<td>$'+fmtN(l.origAmt)+'</td>'
+    +'<td>$'+fmtN(l.outstanding)+'</td>'
+    +'<td>'+l.servicerDpd+'</td>'
+    +'<td style="color:'+dc+';font-weight:600">'+l.mcpDpd+'</td>'
+    +'<td style="color:'+diffC+';font-weight:600">'+(l.diff>0?'+':'')+l.diff+'</td>'
+    +'<td style="font-family:JetBrains Mono;font-size:11px">'+l.factor+'</td>'
+    +'<td>$'+fmtN(l.rawBB)+'</td>'
+    +'<td>'+l.state+'</td>'
+    +'<td style="font-size:11px">'+l.vintage+'</td>'
+    +'<td><span class="pl '+docC+'">'+l.docStatus+'</span></td></tr>';
+  }).join('');
+}
+renderLoans();
+
+// Filter button logic
+document.querySelectorAll('.fbtn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const grp=btn.dataset.filter;
+    document.querySelectorAll('.fbtn[data-filter="'+grp+'"]').forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');
+    if(grp==='status')filterStatus=btn.dataset.val;
+    if(grp==='dpd')filterDpd=btn.dataset.val;
+    if(grp==='doc')filterDoc=btn.dataset.val;
+    renderLoans();
+  });
+});
+document.getElementById('loanSearch').addEventListener('input',e=>{searchTerm=e.target.value;renderLoans()});
+
+// ===== THEME TOGGLE =====
+const themeBtn=document.getElementById('themeToggle');
+themeBtn.addEventListener('click',()=>{
+  const current=document.documentElement.getAttribute('data-theme');
+  const next=current==='light'?'dark':'light';
+  document.documentElement.setAttribute('data-theme',next);
+  themeBtn.innerHTML=next==='light'?'&#9789;':'&#9788;';
+  const gridC=next==='light'?'rgba(0,0,0,.08)':'rgba(30,45,74,.25)';
+  const tickC=next==='light'?'#475569':'#556a8a';
+  const legC=next==='light'?'#475569':'#8899b4';
+  Object.values(Chart.instances).forEach(ch=>{
+    if(!ch.options||!ch.options.scales)return;
+    Object.values(ch.options.scales).forEach(s=>{if(s.grid)s.grid.color=gridC;if(s.ticks)s.ticks.color=tickC;if(s.pointLabels)s.pointLabels.color=legC;});
+    if(ch.options.plugins&&ch.options.plugins.legend&&ch.options.plugins.legend.labels)ch.options.plugins.legend.labels.color=legC;
+    ch.update('none');
+  });
+});
+</script></body></html>

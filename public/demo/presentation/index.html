@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redirecting…</title>
+  <!--
+    Auth guard for the investor presentation.
+
+    If a user navigates directly to /demo/presentation/ without going through
+    the password gate at /demo/, they are redirected back to the gate.
+
+    The actual presentation file is investor_presentation.html in this same
+    directory — it is loaded only after the gate sets sessionStorage.
+  -->
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #050a15;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <p>Redirecting&hellip;</p>
+  <script>
+    // If the user hasn't authenticated through the password gate, send them back.
+    if (sessionStorage.getItem('demo-auth') !== 'true') {
+      window.location.replace('../');
+    } else {
+      // Authenticated — send to the main presentation
+      window.location.replace('investor_presentation.html');
+    }
+  </script>
+</body>
+</html>

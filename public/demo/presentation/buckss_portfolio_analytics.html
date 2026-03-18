@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Buckss Consumer Microloans | Portfolio Analytics</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#06090f;--c1:#0d1420;--c2:#131c2e;--c3:#1a2540;--brd:#1e2d4a;--t1:#e8edf5;--t2:#8899b4;--t3:#556a8a;--ac:#818cf8;--tl:#2dd4bf;--am:#fbbf24;--co:#fb923c;--rd:#f87171;--gn:#4ade80;--bl:#60a5fa;--pk:#f472b6;--r:10px}
+body{background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;overflow-x:hidden}
+.w{max-width:1440px;margin:0 auto;padding:20px 28px}
+h1{font-size:26px;font-weight:700;letter-spacing:-.4px}
+.hdr{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:4px;padding-bottom:16px;border-bottom:1px solid var(--brd)}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:600}
+.tabs{display:flex;gap:4px;margin:16px 0;flex-wrap:wrap}
+.tab{padding:7px 16px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--brd);color:var(--t3);background:transparent;transition:all .2s;font-family:inherit}
+.tab:hover{border-color:var(--ac);color:var(--t1)}.tab.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.g{display:grid;gap:14px;margin-bottom:20px}
+.g6{grid-template-columns:repeat(6,1fr)}.g5{grid-template-columns:repeat(5,1fr)}.g4{grid-template-columns:repeat(4,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:1000px){.g5,.g4,.g6{grid-template-columns:repeat(2,1fr)}}
+.m{background:var(--c1);border:1px solid var(--brd);border-radius:var(--r);padding:16px 18px;position:relative;overflow:hidden;transition:transform .2s,border-color .3s}
+.m:hover{transform:translateY(-1px);border-color:var(--ac)}
+.m .lb{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px}
+.m .vl{font-size:24px;font-weight:700;font-family:'JetBrains Mono',monospace;letter-spacing:-.5px}
+.m .s2{font-size:11px;color:var(--t3);margin-top:3px}
+.cd{background:var(--c1);border:1px solid var(--brd);border-radius:var(--r);padding:18px 22px}
+.cd h3{font-size:14px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.ch{position:relative;width:100%;height:280px}
+.lg{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:10px;font-size:11px;color:var(--t2)}
+.lg span{display:flex;align-items:center;gap:4px}
+.dt{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+.pr{height:8px;border-radius:4px;background:var(--brd);overflow:hidden;margin:4px 0}
+.pf{height:100%;border-radius:4px;transition:width 1.2s cubic-bezier(.22,1,.36,1)}
+.sec{display:none}.sec.on{display:block}
+.sb{display:flex;height:28px;border-radius:6px;overflow:hidden;margin:6px 0}
+.sg{display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:600;transition:all .3s;cursor:pointer;min-width:2px}
+.sg:hover{filter:brightness(1.25)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:8px 6px;border-bottom:1px solid var(--brd);color:var(--t3);font-weight:500;font-size:11px;cursor:pointer;white-space:nowrap}
+td{padding:8px 6px;border-bottom:1px solid rgba(30,45,74,.4);white-space:nowrap}
+tr:hover td{background:rgba(129,140,248,.03)}
+.pl{display:inline-block;padding:2px 9px;border-radius:16px;font-size:10px;font-weight:600}
+.pl-g{background:rgba(45,212,191,.1);color:var(--tl)}.pl-r{background:rgba(248,113,113,.1);color:var(--rd)}.pl-y{background:rgba(251,191,36,.1);color:var(--am)}.pl-b{background:rgba(96,165,250,.1);color:var(--bl)}
+.dp{height:5px;border-radius:3px;background:var(--brd);overflow:hidden;width:50px;display:inline-block;vertical-align:middle;margin-right:5px}
+.dpf{height:100%;border-radius:3px}
+@keyframes su{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fi{from{opacity:0}to{opacity:1}}
+.su{animation:su .5s ease-out both}.fi{animation:fi .6s ease-out both}
+.pulse{animation:pulse 2.5s infinite}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.glow{position:absolute;top:-1px;left:0;right:0;height:2px;border-radius:2px;opacity:0;transition:opacity .3s}
+.m:hover .glow{opacity:1}
+.gauge-wrap{display:flex;flex-direction:column;align-items:center;gap:8px}
+.gauge-svg{width:180px;height:100px}
+.rag{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600}
+.rag-g{background:rgba(74,222,128,.1);color:var(--gn)}.rag-a{background:rgba(251,191,36,.1);color:var(--am)}.rag-r{background:rgba(248,113,113,.1);color:var(--rd)}
+.kpi-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.kpi-scroll table{min-width:1200px}
+.kpi-scroll th,.kpi-scroll td{text-align:center;padding:6px 10px;font-size:11px}
+.kpi-scroll th:first-child,.kpi-scroll td:first-child{text-align:left;position:sticky;left:0;background:var(--c1);z-index:2;min-width:180px}
+.covenant-card{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:var(--c1);border:1px solid var(--brd);border-radius:var(--r);margin-bottom:10px;transition:border-color .3s}
+.covenant-card:hover{border-color:var(--ac)}
+.wf-bar{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.wf-bar-fill{height:30px;border-radius:6px;display:flex;align-items:center;justify-content:flex-end;padding:0 8px;font-size:11px;font-weight:600;color:#fff;transition:width 1s ease}
+[data-theme="light"]{--bg:#f8fafc;--c1:#ffffff;--c2:#f1f5f9;--c3:#e2e8f0;--brd:#e2e8f0;--t1:#0f172a;--t2:#475569;--t3:#94a3b8}
+[data-theme="light"] .sg{color:#fff}
+[data-theme="light"] tr:hover td{background:rgba(129,140,248,.06)}
+[data-theme="light"] .kpi-scroll th:first-child,[data-theme="light"] .kpi-scroll td:first-child{background:var(--c1)}
+.fbtn{padding:4px 12px;border-radius:16px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--brd);color:var(--t3);background:transparent;transition:all .2s;font-family:inherit}
+.fbtn:hover{border-color:var(--ac);color:var(--t1)}
+.fbtn.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.theme-btn{padding:4px 10px;border-radius:8px;font-size:14px;cursor:pointer;border:1px solid var(--brd);background:var(--c1);transition:all .2s;line-height:1}
+.theme-btn:hover{border-color:var(--ac)}
+</style></head><body>
+<div class="w">
+<div class="hdr">
+<div><h1 style="background:linear-gradient(135deg,#818cf8,#2dd4bf);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Consumer Microloan Analytics</h1><p style="color:var(--t3);font-size:12px;margin-top:3px">Employment-Based Personal Loans &middot; As of March 17, 2026 &middot; Buckss Facility</p></div>
+<div style="display:flex;align-items:center;gap:12px"><div class="badge" style="background:rgba(45,212,191,.12);color:#2dd4bf"><span class="pulse" style="width:8px;height:8px;border-radius:50%;background:#2dd4bf"></span>Healthy &middot; 0.2% NPR</div><button class="theme-btn" id="themeToggle" title="Toggle theme">&#9728;&#65039;</button></div>
+</div>
+<div class="tabs" id="tabs">
+<button class="tab on" data-v="overview">Overview</button>
+<button class="tab" data-v="kpi">KPI Tracker</button>
+<button class="tab" data-v="delinquency">Delinquency</button>
+<button class="tab" data-v="bb">Borrowing Base</button>
+<button class="tab" data-v="channels">Acquisition Channels</button>
+<button class="tab" data-v="covenants">Covenant Monitoring</button>
+<button class="tab" data-v="trends">Historic Trends</button>
+<button class="tab" data-v="loans">Loan Explorer</button>
+</div>
+
+<!-- OVERVIEW -->
+<div id="overview" class="sec on">
+<div class="g g5" id="oMets"></div>
+<div class="g g2">
+<div class="cd"><h3><span class="dt" style="background:var(--ac)"></span>DPD Distribution</h3><div class="sb" id="oDpdBar"></div><div class="lg" id="oDpdLeg"></div><div class="ch"><canvas id="oDpdChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--tl)"></span>Facility Utilization</h3>
+<div class="gauge-wrap"><svg class="gauge-svg" viewBox="0 0 200 110" id="utilGauge"></svg><div style="font-size:11px;color:var(--t3)">VOR $385K of $5.0M facility</div></div>
+<div style="margin-top:16px"><div style="font-size:12px;color:var(--t2);margin-bottom:6px">NPR Ratio vs 20% Covenant</div><div class="pr" style="height:12px"><div class="pf" style="background:var(--gn);width:1%"></div></div><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--t3);margin-top:2px"><span>Current: 0.2%</span><span>Max: 20%</span></div></div>
+</div>
+</div>
+<div class="g g2" style="margin-top:14px">
+<div class="cd"><h3><span class="dt" style="background:var(--gn)"></span>Weekly Originations</h3><div class="ch"><canvas id="oOrigChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--am)"></span>Portfolio Composition</h3>
+<div style="display:flex;gap:30px;align-items:center;height:100%">
+<div style="flex:1"><canvas id="oCompChart" style="max-height:240px"></canvas></div>
+<div style="flex:1;font-size:12px;color:var(--t2)">
+<div style="margin-bottom:12px"><div style="font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.6px">Active / Past Due</div><div style="font-size:22px;font-weight:700;font-family:JetBrains Mono;color:var(--ac)">525</div></div>
+<div style="margin-bottom:12px"><div style="font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.6px">Paid in Full</div><div style="font-size:22px;font-weight:700;font-family:JetBrains Mono;color:var(--tl)">334</div></div>
+<div><div style="font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.6px">Avg Loan Size</div><div style="font-size:22px;font-weight:700;font-family:JetBrains Mono;color:var(--am)">$1,000</div></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- KPI TRACKER -->
+<div id="kpi" class="sec">
+<div class="cd" style="margin-bottom:14px"><h3><span class="dt" style="background:var(--ac)"></span>Weekly KPI Tracker &mdash; Returning Customers</h3>
+<div class="kpi-scroll"><table id="kpiRetTable"></table></div></div>
+<div class="cd" style="margin-bottom:14px"><h3><span class="dt" style="background:var(--tl)"></span>Weekly KPI Tracker &mdash; New Customer Acquisition</h3>
+<div class="kpi-scroll"><table id="kpiNewTable"></table></div></div>
+<div class="g g2" style="margin-top:14px">
+<div class="cd"><h3>Returning Customer Originations ($)</h3><div class="ch"><canvas id="kpiOrigChart"></canvas></div></div>
+<div class="cd"><h3>Return Rate & Retention Rate</h3><div class="ch"><canvas id="kpiRateChart"></canvas></div></div>
+</div>
+</div>
+
+<!-- DELINQUENCY -->
+<div id="delinquency" class="sec">
+<div class="g g5" id="dMets"></div>
+<div class="g g2">
+<div class="cd"><h3><span class="dt" style="background:var(--am)"></span>DPD Bucket Distribution (Loan Count)</h3><div class="ch"><canvas id="dBucketChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--rd)"></span>5 DPD Methods Comparison</h3><div class="ch"><canvas id="dMethodChart"></canvas></div></div>
+</div>
+<div class="g g2" style="margin-top:14px">
+<div class="cd"><h3><span class="dt" style="background:var(--tl)"></span>BB Factor by DPD (Linear Decline 0-30)</h3><div class="ch"><canvas id="dFactorChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--bl)"></span>DPD Trend (12 Weeks)</h3><div class="ch"><canvas id="dTrendChart"></canvas></div></div>
+</div>
+</div>
+
+<!-- BORROWING BASE -->
+<div id="bb" class="sec">
+<div class="g g4" id="bbMets"></div>
+<div class="g g2">
+<div class="cd"><h3><span class="dt" style="background:var(--ac)"></span>Borrowing Base Waterfall</h3><div id="bbWaterfall"></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--tl)"></span>BB Factor Distribution</h3><div class="ch"><canvas id="bbFactorChart"></canvas></div></div>
+</div>
+<div class="g g2" style="margin-top:14px">
+<div class="cd"><h3><span class="dt" style="background:var(--am)"></span>Concentration Analysis</h3>
+<div style="margin-bottom:14px"><div style="font-size:12px;color:var(--t2);margin-bottom:6px">New Borrower % (vs 50% limit)</div><div class="pr" style="height:14px"><div class="pf" style="background:var(--gn);width:38%"></div></div><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--t3);margin-top:2px"><span>Current: 38%</span><span>Max: 50%</span></div></div>
+<div class="ch" style="height:220px"><canvas id="bbConcChart"></canvas></div>
+</div>
+<div class="cd"><h3><span class="dt" style="background:var(--gn)"></span>BB Trend (Weekly)</h3><div class="ch"><canvas id="bbTrendChart"></canvas></div></div>
+</div>
+</div>
+
+<!-- ACQUISITION CHANNELS -->
+<div id="channels" class="sec">
+<div class="cd" style="margin-bottom:14px"><h3><span class="dt" style="background:var(--ac)"></span>Lead Channel Performance (Cumulative)</h3>
+<div style="overflow-x:auto"><table id="channelTable"></table></div></div>
+<div class="cd" style="margin-bottom:14px"><h3><span class="dt" style="background:var(--tl)"></span>Weekly Conversion Rate by Channel</h3>
+<div style="overflow-x:auto;max-height:420px"><table id="channelWeeklyConvTable"></table></div></div>
+<div class="cd" style="margin-bottom:14px"><h3><span class="dt" style="background:var(--bl)"></span>Leads Purchased by Channel (Weekly)</h3>
+<div style="overflow-x:auto;max-height:420px"><table id="channelWeeklyLeadsTable"></table></div></div>
+<div class="cd" style="margin-bottom:14px"><h3><span class="dt" style="background:var(--gn)"></span>Blended Cumulative Conversion Rate Trend</h3><div class="ch" style="height:260px"><canvas id="chBlendedConvChart"></canvas></div></div>
+<div class="g g2">
+<div class="cd"><h3><span class="dt" style="background:var(--tl)"></span>Returning vs New Customer Split</h3>
+<div style="display:flex;gap:20px;align-items:center"><div style="flex:1"><canvas id="chSplitChart" style="max-height:240px"></canvas></div>
+<div style="flex:1"><canvas id="chSplitTrend" style="max-height:240px"></canvas></div></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--am)"></span>Weekly Origination (Stacked)</h3><div class="ch"><canvas id="chOrigChart"></canvas></div></div>
+</div>
+<div class="cd" style="margin-top:14px"><h3><span class="dt" style="background:var(--co)"></span>Channel Conversion Funnel</h3><div class="ch" style="height:300px"><canvas id="chFunnelChart"></canvas></div></div>
+</div>
+
+<!-- COVENANT MONITORING -->
+<div id="covenants" class="sec">
+<div class="g g3" id="covGauges"></div>
+<div id="covCards"></div>
+</div>
+
+<!-- HISTORIC TRENDS -->
+<div id="trends" class="sec">
+<div class="g g2">
+<div class="cd"><h3><span class="dt" style="background:var(--ac)"></span>Weekly Origination Volume</h3><div class="ch"><canvas id="tOrigChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--tl)"></span>Cumulative Portfolio Growth</h3><div class="ch"><canvas id="tCumChart"></canvas></div></div>
+</div>
+<div class="g g2" style="margin-top:14px">
+<div class="cd"><h3><span class="dt" style="background:var(--gn)"></span>Borrowing Base Trajectory</h3><div class="ch"><canvas id="tBBChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--am)"></span>DPD Migration (Weekly Bucket Flow)</h3><div class="ch"><canvas id="tMigChart"></canvas></div></div>
+</div>
+<div class="cd" style="margin-top:14px"><h3><span class="dt" style="background:var(--bl)"></span>Payoff Tracking (Loans Maturing per Week)</h3><div class="ch"><canvas id="tPayoffChart"></canvas></div></div>
+</div>
+
+<!-- LOAN EXPLORER -->
+<div id="loans" class="sec">
+<div class="cd">
+<div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap">
+  <input type="text" id="loanSearch" placeholder="Search loans..." style="padding:6px 12px;border-radius:8px;border:1px solid var(--brd);background:var(--c1);color:var(--t1);font-family:inherit;font-size:12px;width:200px;outline:none" />
+  <span style="font-size:11px;color:var(--t3)">Status:</span>
+  <button class="fbtn" data-fg="status" data-fv="Active">Active</button>
+  <button class="fbtn" data-fg="status" data-fv="Paid in Full">Paid in Full</button>
+  <button class="fbtn" data-fg="status" data-fv="Past Due">Past Due</button>
+  <span style="font-size:11px;color:var(--t3);margin-left:4px">Type:</span>
+  <button class="fbtn" data-fg="custType" data-fv="Returning">Returning</button>
+  <button class="fbtn" data-fg="custType" data-fv="New">New</button>
+  <span style="font-size:11px;color:var(--t3);margin-left:4px">DPD:</span>
+  <button class="fbtn" data-fg="dpd" data-fv="0">Current</button>
+  <button class="fbtn" data-fg="dpd" data-fv="1-14">1-14</button>
+  <button class="fbtn" data-fg="dpd" data-fv="15-29">15-29</button>
+  <button class="fbtn" data-fg="dpd" data-fv="30-59">30-59</button>
+  <button class="fbtn" data-fg="dpd" data-fv="60+">60+</button>
+  <span style="color:var(--t3);font-size:11px;margin-left:8px" id="loanCount"></span>
+</div>
+<div style="overflow-x:auto"><table><thead id="lHead"></thead><tbody id="lBody"></tbody></table></div>
+</div>
+<div id="lDetail"></div>
+</div>
+</div>
+
+<script>
+// ===== CONSTANTS & UTILS =====
+const C={ac:'#818cf8',tl:'#2dd4bf',am:'#fbbf24',co:'#fb923c',rd:'#f87171',gn:'#4ade80',bl:'#60a5fa',pk:'#f472b6'};
+const DPD_C=[C.tl,C.bl,C.am,C.co,C.rd];
+const fmt=n=>{if(n==null)return'-';if(Math.abs(n)>=1e6)return'$'+(n/1e6).toFixed(1)+'M';if(Math.abs(n)>=1e3)return'$'+(n/1e3).toFixed(1)+'K';return'$'+Math.round(n)};
+const fmtN=n=>n==null?'-':n.toLocaleString();
+const pct=n=>n==null?'-':Math.round(n)+'%';
+const chartDef={responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect',padding:10}}},scales:{x:{ticks:{color:'#556a8a',font:{size:10},autoSkip:false,maxRotation:45},grid:{color:'rgba(30,45,74,.3)'}},y:{ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.25)'}}}};
+function mkChart(id,type,labels,datasets,opts={}){
+const o=JSON.parse(JSON.stringify(chartDef));
+if(opts.yFmt)o.scales.y.ticks.callback=opts.yFmt==='$'?v=>fmt(v):v=>v+'%';
+if(opts.stacked){o.scales.x.stacked=true;o.scales.y.stacked=true}
+if(opts.noLegend)o.plugins.legend={display:false};
+if(opts.yMax)o.scales.y.max=opts.yMax;
+if(opts.yMin!==undefined)o.scales.y.min=opts.yMin;
+if(opts.extra)Object.assign(o,opts.extra);
+return new Chart(document.getElementById(id),{type,data:{labels,datasets},options:o});
+}
+
+// ===== TAB NAVIGATION =====
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+document.querySelectorAll('.sec').forEach(x=>x.classList.remove('on'));
+t.classList.add('on');document.getElementById(t.dataset.v).classList.add('on');
+}));
+
+// ===== DATA =====
+const KPI_WEEKS=['Wk1\nNov 30','Wk2\nDec 7','Wk3\nDec 14','Wk4\nDec 21','Wk5\nDec 28','Wk6\nJan 4','Wk7\nJan 11','Wk8\nJan 18','Wk9\nJan 25','Wk10\nFeb 1','Wk11\nFeb 8','Wk12\nFeb 15','Wk13\nFeb 22','Wk14\nMar 1','Wk15\nMar 8'];
+const KPI_WK_SHORT=['Nov 30','Dec 7','Dec 14','Dec 21','Dec 28','Jan 4','Jan 11','Jan 18','Jan 25','Feb 1','Feb 8','Feb 15','Feb 22','Mar 1','Mar 8'];
+
+const kpiRet={
+origAmt:[17200,22500,31000,18700,24300,35800,41200,28900,52300,48700,62100,55400,71200,78400,66800],
+origCnt:[18,24,32,19,25,37,42,30,54,50,64,57,73,81,69],
+returnRate:[52,58,65,55,62,72,78,68,85,82,92,88,100,98,95],
+retentionRate:[33,38,45,37,42,52,58,48,65,62,72,68,82,85,100],
+lossRate:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+};
+const kpiNew={
+onlineOrig:[0,1,2,0,1,3,2,4,3,5,4,6,3,5,4],
+directOrig:[3,5,8,4,7,12,15,9,18,14,21,17,19,16,14],
+leadsPurchased:[45,62,78,50,72,95,110,82,130,105,148,120,135,112,98],
+convRate:[2.2,1.6,2.6,2.0,1.4,3.2,1.8,4.9,2.3,4.8,2.7,5.0,2.2,4.5,4.1]
+};
+
+const DPD_DIST={current:{pct:86.0,cnt:739},d1_14:{pct:5.0,cnt:43},d15_29:{pct:5.9,cnt:51},d30_59:{pct:2.8,cnt:24},d60p:{pct:0.2,cnt:2}};
+const DPD_LABELS=['Current','1-14d','15-29d','30-59d','60+'];
+const DPD_CNTS=[739,43,51,24,2];
+const DPD_PCTS=[86.0,5.0,5.9,2.8,0.2];
+
+const WEEKS_16=['Nov 2','Nov 9','Nov 16','Nov 23','Nov 30','Dec 7','Dec 14','Dec 21','Dec 28','Jan 4','Jan 11','Jan 18','Jan 25','Feb 1','Feb 8','Feb 15','Feb 22','Mar 1','Mar 8','Mar 15'];
+
+// Weekly origination data
+const weeklyOrig={
+returning:[8,12,15,14,18,24,32,19,25,37,42,30,54,50,64,57,73,81,69],
+newOnline:[0,0,1,0,0,1,2,0,1,3,2,4,3,5,4,6,3,5,4],
+newDirect:[2,3,4,3,3,5,8,4,7,12,15,9,18,14,21,17,19,16,14]
+};
+
+// Channel data
+const CHANNELS=[
+{name:'DOT818',leads:420,funded:14,cost:8400,costPerLead:20},
+{name:'Leads Market',leads:380,funded:12,cost:5700,costPerLead:15},
+{name:'ZeroParallel',leads:310,funded:11,cost:7750,costPerLead:25},
+{name:'PingTree',leads:285,funded:9,cost:5130,costPerLead:18},
+{name:'LeadPoint',leads:195,funded:7,cost:4290,costPerLead:22},
+{name:'Direct/Organic',leads:0,funded:134,cost:0,costPerLead:0},
+{name:'Returning',leads:0,funded:448,cost:0,costPerLead:0}
+];
+
+const CHANNEL_WEEKLY = {
+  weeks: ['Nov 30','Dec 7','Dec 14','Dec 21','Dec 28','Jan 4','Jan 11','Jan 18','Jan 25','Feb 1','Feb 8','Feb 15','Feb 22','Mar 1','Mar 8'],
+  channels: {
+    'DOT818':      { leads: [28,32,25,30,35,28,31,29,33,27,30,32,28,34,31], funded: [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1] },
+    'Leads Market': { leads: [25,28,22,27,30,25,28,26,30,24,27,29,25,31,28], funded: [1,1,1,1,1,1,1,1,1,0,1,1,1,1,1] },
+    'ZeroParallel': { leads: [20,23,18,22,25,20,23,21,24,19,22,24,20,26,23], funded: [1,1,0,1,1,1,0,1,1,1,1,0,1,1,1] },
+    'PingTree':     { leads: [18,21,16,20,23,18,21,19,22,17,20,22,18,24,21], funded: [0,1,1,0,1,1,1,0,1,1,0,1,1,0,1] },
+    'LeadPoint':    { leads: [12,14,11,13,16,12,14,13,15,11,14,15,12,17,14], funded: [0,1,0,0,1,0,1,0,0,1,0,1,0,1,0] }
+  }
+};
+
+// BB Weekly
+const BB_WEEKLY=[42000,58000,72000,85000,94000,108000,119000,128000,142000,155000,168000,174000,182000,190000,198000,203000,205000,207000,208150,210809];
+
+// Loan explorer data - 50 sample rows
+function genLoans(){
+const statuses=['Active','Past Due','Paid in Full'];
+const custTypes=['New','Returning'];
+const loans=[];
+for(let i=0;i<50;i++){
+const isActive=i<34;const isPaid=i>=34;
+const funded=800+Math.round(Math.random()*400);
+const dpd=isPaid?0:i<26?0:i<30?Math.round(Math.random()*14):i<33?15+Math.round(Math.random()*14):30+Math.round(Math.random()*29);
+const peakDpd=Math.max(dpd,Math.round(Math.random()*dpd*1.3));
+const bbFactor=dpd>=30?0:dpd>=1?Math.max(0,((30-dpd)/30)).toFixed(2):1.00;
+const vor=funded*(isPaid?0:(1-Math.random()*0.3));
+const bbContrib=vor*parseFloat(bbFactor);
+const orig=new Date(2025,9+Math.floor(Math.random()*5),1+Math.floor(Math.random()*28));
+const mat=new Date(orig);mat.setMonth(mat.getMonth()+5+Math.round(Math.random()));
+const status=isPaid?'Paid in Full':dpd>0?'Past Due':'Active';
+loans.push({
+id:'BK-'+String(10001+i),
+status,
+funded:funded,
+vor:Math.round(vor),
+dpd,
+peakDpd,
+bbFactor:parseFloat(bbFactor),
+bbContrib:Math.round(bbContrib),
+npr:dpd>=60?'Y':'N',
+orig:orig.toISOString().slice(0,10),
+mat:mat.toISOString().slice(0,10),
+custType:custTypes[Math.random()>0.38?1:0],
+payments:isPaid?'5/5':Math.floor(Math.random()*4)+'/5'
+});
+}
+return loans;
+}
+const LOANS=genLoans();
+// Scale loan BB to match real total
+const realBB=210809;
+const rawBBSum=LOANS.reduce((s,l)=>s+l.bbContrib,0);
+if(rawBBSum>0){const sc=realBB/rawBBSum;LOANS.forEach(l=>{l.bbContrib=Math.round(l.bbContrib*sc)})}
+
+// ===== OVERVIEW TAB =====
+const oMets=document.getElementById('oMets');
+[{l:'Active Loans',v:'859',s:'525 Active + 334 Paid'},{l:'Total VOR',v:'$384.6K',s:'Avg $1,000 funded'},{l:'Borrowing Base',v:'$210.8K',s:'60% advance rate'},{l:'NPR (60+ DPD)',v:'0.2%',s:'2 non-performing'},{l:'Facility',v:'$5M',s:'$20M max capacity'}
+].forEach((m,i)=>{
+const d=document.createElement('div');d.className='m su';d.style.animationDelay=(i*.07)+'s';
+d.innerHTML='<div class="glow" style="background:linear-gradient(90deg,'+C.ac+','+C.tl+')"></div><div class="lb">'+m.l+'</div><div class="vl">'+m.v+'</div><div class="s2">'+m.s+'</div>';
+oMets.appendChild(d);
+});
+
+// DPD stacked bar
+const oDpdBar=document.getElementById('oDpdBar');
+const oDpdLeg=document.getElementById('oDpdLeg');
+DPD_PCTS.forEach((p,i)=>{
+if(p>0){const s=document.createElement('div');s.className='sg';s.style.width=p+'%';s.style.background=DPD_C[i];s.title=DPD_LABELS[i]+': '+p+'%';if(p>4)s.textContent=p+'%';oDpdBar.appendChild(s)}
+oDpdLeg.innerHTML+='<span><span class="dt" style="background:'+DPD_C[i]+'"></span>'+DPD_LABELS[i]+' ('+DPD_CNTS[i]+')</span>';
+});
+
+new Chart(document.getElementById('oDpdChart'),{type:'doughnut',data:{labels:DPD_LABELS,datasets:[{data:DPD_PCTS,backgroundColor:DPD_C,borderWidth:2,borderColor:'#0d1420'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{display:false}}}});
+
+// Facility gauge
+(function(){
+const svg=document.getElementById('utilGauge');
+const pctUsed=7.7;
+const ang=Math.PI;
+const cx=100,cy=100,r=80;
+let path='';
+const steps=50;
+for(let i=0;i<=steps;i++){const a=Math.PI+i/steps*Math.PI;const x=cx+r*Math.cos(a);const y=cy+r*Math.sin(a);path+=(i===0?'M':'L')+x.toFixed(1)+','+y.toFixed(1)}
+svg.innerHTML='<path d="'+path+'" fill="none" stroke="#1e2d4a" stroke-width="14" stroke-linecap="round"/>';
+const filledSteps=Math.round(steps*pctUsed/100);
+let fpath='';
+for(let i=0;i<=filledSteps;i++){const a=Math.PI+i/steps*Math.PI;const x=cx+r*Math.cos(a);const y=cy+r*Math.sin(a);fpath+=(i===0?'M':'L')+x.toFixed(1)+','+y.toFixed(1)}
+svg.innerHTML+='<path d="'+fpath+'" fill="none" stroke="'+C.tl+'" stroke-width="14" stroke-linecap="round"/>';
+svg.innerHTML+='<text x="100" y="85" text-anchor="middle" fill="'+C.tl+'" font-family="JetBrains Mono" font-size="22" font-weight="700">7.7%</text>';
+svg.innerHTML+='<text x="100" y="102" text-anchor="middle" fill="#556a8a" font-family="DM Sans" font-size="11">utilized</text>';
+})();
+
+// Weekly originations chart
+mkChart('oOrigChart','bar',WEEKS_16.slice(-15),[
+{label:'Returning',data:weeklyOrig.returning.slice(-15),backgroundColor:C.ac+'88',borderRadius:4,stack:'s'},
+{label:'New Online',data:weeklyOrig.newOnline.slice(-15),backgroundColor:C.tl+'88',borderRadius:4,stack:'s'},
+{label:'New Direct',data:weeklyOrig.newDirect.slice(-15),backgroundColor:C.am+'88',borderRadius:4,stack:'s'}
+],{stacked:true});
+
+// Composition donut
+new Chart(document.getElementById('oCompChart'),{type:'doughnut',data:{labels:['Active','Past Due','Paid in Full'],datasets:[{data:[525,0,334],backgroundColor:[C.ac,C.am,C.tl],borderWidth:2,borderColor:'#0d1420'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}}}});
+
+// ===== KPI TRACKER TAB =====
+(function(){
+// Returning table
+const rt=document.getElementById('kpiRetTable');
+let h='<thead><tr><th>Metric</th>'+KPI_WK_SHORT.map(w=>'<th>'+w+'</th>').join('')+'</tr></thead>';
+const rows=[
+{name:'Originations ($)',data:kpiRet.origAmt,fmt:v=>fmt(v)},
+{name:'Origination Count',data:kpiRet.origCnt,fmt:v=>v},
+{name:'Return Rate',data:kpiRet.returnRate,fmt:v=>v+'%'},
+{name:'Retention Rate',data:kpiRet.retentionRate,fmt:v=>v+'%'},
+{name:'Loss Rate',data:kpiRet.lossRate,fmt:v=>v+'%'}
+];
+let b='<tbody>';
+rows.forEach(r=>{
+b+='<tr><td style="font-weight:600;color:var(--t2)">'+r.name+'</td>';
+r.data.forEach((v,i)=>{
+const prev=i>0?r.data[i-1]:v;
+const col=v>prev?C.gn:v<prev?C.rd:'var(--t1)';
+b+='<td style="font-family:JetBrains Mono;color:'+col+'">'+r.fmt(v)+'</td>';
+});
+b+='</tr>';
+});
+b+='</tbody>';
+rt.innerHTML=h+b;
+
+// New customer table
+const nt=document.getElementById('kpiNewTable');
+h='<thead><tr><th>Metric</th>'+KPI_WK_SHORT.map(w=>'<th>'+w+'</th>').join('')+'</tr></thead>';
+const nrows=[
+{name:'Online Originations',data:kpiNew.onlineOrig,fmt:v=>v},
+{name:'Direct Originations',data:kpiNew.directOrig,fmt:v=>v},
+{name:'Leads Purchased',data:kpiNew.leadsPurchased,fmt:v=>v},
+{name:'Conversion Rate',data:kpiNew.convRate,fmt:v=>v+'%'}
+];
+b='<tbody>';
+nrows.forEach(r=>{
+b+='<tr><td style="font-weight:600;color:var(--t2)">'+r.name+'</td>';
+r.data.forEach((v,i)=>{
+const prev=i>0?r.data[i-1]:v;
+const col=v>prev?C.gn:v<prev?C.rd:'var(--t1)';
+b+='<td style="font-family:JetBrains Mono;color:'+col+'">'+r.fmt(v)+'</td>';
+});
+b+='</tr>';
+});
+b+='</tbody>';
+nt.innerHTML=h+b;
+})();
+
+mkChart('kpiOrigChart','bar',KPI_WK_SHORT,[
+{label:'Origination $',data:kpiRet.origAmt,backgroundColor:C.ac+'88',borderRadius:4}
+],{yFmt:'$'});
+
+mkChart('kpiRateChart','line',KPI_WK_SHORT,[
+{label:'Return Rate',data:kpiRet.returnRate,borderColor:C.ac,backgroundColor:C.ac+'22',fill:true,pointRadius:4,pointBackgroundColor:C.ac,borderWidth:2,tension:.3},
+{label:'Retention Rate',data:kpiRet.retentionRate,borderColor:C.tl,backgroundColor:C.tl+'22',fill:true,pointRadius:4,pointBackgroundColor:C.tl,borderWidth:2,tension:.3}
+],{yFmt:'%',yMax:110,yMin:0});
+
+// ===== DELINQUENCY TAB =====
+const dMets=document.getElementById('dMets');
+[{l:'Current',v:'739',s:'86.0%'},{l:'1-14 DPD',v:'43',s:'5.0%'},{l:'15-29 DPD',v:'51',s:'5.9% (delinquent)'},{l:'30-59 DPD',v:'24',s:'2.8% (default)'},{l:'60+ DPD (NPR)',v:'2',s:'0.2% non-performing'}
+].forEach((m,i)=>{
+const d=document.createElement('div');d.className='m su';d.style.animationDelay=(i*.07)+'s';
+d.innerHTML='<div class="glow" style="background:linear-gradient(90deg,'+DPD_C[i]+','+DPD_C[Math.min(i+1,4)]+')"></div><div class="lb">'+m.l+'</div><div class="vl" style="color:'+DPD_C[i]+'">'+m.v+'</div><div class="s2">'+m.s+'</div>';
+dMets.appendChild(d);
+});
+
+mkChart('dBucketChart','bar',DPD_LABELS,[
+{label:'Loan Count',data:DPD_CNTS,backgroundColor:DPD_C.map(c=>c+'aa'),borderRadius:6}
+],{noLegend:true});
+
+// 5 DPD methods
+const methods=['Cumul. Scheduled','Principal','Principal-Adj','Peak','Daily Accrual'];
+const methodData=[[86.7,6.4,5.2,1.7,0],[87.2,5.9,5.1,1.8,0],[86.7,6.4,5.2,1.7,0],[84.1,7.8,5.9,2.2,0],[87.5,6.1,4.8,1.6,0]];
+mkChart('dMethodChart','bar',DPD_LABELS,[
+{label:methods[0],data:methodData[0],backgroundColor:C.ac+'88',borderRadius:3},
+{label:methods[1],data:methodData[1],backgroundColor:C.tl+'88',borderRadius:3},
+{label:methods[2],data:methodData[2],backgroundColor:C.am+'88',borderRadius:3},
+{label:methods[3],data:methodData[3],backgroundColor:C.co+'88',borderRadius:3},
+{label:methods[4],data:methodData[4],backgroundColor:C.bl+'88',borderRadius:3}
+],{yFmt:'%'});
+
+// BB Factor chart
+const factorDPD=Array.from({length:61},(_, i)=>i);
+const factorVals=factorDPD.map(d=>d<=0?1:d>=30?0:Math.max(0,((30-d)/30)));
+mkChart('dFactorChart','line',factorDPD.filter((_,i)=>i%5===0||i===30||i===60).map(d=>d+' DPD'),[
+{label:'BB Factor',data:factorDPD.filter((_,i)=>i%5===0||i===30||i===60).map(d=>d<=0?100:d>=30?0:Math.round((30-d)/30*100)),borderColor:C.tl,backgroundColor:C.tl+'22',fill:true,pointRadius:4,pointBackgroundColor:C.tl,borderWidth:2,tension:0}
+],{yFmt:'%',yMax:110,yMin:0});
+
+// DPD Trend 12 weeks
+const dpdTrendWeeks=WEEKS_16.slice(-12);
+const dpdTrendCurrent=[90.2,89.8,89.1,88.5,88.0,87.8,87.5,87.2,87.0,86.9,86.8,86.7];
+const dpdTrend1_14=[5.1,5.4,5.6,5.8,6.0,6.1,6.2,6.3,6.3,6.4,6.4,6.4];
+const dpdTrend15_29=[3.8,3.9,4.2,4.5,4.7,4.8,5.0,5.1,5.1,5.2,5.2,5.2];
+const dpdTrend30_59=[0.9,0.9,1.1,1.2,1.3,1.3,1.3,1.4,1.6,1.5,1.6,1.7];
+mkChart('dTrendChart','line',dpdTrendWeeks,[
+{label:'Current',data:dpdTrendCurrent,borderColor:C.tl,borderWidth:2,pointRadius:3,pointBackgroundColor:C.tl,tension:.3},
+{label:'1-14d',data:dpdTrend1_14,borderColor:C.bl,borderWidth:2,pointRadius:3,pointBackgroundColor:C.bl,tension:.3},
+{label:'15-29d',data:dpdTrend15_29,borderColor:C.am,borderWidth:2,pointRadius:3,pointBackgroundColor:C.am,tension:.3},
+{label:'30-59d',data:dpdTrend30_59,borderColor:C.co,borderWidth:2,pointRadius:3,pointBackgroundColor:C.co,tension:.3}
+],{yFmt:'%'});
+
+// ===== BORROWING BASE TAB =====
+const bbM=document.getElementById('bbMets');
+[{l:'Gross VOR',v:'$384.6K',s:'859 total loans'},{l:'Eligible VOR',v:'$369.3K',s:'After exclusions'},{l:'Borrowing Base',v:'$210.8K',s:'60% advance rate'},{l:'Advance Rate',v:'60%',s:'Fixed rate'}
+].forEach((m,i)=>{
+const d=document.createElement('div');d.className='m su';d.style.animationDelay=(i*.07)+'s';
+d.innerHTML='<div class="glow" style="background:linear-gradient(90deg,'+C.ac+','+C.tl+')"></div><div class="lb">'+m.l+'</div><div class="vl">'+m.v+'</div><div class="s2">'+m.s+'</div>';
+bbM.appendChild(d);
+});
+
+// BB Waterfall
+const bbWf=document.getElementById('bbWaterfall');
+const wfSteps=[
+{l:'Gross VOR',v:384631,c:C.bl},
+{l:'Non-Performing Exclusions (60+ DPD)',v:-2000,c:C.rd,neg:true},
+{l:'Zero-Factor Exclusions (30+ DPD)',v:-24000,c:C.rd,neg:true},
+{l:'Concentration Haircuts',v:0,c:C.co,neg:true},
+{l:'Eligible VOR',v:358631,c:C.ac},
+{l:'Apply 60% Advance Rate',v:-147822,c:C.am,neg:true},
+{l:'Borrowing Base',v:210809,c:C.tl}
+];
+const maxWf=384631;
+wfSteps.forEach((item,i)=>{
+const w=Math.abs(item.v)/maxWf*100;
+bbWf.innerHTML+='<div class="su" style="margin-bottom:10px;animation-delay:'+(i*.1)+'s"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:12px;color:var(--t2)">'+item.l+'</span><span style="font-size:13px;font-weight:600;font-family:JetBrains Mono;color:'+(item.neg?C.rd:item.c)+'">'+fmt(Math.abs(item.v))+(item.neg?' (-)':'')+'</span></div><div class="pr"><div class="pf" style="background:'+item.c+';width:'+w+'%"></div></div></div>';
+});
+
+// BB Factor distribution
+const bbFactorBuckets=['100%','90-99%','80-89%','70-79%','60-69%','50-59%','40-49%','30-39%','20-29%','10-19%','0%'];
+const bbFactorCounts=[443,8,7,6,5,4,3,2,2,1,8];
+mkChart('bbFactorChart','bar',bbFactorBuckets,[
+{label:'Loan Count',data:bbFactorCounts,backgroundColor:bbFactorBuckets.map((_,i)=>{const colors=[C.tl,C.tl,C.bl,C.bl,C.am,C.am,C.co,C.co,C.rd,C.rd,C.rd];return colors[i]+'aa'}),borderRadius:4}
+],{noLegend:true});
+
+// Concentration chart
+mkChart('bbConcChart','doughnut',['Employment-Salaried','Employment-Hourly','Self-Employed','Gig/Contract'],[
+{data:[58,24,12,6],backgroundColor:[C.ac+'aa',C.tl+'aa',C.am+'aa',C.co+'aa'],borderWidth:2,borderColor:'#0d1420'}
+],{extra:{scales:{}}});
+
+// BB Trend
+mkChart('bbTrendChart','line',WEEKS_16,[
+{label:'Borrowing Base',data:BB_WEEKLY,borderColor:C.tl,backgroundColor:C.tl+'22',fill:true,pointRadius:3,pointBackgroundColor:C.tl,borderWidth:2,tension:.3}
+],{yFmt:'$'});
+
+// ===== ACQUISITION CHANNELS TAB =====
+(function(){
+// Derive cumulative totals from CHANNEL_WEEKLY
+const chNames=Object.keys(CHANNEL_WEEKLY.channels);
+const cumChannels=chNames.map(name=>{
+  const ch=CHANNEL_WEEKLY.channels[name];
+  const totalLeads=ch.leads.reduce((a,b)=>a+b,0);
+  const totalFunded=ch.funded.reduce((a,b)=>a+b,0);
+  const orig=CHANNELS.find(c=>c.name===name);
+  return {name,leads:totalLeads,funded:totalFunded,cost:orig?orig.cost:0,costPerLead:orig?orig.costPerLead:0};
+});
+// Add Direct/Organic and Returning rows from original CHANNELS
+CHANNELS.filter(c=>c.leads===0).forEach(c=>cumChannels.push(c));
+
+const ct=document.getElementById('channelTable');
+let h='<thead><tr><th>Channel</th><th>Leads Purchased</th><th>Funded Loans</th><th>Conversion %</th><th>Cost per Funded</th><th>Total Cost</th><th>Visual</th></tr></thead>';
+let b='<tbody>';
+cumChannels.forEach(ch=>{
+const isLead=ch.leads>0;
+const conv=isLead?(ch.funded/ch.leads*100).toFixed(1)+'%':'<span style="color:var(--t3)">Direct</span>';
+const cpf=isLead&&ch.funded>0?'$'+Math.round(ch.cost/ch.funded):'<span style="color:var(--t3)">\u2014</span>';
+const leadsDisp=isLead?fmtN(ch.leads):'<span style="color:var(--t3)">\u2014</span>';
+const costDisp=isLead?fmt(ch.cost):'<span style="color:var(--t3)">\u2014</span>';
+b+='<tr><td style="font-weight:600">'+ch.name+'</td><td style="font-family:JetBrains Mono">'+leadsDisp+'</td><td style="font-family:JetBrains Mono;color:'+C.tl+'">'+ch.funded+'</td><td style="font-family:JetBrains Mono;color:'+C.ac+'">'+conv+'</td><td style="font-family:JetBrains Mono">'+cpf+'</td><td style="font-family:JetBrains Mono">'+costDisp+'</td><td><div class="pr" style="width:80px"><div class="pf" style="background:'+C.ac+';width:'+Math.min(100,ch.funded/5)+'%"></div></div></td></tr>';
+});
+b+='</tbody>';
+ct.innerHTML=h+b;
+
+// Weekly Conversion Rate table
+const convT=document.getElementById('channelWeeklyConvTable');
+let ch2='<thead style="position:sticky;top:0;z-index:1"><tr><th style="min-width:80px">Week Ending</th>';
+chNames.forEach(n=>{ch2+='<th style="min-width:90px">'+n+'</th>'});
+ch2+='<th style="min-width:90px">Cumulative</th></tr></thead><tbody>';
+CHANNEL_WEEKLY.weeks.forEach((wk,wi)=>{
+  ch2+='<tr><td style="font-weight:600;font-size:12px">'+wk+'</td>';
+  let wkLeads=0,wkFunded=0;
+  chNames.forEach(n=>{
+    const d=CHANNEL_WEEKLY.channels[n];
+    const l=d.leads[wi],f=d.funded[wi];
+    wkLeads+=l;wkFunded+=f;
+    const rate=l>0?(f/l*100):0;
+    const color=rate>4?C.gn:rate>=2?C.am:'var(--t3)';
+    ch2+='<td style="font-family:JetBrains Mono;font-size:12px;color:'+color+'">'+rate.toFixed(1)+'%</td>';
+  });
+  const cumRate=wkLeads>0?(wkFunded/wkLeads*100):0;
+  const cumColor=cumRate>4?C.gn:cumRate>=2?C.am:'var(--t3)';
+  ch2+='<td style="font-family:JetBrains Mono;font-size:12px;font-weight:600;color:'+cumColor+'">'+cumRate.toFixed(1)+'%</td></tr>';
+});
+ch2+='</tbody>';
+convT.innerHTML=ch2;
+
+// Leads Purchased by Channel weekly table
+const leadsT=document.getElementById('channelWeeklyLeadsTable');
+let lh='<thead style="position:sticky;top:0;z-index:1"><tr><th style="min-width:80px">Week Ending</th>';
+chNames.forEach(n=>{lh+='<th style="min-width:90px">'+n+'</th>'});
+lh+='<th style="min-width:80px">Total</th></tr></thead><tbody>';
+CHANNEL_WEEKLY.weeks.forEach((wk,wi)=>{
+  lh+='<tr><td style="font-weight:600;font-size:12px">'+wk+'</td>';
+  let wkTotal=0;
+  chNames.forEach(n=>{
+    const l=CHANNEL_WEEKLY.channels[n].leads[wi];
+    wkTotal+=l;
+    lh+='<td style="font-family:JetBrains Mono;font-size:12px">'+l+'</td>';
+  });
+  lh+='<td style="font-family:JetBrains Mono;font-size:12px;font-weight:600">'+wkTotal+'</td></tr>';
+});
+lh+='</tbody>';
+leadsT.innerHTML=lh;
+
+// Blended cumulative conversion rate trend chart
+const blendedRates=CHANNEL_WEEKLY.weeks.map((_,wi)=>{
+  let tl=0,tf=0;
+  chNames.forEach(n=>{
+    const d=CHANNEL_WEEKLY.channels[n];
+    for(let j=0;j<=wi;j++){tl+=d.leads[j];tf+=d.funded[j]}
+  });
+  return tl>0?(tf/tl*100):0;
+});
+mkChart('chBlendedConvChart','line',CHANNEL_WEEKLY.weeks,[
+  {label:'Blended Conversion %',data:blendedRates,borderColor:C.tl,backgroundColor:C.tl+'22',fill:true,pointRadius:4,pointBackgroundColor:C.tl,borderWidth:2,tension:.3}
+],{yFmt:'%'});
+})();
+
+// Split donut
+new Chart(document.getElementById('chSplitChart'),{type:'doughnut',data:{labels:['Returning','New Online','New Direct'],datasets:[{data:[448,43,134],backgroundColor:[C.ac+'cc',C.tl+'cc',C.am+'cc'],borderWidth:2,borderColor:'#0d1420'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}}}});
+
+// Split trend
+mkChart('chSplitTrend','line',KPI_WK_SHORT,[
+{label:'Returning',data:kpiRet.origCnt,borderColor:C.ac,borderWidth:2,pointRadius:3,pointBackgroundColor:C.ac,tension:.3},
+{label:'New Online',data:kpiNew.onlineOrig,borderColor:C.tl,borderWidth:2,pointRadius:3,pointBackgroundColor:C.tl,tension:.3},
+{label:'New Direct',data:kpiNew.directOrig,borderColor:C.am,borderWidth:2,pointRadius:3,pointBackgroundColor:C.am,tension:.3}
+]);
+
+// Stacked originations
+mkChart('chOrigChart','bar',KPI_WK_SHORT,[
+{label:'Returning',data:kpiRet.origCnt,backgroundColor:C.ac+'88',borderRadius:3,stack:'s'},
+{label:'New Online',data:kpiNew.onlineOrig,backgroundColor:C.tl+'88',borderRadius:3,stack:'s'},
+{label:'New Direct',data:kpiNew.directOrig,backgroundColor:C.am+'88',borderRadius:3,stack:'s'}
+],{stacked:true});
+
+// Channel funnel
+const funnelChannels=CHANNELS.filter(c=>c.leads>0);
+mkChart('chFunnelChart','bar',funnelChannels.map(c=>c.name),[
+{label:'Leads Purchased',data:funnelChannels.map(c=>c.leads),backgroundColor:C.bl+'77',borderRadius:4},
+{label:'Funded',data:funnelChannels.map(c=>c.funded),backgroundColor:C.tl+'cc',borderRadius:4}
+]);
+
+// ===== COVENANT MONITORING TAB =====
+(function(){
+const gaugeArea=document.getElementById('covGauges');
+function makeSemiGauge(label,current,max,unit,color,status){
+const pct=Math.min(100,current/max*100);
+const cx=100,cy=100,r=75;
+const steps=50;
+let bgPath='',fgPath='';
+for(let i=0;i<=steps;i++){const a=Math.PI+i/steps*Math.PI;const x=cx+r*Math.cos(a);const y=cy+r*Math.sin(a);bgPath+=(i===0?'M':'L')+x.toFixed(1)+','+y.toFixed(1)}
+const filledSteps=Math.round(steps*pct/100);
+for(let i=0;i<=filledSteps;i++){const a=Math.PI+i/steps*Math.PI;const x=cx+r*Math.cos(a);const y=cy+r*Math.sin(a);fgPath+=(i===0?'M':'L')+x.toFixed(1)+','+y.toFixed(1)}
+return '<div class="cd su"><h3>'+label+'</h3><div class="gauge-wrap"><svg viewBox="0 0 200 115" style="width:180px;height:105px"><path d="'+bgPath+'" fill="none" stroke="#1e2d4a" stroke-width="12" stroke-linecap="round"/><path d="'+fgPath+'" fill="none" stroke="'+color+'" stroke-width="12" stroke-linecap="round"/><text x="100" y="82" text-anchor="middle" fill="'+color+'" font-family="JetBrains Mono" font-size="20" font-weight="700">'+current+unit+'</text><text x="100" y="100" text-anchor="middle" fill="#556a8a" font-family="DM Sans" font-size="11">of '+max+unit+' '+((label.includes('Min')||label.includes('Coverage'))?'min':'max')+'</text></svg></div><div style="text-align:center;margin-top:4px"><span class="rag rag-'+status+'">'+{g:'PASS',a:'WATCH',r:'BREACH'}[status]+'</span></div></div>';
+}
+gaugeArea.innerHTML=
+makeSemiGauge('NPR Ratio',0.2,20,'%',C.gn,'g')+
+makeSemiGauge('Debt-to-Equity',1.2,3.0,'x',C.gn,'g')+
+makeSemiGauge('Fixed Charge Coverage',1.4,1.0,'x',C.gn,'g');
+
+const covCards=document.getElementById('covCards');
+const covenants=[
+{name:'Non-Performing Rate (NPR)',current:'0.2%',limit:'20% max',status:'g',detail:'2 loans 60+ DPD out of 525 active'},
+{name:'Liquidity Requirement',current:'$340K',limit:'$300K min',status:'g',detail:'Cash + undrawn facility'},
+{name:'Tangible Net Capital Assets (TNCA)',current:'$850K',limit:'$700K initial target',status:'g',detail:'Above initial covenant threshold'},
+{name:'Debt-to-Equity Ratio',current:'1.2:1',limit:'3.0:1 max',status:'g',detail:'Conservative leverage, well within limits'},
+{name:'Fixed Charge Coverage',current:'1.4:1',limit:'1.0:1 min',status:'g',detail:'Sufficient cash flow to cover fixed charges'},
+{name:'Facility Utilization',current:'$385K',limit:'$5M initial / $20M max',status:'g',detail:'Early ramp phase, 7.7% of initial facility used'},
+{name:'New Borrower Concentration',current:'38%',limit:'50% max',status:'g',detail:'Returning customer base growing steadily'},
+{name:'Advance Rate',current:'60%',limit:'60% fixed',status:'g',detail:'Standard advance rate per facility agreement'}
+];
+let html='<div style="margin-top:14px">';
+covenants.forEach((cov,i)=>{
+html+='<div class="covenant-card su" style="animation-delay:'+(i*.06)+'s"><div style="flex:1"><div style="font-size:14px;font-weight:600">'+cov.name+'</div><div style="font-size:11px;color:var(--t3);margin-top:2px">'+cov.detail+'</div></div><div style="display:flex;align-items:center;gap:16px"><div style="text-align:right"><div style="font-size:16px;font-weight:700;font-family:JetBrains Mono;color:'+(cov.status==='g'?C.gn:cov.status==='a'?C.am:C.rd)+'">'+cov.current+'</div><div style="font-size:11px;color:var(--t3)">'+cov.limit+'</div></div><span class="rag rag-'+cov.status+'">'+{g:'PASS',a:'WATCH',r:'BREACH'}[cov.status]+'</span></div></div>';
+});
+html+='</div>';
+covCards.innerHTML=html;
+})();
+
+// ===== HISTORIC TRENDS TAB =====
+// Weekly origination volume
+const weeklyOrigAmt=[8200,12400,16500,15200,17200,22500,31000,18700,24300,35800,41200,28900,52300,48700,62100,55400,71200,78400,66800];
+mkChart('tOrigChart','bar',WEEKS_16,[
+{label:'Origination Volume ($)',data:weeklyOrigAmt,backgroundColor:C.ac+'88',borderRadius:4}
+],{yFmt:'$'});
+
+// Cumulative growth
+let cum=0;
+const cumData=weeklyOrigAmt.map(v=>{cum+=v;return cum});
+mkChart('tCumChart','line',WEEKS_16,[
+{label:'Cumulative Originations',data:cumData,borderColor:C.tl,backgroundColor:C.tl+'22',fill:true,pointRadius:3,pointBackgroundColor:C.tl,borderWidth:2,tension:.3}
+],{yFmt:'$'});
+
+// BB trajectory
+mkChart('tBBChart','line',WEEKS_16,[
+{label:'Borrowing Base',data:BB_WEEKLY,borderColor:C.gn,backgroundColor:C.gn+'22',fill:true,pointRadius:3,pointBackgroundColor:C.gn,borderWidth:2,tension:.3},
+{label:'VOR',data:BB_WEEKLY.map(v=>Math.round(v/0.558)),borderColor:C.ac,borderWidth:2,pointRadius:3,pointBackgroundColor:C.ac,tension:.3,borderDash:[4,4]}
+],{yFmt:'$'});
+
+// DPD Migration
+mkChart('tMigChart','bar',WEEKS_16.slice(-12),[
+{label:'Current',data:dpdTrendCurrent.map(v=>v),backgroundColor:C.tl+'88',borderRadius:2,stack:'s'},
+{label:'1-14d',data:dpdTrend1_14,backgroundColor:C.bl+'88',borderRadius:2,stack:'s'},
+{label:'15-29d',data:dpdTrend15_29,backgroundColor:C.am+'88',borderRadius:2,stack:'s'},
+{label:'30-59d',data:dpdTrend30_59,backgroundColor:C.co+'88',borderRadius:2,stack:'s'}
+],{stacked:true,yFmt:'%'});
+
+// Payoff tracking
+const payoffs=[12,18,22,15,20,28,35,24,38,32,45,40,52,48,55,50,58,62,56];
+mkChart('tPayoffChart','bar',WEEKS_16,[
+{label:'Loans Paid Off',data:payoffs,backgroundColor:C.tl+'88',borderRadius:4}
+]);
+
+// ===== LOAN EXPLORER TAB =====
+let sk='id',sd=1;
+const activeFilters={status:null,custType:null,dpd:null};
+
+document.querySelectorAll('.fbtn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const grp=btn.dataset.fg,val=btn.dataset.fv;
+    if(activeFilters[grp]===val){activeFilters[grp]=null;btn.classList.remove('on')}
+    else{document.querySelectorAll('.fbtn[data-fg="'+grp+'"]').forEach(b=>b.classList.remove('on'));activeFilters[grp]=val;btn.classList.add('on')}
+    renderLoans();
+  });
+});
+
+function filterLoans(){
+  let ls=[...LOANS];
+  const st=(document.getElementById('loanSearch').value||'').toLowerCase();
+  if(st) ls=ls.filter(l=>l.id.toLowerCase().includes(st)||l.status.toLowerCase().includes(st)||l.custType.toLowerCase().includes(st)||l.orig.includes(st)||l.mat.includes(st));
+  if(activeFilters.status) ls=ls.filter(l=>l.status===activeFilters.status);
+  if(activeFilters.custType) ls=ls.filter(l=>l.custType===activeFilters.custType);
+  if(activeFilters.dpd){
+    const d=activeFilters.dpd;
+    if(d==='0') ls=ls.filter(l=>l.dpd===0);
+    else if(d==='1-14') ls=ls.filter(l=>l.dpd>=1&&l.dpd<=14);
+    else if(d==='15-29') ls=ls.filter(l=>l.dpd>=15&&l.dpd<=29);
+    else if(d==='30-59') ls=ls.filter(l=>l.dpd>=30&&l.dpd<=59);
+    else if(d==='60+') ls=ls.filter(l=>l.dpd>=60);
+  }
+  return ls;
+}
+
+function renderLoans(){
+const filtered=filterLoans();
+document.getElementById('loanCount').textContent=filtered.length+' of '+LOANS.length+' loans';
+let ls=filtered.sort((a,b)=>{
+const av=a[sk],bv=b[sk];
+if(typeof av==='string')return sd*(av.localeCompare(bv));
+return sd*(av-bv);
+});
+const cols=[
+{k:'id',l:'Loan ID',w:80},{k:'status',l:'Status',w:80},{k:'funded',l:'Funded',w:70},{k:'vor',l:'VOR',w:70},
+{k:'dpd',l:'DPD (Prin-Adj)',w:95},{k:'peakDpd',l:'Peak DPD',w:70},{k:'bbFactor',l:'BB Factor',w:70},
+{k:'bbContrib',l:'BB Contrib',w:80},{k:'npr',l:'NPR',w:40},{k:'orig',l:'Orig Date',w:90},
+{k:'mat',l:'Maturity',w:90},{k:'custType',l:'Type',w:75}
+];
+document.getElementById('lHead').innerHTML='<tr>'+cols.map(c=>'<th style="width:'+c.w+'px" data-k="'+c.k+'">'+c.l+(sk===c.k?(sd<0?' ↓':' ↑'):'')+'</th>').join('')+'</tr>';
+document.getElementById('lHead').querySelectorAll('th').forEach(th=>{th.onclick=()=>{const k=th.dataset.k;if(sk===k)sd*=-1;else{sk=k;sd=-1}renderLoans()}});
+
+const maxD=Math.max(...LOANS.map(l=>l.dpd),1);
+document.getElementById('lBody').innerHTML=ls.map((l,i)=>{
+const dc=l.dpd>=30?C.rd:l.dpd>=15?C.co:l.dpd>=1?C.am:C.tl;
+const sc=l.status==='Active'?'pl-g':l.status==='Past Due'?'pl-y':'pl-b';
+const tc=l.custType==='Returning'?'color:'+C.ac:'color:'+C.am;
+return'<tr style="animation:fi .3s ease-out '+Math.min(i*.02,.5)+'s both"><td style="font-family:JetBrains Mono;font-size:11px">'+l.id+'</td><td><span class="pl '+sc+'">'+l.status+'</span></td><td>$'+l.funded+'</td><td>$'+l.vor+'</td><td><div class="dp"><div class="dpf" style="width:'+Math.max(4,l.dpd/maxD*100)+'%;background:'+dc+'"></div></div><span style="color:'+dc+';font-weight:600;font-size:11px">'+l.dpd+'</span></td><td style="font-family:JetBrains Mono;font-size:11px">'+l.peakDpd+'</td><td style="font-family:JetBrains Mono;font-size:11px">'+l.bbFactor.toFixed(2)+'</td><td>$'+l.bbContrib+'</td><td style="color:'+(l.npr==='Y'?C.rd:C.gn)+'">'+l.npr+'</td><td style="font-size:11px">'+l.orig+'</td><td style="font-size:11px">'+l.mat+'</td><td style="'+tc+';font-weight:600;font-size:11px">'+l.custType+'</td></tr>';
+}).join('');
+}
+document.getElementById('loanSearch').addEventListener('input',()=>renderLoans());
+renderLoans();
+
+// ===== THEME TOGGLE =====
+document.getElementById('themeToggle').addEventListener('click',()=>{
+  const html=document.documentElement;
+  const next=html.getAttribute('data-theme')==='light'?'dark':'light';
+  html.setAttribute('data-theme',next);
+  document.getElementById('themeToggle').innerHTML=next==='light'?'&#127769;':'&#9728;&#65039;';
+  Chart.defaults.color=next==='light'?'#475569':'#8899b4';
+  Chart.helpers.each(Chart.instances,(c)=>{
+    if(c.options.scales){
+      Object.values(c.options.scales).forEach(s=>{if(s.ticks)s.ticks.color=next==='light'?'#475569':'#556a8a';if(s.grid)s.grid.color=next==='light'?'rgba(0,0,0,.08)':'rgba(30,45,74,.25)';if(s.title&&s.title.color)s.title.color=next==='light'?'#475569':'#556a8a'});
+    }
+    c.update('none');
+  });
+});
+</script></body></html>

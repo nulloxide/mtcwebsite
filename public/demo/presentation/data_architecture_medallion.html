@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<title>CLS Platform — Data Pipeline Architecture</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+/* ── Theme Variables ── */
+:root,[data-theme="dark"]{
+  --bg:#060a14;--text:#e2e8f0;--text-muted:#64748b;--text-sub:#475569;
+  --grid:rgba(100,200,255,0.01);
+  --blob1:rgba(205,127,50,0.05);--blob2:rgba(148,163,184,0.03);--blob3:rgba(139,92,246,0.03);--blob4:rgba(255,215,0,0.04);
+  --tip-bg:rgba(6,10,20,0.96);--tip-border:rgba(255,255,255,0.1);--tip-text:#cbd5e1;--tip-shadow:rgba(0,0,0,0.6);
+  --btn-bg:rgba(100,160,255,0.08);--btn-border:rgba(100,160,255,0.2);--btn-text:#94a3b8;
+  --title-grad:linear-gradient(135deg,#60a5fa,#a78bfa,#2dd4bf);
+  --badge-bz-c:#cd7f32;--badge-bz-bg:rgba(205,127,50,0.1);--badge-bz-bdr:rgba(205,127,50,0.2);
+  --badge-sv-c:#a8a8c0;--badge-sv-bg:rgba(168,168,192,0.08);--badge-sv-bdr:rgba(168,168,192,0.15);
+  --badge-gd-c:#ffd700;--badge-gd-bg:rgba(255,215,0,0.08);--badge-gd-bdr:rgba(255,215,0,0.15);
+}
+[data-theme="light"]{
+  --bg:#f1f5f9;--text:#0f172a;--text-muted:#475569;--text-sub:#64748b;
+  --grid:rgba(15,23,42,0.03);
+  --blob1:rgba(205,127,50,0.04);--blob2:rgba(148,163,184,0.025);--blob3:rgba(139,92,246,0.025);--blob4:rgba(255,215,0,0.035);
+  --tip-bg:rgba(248,250,252,0.97);--tip-border:rgba(15,23,42,0.12);--tip-text:#334155;--tip-shadow:rgba(0,0,0,0.12);
+  --btn-bg:rgba(30,41,59,0.05);--btn-border:rgba(30,41,59,0.15);--btn-text:#475569;
+  --title-grad:linear-gradient(135deg,#1d4ed8,#6d28d9,#0d9488);
+  --badge-bz-c:#92400e;--badge-bz-bg:rgba(205,127,50,0.08);--badge-bz-bdr:rgba(180,100,30,0.25);
+  --badge-sv-c:#475569;--badge-sv-bg:rgba(100,116,139,0.08);--badge-sv-bdr:rgba(100,116,139,0.2);
+  --badge-gd-c:#a16207;--badge-gd-bg:rgba(161,98,7,0.08);--badge-gd-bdr:rgba(161,98,7,0.2);
+}
+
+body{
+  font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);
+  overflow-x:hidden;min-height:100vh;transition:background 0.3s ease,color 0.3s ease;
+}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse at 8% 40%,var(--blob1) 0%,transparent 45%),
+    radial-gradient(ellipse at 35% 35%,var(--blob2) 0%,transparent 40%),
+    radial-gradient(ellipse at 62% 35%,var(--blob3) 0%,transparent 40%),
+    radial-gradient(ellipse at 88% 40%,var(--blob4) 0%,transparent 45%);
+}
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    linear-gradient(var(--grid) 1px,transparent 1px),
+    linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:60px 60px;
+}
+.page{position:relative;z-index:1;padding:12px 14px 30px;min-width:900px;max-width:2200px;margin:0 auto}
+
+/* Header */
+.hdr{text-align:center;margin-bottom:10px;position:relative}
+.hdr h1{
+  font-size:1.7rem;font-weight:900;letter-spacing:-0.5px;
+  background:var(--title-grad);background-size:200% 200%;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  animation:shimmer 4s ease-in-out infinite;
+}
+.hdr .sub{color:var(--text-sub);font-size:0.7rem;margin-top:4px;letter-spacing:0.5px}
+.hdr .sub span{
+  display:inline-block;padding:2px 10px;border-radius:10px;margin:0 3px;font-weight:600;
+}
+.hdr .sub .bz{color:var(--badge-bz-c);background:var(--badge-bz-bg);border:1px solid var(--badge-bz-bdr)}
+.hdr .sub .sv{color:var(--badge-sv-c);background:var(--badge-sv-bg);border:1px solid var(--badge-sv-bdr)}
+.hdr .sub .gd{color:var(--badge-gd-c);background:var(--badge-gd-bg);border:1px solid var(--badge-gd-bdr)}
+@keyframes shimmer{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+
+/* Theme toggle */
+.theme-toggle{
+  position:absolute;top:0;right:0;background:var(--btn-bg);border:1px solid var(--btn-border);
+  border-radius:8px;color:var(--btn-text);font-size:0.65rem;font-family:'Inter',sans-serif;
+  padding:4px 12px;cursor:pointer;transition:border-color 0.2s ease;
+  display:flex;align-items:center;gap:5px;
+}
+.theme-toggle:hover{border-color:var(--text-muted)}
+.theme-toggle .icon{font-size:0.85rem}
+
+/* Legend row */
+.legend{display:flex;justify-content:center;gap:28px;margin:10px 0 8px;flex-wrap:wrap}
+.legend .it{display:flex;align-items:center;gap:6px;font-size:0.62rem;color:var(--text-muted)}
+.legend .dt{width:8px;height:8px;border-radius:2px}
+
+svg.main{width:100%;display:block}
+text{font-family:'Inter',sans-serif}
+
+/* Animations */
+@keyframes flowDash{to{stroke-dashoffset:-40}}
+
+/* Hover */
+svg.main .stage{cursor:pointer}
+svg.main .stage .card{transition:filter 0.3s ease,stroke-width 0.3s ease}
+svg.main .stage:hover .card{stroke-width:2.2}
+
+/* Tooltip */
+.tip{
+  position:fixed;z-index:9999;pointer-events:none;
+  background:var(--tip-bg);border:1px solid var(--tip-border);
+  border-radius:10px;padding:12px 16px;max-width:260px;
+  font-size:0.68rem;color:var(--tip-text);line-height:1.5;
+  backdrop-filter:blur(14px);box-shadow:0 12px 40px var(--tip-shadow);
+  opacity:0;transition:opacity 0.15s ease;
+}
+.tip.show{opacity:1}
+.tip h4{font-size:0.78rem;font-weight:700;margin-bottom:4px}
+.tip .bg{display:inline-block;padding:1px 7px;border-radius:4px;font-size:0.58rem;font-weight:700;letter-spacing:0.5px;margin-bottom:6px}
+
+/* ── Light Theme: SVG Overrides ── */
+/* Default text → dark */
+[data-theme="light"] svg.main text{fill:#1e293b}
+
+/* Bronze text */
+[data-theme="light"] svg.main text[fill="#cd7f32"]{fill:#92400e}
+[data-theme="light"] svg.main text[fill="#e2a96d"]{fill:#78350f}
+/* Silver text */
+[data-theme="light"] svg.main text[fill="#c0c0d2"]{fill:#334155}
+[data-theme="light"] svg.main text[fill="#a8a8c0"]{fill:#475569}
+[data-theme="light"] svg.main text[fill="#94a3b8"]{fill:#334155}
+/* Enrichment text */
+[data-theme="light"] svg.main text[fill="#a78bfa"]{fill:#5b21b6}
+[data-theme="light"] svg.main text[fill="#c4b5fd"]{fill:#6d28d9}
+/* Gold text */
+[data-theme="light"] svg.main text[fill="#ffd700"]{fill:#a16207}
+[data-theme="light"] svg.main text[fill="#fde68a"]{fill:#92400e}
+/* Consumption text */
+[data-theme="light"] svg.main text[fill="#22d3ee"]{fill:#0e7490}
+[data-theme="light"] svg.main text[fill="#67e8f9"]{fill:#155e75}
+/* Source text */
+[data-theme="light"] svg.main text[fill="#60a5fa"]{fill:#1d4ed8}
+[data-theme="light"] svg.main text[fill="#93c5fd"]{fill:#1e40af}
+[data-theme="light"] svg.main text[fill="#2dd4bf"]{fill:#0f766e}
+[data-theme="light"] svg.main text[fill="#5eead4"]{fill:#115e59}
+[data-theme="light"] svg.main text[fill="#fbbf24"]{fill:#92400e}
+/* Quarantine text */
+[data-theme="light"] svg.main text[fill="#f87171"]{fill:#b91c1c}
+[data-theme="light"] svg.main text[fill="#fca5a5"]{fill:#991b1b}
+[data-theme="light"] svg.main text[fill="#ef4444"]{fill:#b91c1c}
+/* Muted text */
+[data-theme="light"] svg.main text[fill="#64748b"]{fill:#334155}
+[data-theme="light"] svg.main text[fill="#334155"]{fill:#1e293b}
+[data-theme="light"] svg.main text[fill="#475569"]{fill:#1e293b}
+/* Purple zone label */
+[data-theme="light"] svg.main text[fill="#8b5cf6"]{fill:#6d28d9}
+[data-theme="light"] svg.main text[fill="#f97316"]{fill:#c2410c}
+
+/* Light Theme: Strokes */
+[data-theme="light"] svg.main [stroke="#cd7f32"]{stroke:#b45309}
+[data-theme="light"] svg.main [stroke="#a8a8c0"]{stroke:#64748b}
+[data-theme="light"] svg.main [stroke="#ffd700"]{stroke:#ca8a04}
+[data-theme="light"] svg.main [stroke="#22d3ee"]{stroke:#0891b2}
+[data-theme="light"] svg.main [stroke="#a78bfa"]{stroke:#7c3aed}
+[data-theme="light"] svg.main [stroke="#ef4444"]{stroke:#dc2626}
+[data-theme="light"] svg.main [stroke="#60a5fa"]{stroke:#2563eb}
+[data-theme="light"] svg.main [stroke="#2dd4bf"]{stroke:#0d9488}
+[data-theme="light"] svg.main [stroke="#fbbf24"]{stroke:#d97706}
+
+/* Light Theme: Stage card fills → soft tinted whites */
+[data-theme="light"] svg.main .stage .card[stroke="#cd7f32"]{fill:rgba(205,127,50,0.06)}
+[data-theme="light"] svg.main .stage .card[stroke="#a8a8c0"]{fill:rgba(100,116,139,0.05)}
+[data-theme="light"] svg.main .stage .card[stroke="#ffd700"]{fill:rgba(202,138,4,0.05)}
+[data-theme="light"] svg.main .stage .card[stroke="#22d3ee"]{fill:rgba(8,145,178,0.05)}
+[data-theme="light"] svg.main .stage .card[stroke="rgba(167,139,250,0.45)"]{fill:rgba(124,58,237,0.04);stroke:rgba(124,58,237,0.4)}
+
+/* Light Theme: Particles → deeper colors */
+[data-theme="light"] svg.main circle[fill="#cd7f32"]{fill:#b45309}
+[data-theme="light"] svg.main circle[fill="#c0c0d2"]{fill:#64748b}
+[data-theme="light"] svg.main circle[fill="#a78bfa"]{fill:#7c3aed}
+[data-theme="light"] svg.main circle[fill="#ffd700"]{fill:#ca8a04}
+[data-theme="light"] svg.main circle[fill="#22d3ee"]{fill:#0891b2}
+[data-theme="light"] svg.main circle[fill="#8b5cf6"]{fill:#6d28d9}
+
+/* Light Theme: Ownership zone borders */
+[data-theme="light"] svg.main rect[stroke="rgba(249,115,22,0.18)"]{stroke:rgba(194,65,12,0.22)}
+[data-theme="light"] svg.main rect[stroke="rgba(139,92,246,0.18)"]{stroke:rgba(109,40,217,0.2)}
+[data-theme="light"] svg.main rect[stroke="rgba(34,211,238,0.18)"]{stroke:rgba(8,145,178,0.22)}
+
+/* Light Theme: Source boxes */
+[data-theme="light"] svg.main rect[fill="rgba(59,130,246,0.06)"]{fill:rgba(37,99,235,0.06)}
+[data-theme="light"] svg.main rect[fill="rgba(20,184,166,0.06)"]{fill:rgba(15,118,110,0.06)}
+[data-theme="light"] svg.main rect[fill="rgba(167,139,250,0.06)"]{fill:rgba(109,40,217,0.06)}
+[data-theme="light"] svg.main rect[fill="rgba(251,191,36,0.06)"]{fill:rgba(161,98,7,0.06)}
+
+/* Light Theme: Quarantine boxes */
+[data-theme="light"] svg.main rect[stroke="rgba(239,68,68,0.2)"]{stroke:rgba(185,28,28,0.25)}
+
+/* Light Theme: SVG paths — icon strokes inside cards */
+[data-theme="light"] svg.main path[stroke="#cd7f32"]{stroke:#92400e}
+[data-theme="light"] svg.main line[stroke="#cd7f32"]{stroke:#92400e}
+[data-theme="light"] svg.main path[stroke="#a8a8c0"]{stroke:#475569}
+[data-theme="light"] svg.main path[stroke="#a78bfa"]{stroke:#6d28d9}
+[data-theme="light"] svg.main line[stroke="#a78bfa"]{stroke:#6d28d9}
+[data-theme="light"] svg.main path[stroke="#ffd700"]{stroke:#a16207}
+[data-theme="light"] svg.main line[stroke="#ffd700"]{stroke:#a16207}
+[data-theme="light"] svg.main path[stroke="#22d3ee"]{stroke:#0e7490}
+[data-theme="light"] svg.main line[stroke="#22d3ee"]{stroke:#0e7490}
+[data-theme="light"] svg.main path[stroke="#60a5fa"]{stroke:#2563eb}
+[data-theme="light"] svg.main ellipse[stroke="#60a5fa"]{stroke:#2563eb}
+[data-theme="light"] svg.main path[stroke="#2dd4bf"]{stroke:#0d9488}
+[data-theme="light"] svg.main path[stroke="#ef4444"]{stroke:#b91c1c}
+[data-theme="light"] svg.main line[stroke="#ef4444"]{stroke:#b91c1c}
+[data-theme="light"] svg.main circle[stroke="#ef4444"]{stroke:#b91c1c}
+[data-theme="light"] svg.main path[stroke="#f87171"]{stroke:#b91c1c}
+
+/* Light Theme: Badge fills */
+[data-theme="light"] svg.main rect[fill="rgba(205,127,50,0.2)"]{fill:rgba(180,83,9,0.12)}
+[data-theme="light"] svg.main rect[fill="rgba(168,168,192,0.12)"]{fill:rgba(71,85,105,0.1)}
+[data-theme="light"] svg.main rect[fill="rgba(255,215,0,0.15)"]{fill:rgba(161,98,7,0.1)}
+[data-theme="light"] svg.main rect[fill="rgba(255,215,0,0.1)"]{fill:rgba(161,98,7,0.08)}
+[data-theme="light"] svg.main rect[fill="rgba(168,168,192,0.15)"]{fill:rgba(71,85,105,0.08)}
+
+/* Light Theme: Circle fills inside attribute lists */
+[data-theme="light"] svg.main circle[fill="rgba(205,127,50,0.1)"]{fill:rgba(180,83,9,0.08)}
+[data-theme="light"] svg.main circle[fill="rgba(168,168,192,0.08)"]{fill:rgba(71,85,105,0.06)}
+[data-theme="light"] svg.main circle[fill="rgba(139,92,246,0.08)"]{fill:rgba(109,40,217,0.06)}
+[data-theme="light"] svg.main circle[fill="rgba(255,215,0,0.08)"]{fill:rgba(161,98,7,0.06)}
+[data-theme="light"] svg.main circle[fill="rgba(168,168,192,0.06)"]{fill:rgba(71,85,105,0.05)}
+[data-theme="light"] svg.main circle[fill="rgba(255,215,0,0.1)"]{fill:rgba(161,98,7,0.06)}
+[data-theme="light"] svg.main circle[fill="rgba(34,211,238,0.3)"]{fill:rgba(14,116,144,0.15)}
+
+/* Light Theme: Consumption sub-cards */
+[data-theme="light"] svg.main rect[fill="rgba(34,211,238,0.03)"]{fill:rgba(8,145,178,0.05)}
+[data-theme="light"] svg.main rect[fill="rgba(34,211,238,0.02)"]{fill:rgba(8,145,178,0.04)}
+[data-theme="light"] svg.main rect[stroke="rgba(34,211,238,0.12)"]{stroke:rgba(8,145,178,0.18)}
+[data-theme="light"] svg.main rect[stroke="rgba(34,211,238,0.1)"]{stroke:rgba(8,145,178,0.15)}
+[data-theme="light"] svg.main rect[stroke="rgba(34,211,238,0.08)"]{stroke:rgba(8,145,178,0.12)}
+[data-theme="light"] svg.main rect[stroke="rgba(34,211,238,0.06)"]{stroke:rgba(8,145,178,0.1)}
+
+/* Light Theme: Guarantee cards */
+[data-theme="light"] svg.main rect[fill="rgba(139,92,246,0.03)"]{fill:rgba(109,40,217,0.04)}
+[data-theme="light"] svg.main rect[fill="rgba(52,211,153,0.03)"]{fill:rgba(5,150,105,0.04)}
+[data-theme="light"] svg.main rect[fill="rgba(239,68,68,0.03)"]{fill:rgba(185,28,28,0.04)}
+[data-theme="light"] svg.main rect[fill="rgba(251,191,36,0.03)"]{fill:rgba(161,98,7,0.04)}
+[data-theme="light"] svg.main [stroke="rgba(139,92,246,0.12)"]{stroke:rgba(109,40,217,0.18)}
+[data-theme="light"] svg.main [stroke="rgba(52,211,153,0.12)"]{stroke:rgba(5,150,105,0.18)}
+[data-theme="light"] svg.main [stroke="rgba(239,68,68,0.1)"]{stroke:rgba(185,28,28,0.15)}
+[data-theme="light"] svg.main [stroke="rgba(251,191,36,0.1)"]{stroke:rgba(161,98,7,0.15)}
+
+/* Light Theme: Guarantee icon paths */
+[data-theme="light"] svg.main path[stroke="#a78bfa"]{stroke:#6d28d9}
+[data-theme="light"] svg.main path[stroke="#34d399"]{stroke:#059669}
+[data-theme="light"] svg.main circle[stroke="#34d399"]{stroke:#059669}
+[data-theme="light"] svg.main rect[stroke="#34d399"]{stroke:#059669}
+[data-theme="light"] svg.main circle[stroke="#f87171"]{stroke:#b91c1c}
+[data-theme="light"] svg.main line[stroke="#f87171"]{stroke:#b91c1c}
+[data-theme="light"] svg.main circle[fill="#f87171"]{fill:#b91c1c}
+[data-theme="light"] svg.main path[stroke="#fbbf24"]{stroke:#d97706}
+[data-theme="light"] svg.main line[stroke="#fbbf24"]{stroke:#d97706}
+[data-theme="light"] svg.main text[fill="#34d399"]{fill:#047857}
+
+/* Light Theme: Regenerability arc */
+[data-theme="light"] svg.main path[stroke="rgba(139,92,246,0.25)"]{stroke:rgba(109,40,217,0.35)}
+[data-theme="light"] svg.main path[stroke="rgba(139,92,246,0.08)"]{stroke:rgba(109,40,217,0.12)}
+[data-theme="light"] svg.main rect[fill="rgba(139,92,246,0.08)"][rx="11"]{fill:rgba(109,40,217,0.08);stroke:rgba(109,40,217,0.22)}
+/* Light Theme: Guarantee separator line */
+[data-theme="light"] svg.main line[stroke="rgba(255,255,255,0.03)"]{stroke:rgba(15,23,42,0.06)}
+
+/* Light Theme: Glow filters → subtle box shadows */
+[data-theme="light"] svg.main [filter="url(#glB)"]{filter:drop-shadow(0 2px 6px rgba(180,83,9,0.10))}
+[data-theme="light"] svg.main [filter="url(#glS)"]{filter:drop-shadow(0 2px 6px rgba(100,116,139,0.10))}
+[data-theme="light"] svg.main [filter="url(#glG)"]{filter:drop-shadow(0 2px 6px rgba(161,98,7,0.10))}
+[data-theme="light"] svg.main [filter="url(#glC)"]{filter:drop-shadow(0 2px 6px rgba(8,145,178,0.10))}
+
+/* Light Theme: Stage card gradient overrides → white-tinted fills */
+[data-theme="light"] svg.main .card[fill="url(#gBz)"]{fill:rgba(255,247,237,0.9)}
+[data-theme="light"] svg.main .card[fill="url(#gSv)"]{fill:rgba(248,250,252,0.9)}
+[data-theme="light"] svg.main .card[fill="url(#gEn)"]{fill:rgba(250,245,255,0.9)}
+[data-theme="light"] svg.main .card[fill="url(#gGd)"]{fill:rgba(254,252,232,0.9)}
+[data-theme="light"] svg.main .card[fill="url(#gBI)"]{fill:rgba(236,254,255,0.9)}
+
+/* Light Theme: Flow arrows — increase opacity */
+[data-theme="light"] svg.main path[opacity="0.3"]{opacity:0.55}
+[data-theme="light"] svg.main path[opacity="0.25"]{opacity:0.5}
+
+/* Light Theme: Flow arrow rgba strokes → stronger */
+[data-theme="light"] svg.main path[stroke="rgba(167,139,250,0.4)"]{stroke:rgba(109,40,217,0.55)}
+[data-theme="light"] svg.main path[stroke="rgba(255,215,0,0.35)"]{stroke:rgba(161,98,7,0.5)}
+[data-theme="light"] svg.main path[stroke="rgba(34,211,238,0.35)"]{stroke:rgba(8,145,178,0.5)}
+
+/* Light Theme: Animated particles — boost opacity */
+[data-theme="light"] svg.main circle[opacity="0.4"]{opacity:0.65}
+[data-theme="light"] svg.main circle[opacity="0.5"]{opacity:0.7}
+[data-theme="light"] svg.main circle[opacity="0.35"]{opacity:0.6}
+[data-theme="light"] svg.main circle[opacity="0.3"]{opacity:0.55}
+[data-theme="light"] svg.main circle[opacity="0.2"]{opacity:0.5}
+
+/* Light Theme: Internal rgba sub-element fills — stronger tints */
+[data-theme="light"] svg.main rect[fill="rgba(205,127,50,0.04)"]{fill:rgba(180,83,9,0.06)}
+[data-theme="light"] svg.main rect[fill="rgba(205,127,50,0.06)"]{fill:rgba(180,83,9,0.08)}
+[data-theme="light"] svg.main rect[fill="rgba(205,127,50,0.09)"]{fill:rgba(180,83,9,0.12)}
+[data-theme="light"] svg.main rect[fill="rgba(205,127,50,0.05)"]{fill:rgba(180,83,9,0.07)}
+[data-theme="light"] svg.main rect[fill="rgba(168,168,192,0.04)"]{fill:rgba(71,85,105,0.06)}
+[data-theme="light"] svg.main rect[fill="rgba(168,168,192,0.06)"]{fill:rgba(71,85,105,0.08)}
+[data-theme="light"] svg.main rect[fill="rgba(168,168,192,0.08)"]{fill:rgba(71,85,105,0.10)}
+[data-theme="light"] svg.main rect[fill="rgba(139,92,246,0.04)"]{fill:rgba(109,40,217,0.06)}
+[data-theme="light"] svg.main rect[fill="rgba(255,215,0,0.04)"]{fill:rgba(161,98,7,0.06)}
+[data-theme="light"] svg.main rect[fill="rgba(255,215,0,0.06)"]{fill:rgba(161,98,7,0.08)}
+[data-theme="light"] svg.main rect[fill="rgba(255,215,0,0.08)"]{fill:rgba(161,98,7,0.10)}
+
+/* Light Theme: Bronze/Silver/Gold internal strokes — stronger */
+[data-theme="light"] svg.main rect[stroke="rgba(205,127,50,0.15)"]{stroke:rgba(180,83,9,0.25)}
+[data-theme="light"] svg.main rect[stroke="rgba(205,127,50,0.2)"]{stroke:rgba(180,83,9,0.3)}
+[data-theme="light"] svg.main rect[stroke="rgba(205,127,50,0.12)"]{stroke:rgba(180,83,9,0.2)}
+[data-theme="light"] svg.main rect[stroke="rgba(168,168,192,0.15)"]{stroke:rgba(71,85,105,0.22)}
+[data-theme="light"] svg.main rect[stroke="rgba(168,168,192,0.2)"]{stroke:rgba(71,85,105,0.28)}
+[data-theme="light"] svg.main rect[stroke="rgba(168,168,192,0.12)"]{stroke:rgba(71,85,105,0.18)}
+[data-theme="light"] svg.main rect[stroke="rgba(168,168,192,0.1)"]{stroke:rgba(71,85,105,0.16)}
+[data-theme="light"] svg.main rect[stroke="rgba(255,215,0,0.15)"]{stroke:rgba(161,98,7,0.22)}
+[data-theme="light"] svg.main rect[stroke="rgba(255,215,0,0.2)"]{stroke:rgba(161,98,7,0.28)}
+[data-theme="light"] svg.main rect[stroke="rgba(255,215,0,0.12)"]{stroke:rgba(161,98,7,0.18)}
+[data-theme="light"] svg.main rect[stroke="rgba(139,92,246,0.15)"]{stroke:rgba(109,40,217,0.22)}
+[data-theme="light"] svg.main rect[stroke="rgba(139,92,246,0.2)"]{stroke:rgba(109,40,217,0.28)}
+
+/* Light Theme: Consumption internal bar chart fills */
+[data-theme="light"] svg.main rect[fill="rgba(34,211,238,0.25)"]{fill:rgba(8,145,178,0.2)}
+[data-theme="light"] svg.main rect[fill="rgba(34,211,238,0.35)"]{fill:rgba(8,145,178,0.28)}
+[data-theme="light"] svg.main rect[fill="rgba(34,211,238,0.45)"]{fill:rgba(8,145,178,0.35)}
+[data-theme="light"] svg.main rect[fill="rgba(34,211,238,0.05)"]{fill:rgba(8,145,178,0.07)}
+[data-theme="light"] svg.main rect[fill="rgba(34,211,238,0.08)"]{fill:rgba(8,145,178,0.10)}
+[data-theme="light"] svg.main circle[fill="rgba(34,211,238,0.2)"]{fill:rgba(8,145,178,0.15)}
+[data-theme="light"] svg.main circle[stroke="rgba(34,211,238,0.2)"]{stroke:rgba(8,145,178,0.18)}
+[data-theme="light"] svg.main circle[fill="rgba(34,211,238,0.5)"]{fill:rgba(8,145,178,0.4)}
+[data-theme="light"] svg.main circle[fill="rgba(34,211,238,0.6)"]{fill:rgba(8,145,178,0.5)}
+[data-theme="light"] svg.main polyline[stroke="#22d3ee"]{stroke:#0891b2}
+[data-theme="light"] svg.main rect[fill="rgba(34,211,238,0.15)"]{fill:rgba(8,145,178,0.12)}
+
+/* Light Theme: Quarantine dashed boxes */
+[data-theme="light"] svg.main rect[fill="rgba(239,68,68,0.03)"]{fill:rgba(185,28,28,0.04)}
+
+/* Light Theme: Source box strokes — strengthen */
+[data-theme="light"] svg.main rect[stroke="rgba(59,130,246,0.2)"]{stroke:rgba(37,99,235,0.3)}
+[data-theme="light"] svg.main rect[stroke="rgba(20,184,166,0.2)"]{stroke:rgba(15,118,110,0.3)}
+[data-theme="light"] svg.main rect[stroke="rgba(167,139,250,0.2)"]{stroke:rgba(109,40,217,0.3)}
+[data-theme="light"] svg.main rect[stroke="rgba(251,191,36,0.2)"]{stroke:rgba(161,98,7,0.3)}
+
+/* Light Theme: Bottom medallion flow labels — boost visibility */
+[data-theme="light"] svg.main text[opacity="0.25"]{opacity:0.55}
+[data-theme="light"] svg.main text[opacity="0.3"]{opacity:0.55}
+[data-theme="light"] svg.main text[opacity="0.35"]{opacity:0.55}
+[data-theme="light"] svg.main text[opacity="0.45"]{opacity:0.65}
+[data-theme="light"] svg.main text[opacity="0.5"]{opacity:0.7}
+[data-theme="light"] svg.main text[opacity="0.6"]{opacity:0.75}
+[data-theme="light"] svg.main text[opacity="0.7"]{opacity:0.85}
+[data-theme="light"] svg.main line[stroke="rgba(168,168,192,0.08)"]{stroke:rgba(71,85,105,0.15)}
+[data-theme="light"] svg.main line[stroke="rgba(34,211,238,0.08)"]{stroke:rgba(8,145,178,0.15)}
+
+/* Light Theme: Enrichment card stroke override */
+[data-theme="light"] svg.main .card[stroke="rgba(167,139,250,0.45)"]{stroke:rgba(124,58,237,0.5);fill:rgba(250,245,255,0.9)}
+
+/* Light Theme: Arrow markers — use darker fills */
+[data-theme="light"] svg.main marker path[fill="#cd7f32"]{fill:#b45309}
+[data-theme="light"] svg.main marker path[fill="#a8a8c0"]{fill:#64748b}
+[data-theme="light"] svg.main marker path[fill="#ffd700"]{fill:#ca8a04}
+[data-theme="light"] svg.main marker path[fill="#22d3ee"]{fill:#0891b2}
+[data-theme="light"] svg.main marker path[fill="#ef4444"]{fill:#b91c1c}
+
+/* Light Theme: Green feedback arrows */
+[data-theme="light"] svg.main marker path[fill="#34d399"]{fill:#059669}
+[data-theme="light"] svg.main path[stroke="#34d399"]{stroke:#059669}
+[data-theme="light"] svg.main text[fill="#34d399"]{fill:#047857}
+
+/* Light Theme: Funnel visual */
+[data-theme="light"] svg.main polygon[fill="url(#gFunnel)"]{fill:rgba(30,41,59,0.02)}
+[data-theme="light"] svg.main polygon[stroke="rgba(148,163,184,0.04)"]{stroke:rgba(15,23,42,0.06)}
+
+/* Light Theme: Loan Doc Verification icon */
+[data-theme="light"] svg.main circle[fill="rgba(96,165,250,0.08)"]{fill:rgba(37,99,235,0.08)}
+
+/* Light Theme: Ownership zone border fix */
+[data-theme="light"] svg.main rect[stroke="rgba(139,92,246,0.06)"]{stroke:rgba(109,40,217,0.1)}
+
+/* Light Theme: Retention note */
+[data-theme="light"] svg.main rect[fill="rgba(148,163,184,0.04)"]{fill:rgba(30,41,59,0.04)}
+[data-theme="light"] svg.main rect[stroke="rgba(148,163,184,0.1)"]{stroke:rgba(30,41,59,0.1)}
+
+@media(prefers-reduced-motion:reduce){
+  *{animation-duration:0.01ms!important;animation-iteration-count:1!important}
+}
+
+/* Stage entrance animation — opacity only (CSS transform would override SVG transform attributes) */
+@keyframes stageFadeIn{from{opacity:0}to{opacity:1}}
+svg.main .stage{opacity:0}
+svg.main .stage.entered{animation:stageFadeIn 0.5s ease forwards;opacity:1}
+
+/* Hover flow dimming — gentle and smooth */
+svg.main .stage{transition:opacity 0.5s ease, filter 0.5s ease}
+svg.main .flow-arrow{transition:opacity 0.5s ease}
+svg.main.highlighting .stage{opacity:0.4!important;filter:saturate(0.3);transition:opacity 0.5s ease, filter 0.5s ease}
+svg.main.highlighting .flow-arrow{opacity:0.15!important;transition:opacity 0.5s ease}
+svg.main.highlighting .stage.active{opacity:1!important;filter:saturate(1) brightness(1.05);transition:opacity 0.5s ease, filter 0.5s ease}
+svg.main.highlighting .flow-arrow.active{opacity:0.8!important;transition:opacity 0.5s ease}
+
+/* Breadcrumb */
+.breadcrumb{display:flex;justify-content:center;gap:4px;margin:6px 0 4px;flex-wrap:wrap;align-items:center}
+.breadcrumb .step{
+  font-size:0.6rem;font-weight:600;padding:3px 10px;border-radius:6px;cursor:pointer;
+  color:var(--text-muted);background:var(--btn-bg);border:1px solid var(--btn-border);
+  transition:all 0.2s ease;font-family:'Inter',sans-serif;
+}
+.breadcrumb .step:hover{border-color:var(--text-muted);color:var(--text)}
+.breadcrumb .step.hl{color:var(--text);border-color:var(--text-muted)}
+.breadcrumb .arr{color:var(--text-sub);font-size:0.55rem;opacity:0.4}
+
+/* Click-to-expand modal */
+.modal-overlay{
+  position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0.7);
+  display:none;align-items:center;justify-content:center;
+  backdrop-filter:blur(6px);animation:modalFadeIn 0.2s ease;
+}
+.modal-overlay.show{display:flex}
+@keyframes modalFadeIn{from{opacity:0}to{opacity:1}}
+.modal-card{
+  background:var(--tip-bg);border:1px solid var(--tip-border);border-radius:16px;
+  padding:24px 28px;max-width:420px;width:90%;max-height:85vh;overflow-y:auto;
+  box-shadow:0 20px 60px var(--tip-shadow);color:var(--tip-text);
+  animation:modalSlideUp 0.25s ease;
+}
+@keyframes modalSlideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.modal-card h3{font-size:1rem;font-weight:800;margin-bottom:8px}
+.modal-card .mbadge{display:inline-block;padding:2px 10px;border-radius:6px;font-size:0.6rem;font-weight:700;letter-spacing:0.5px;margin-bottom:10px}
+.modal-card p{font-size:0.75rem;line-height:1.6;margin-bottom:10px}
+.modal-card .mdetail{font-size:0.68rem;color:var(--text-muted);line-height:1.5}
+.modal-card .mdetail dt{font-weight:700;color:var(--text);margin-top:8px}
+.modal-card .mdetail dd{margin:2px 0 0 0}
+.modal-card .close-btn{
+  position:absolute;top:12px;right:16px;background:none;border:none;
+  color:var(--text-muted);font-size:1.2rem;cursor:pointer;
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="hdr">
+  <h1>CLS Platform &mdash; Data Pipeline Architecture</h1>
+  <div class="sub">
+    Medallion Pattern
+    <span class="bz">Bronze</span>
+    <span class="sv">Silver</span>
+    <span class="gd">Gold</span>
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+    <span class="icon" id="theme-icon">&#9790;</span>
+    <span id="theme-label">Light</span>
+  </button>
+</header>
+
+<div class="legend">
+  <div class="it"><div class="dt" style="background:#f97316"></div>Harvester (Ingestion + Conformance)</div>
+  <div class="it"><div class="dt" style="background:#8b5cf6"></div>Analytics &amp; Orchestration (Enrichment + Gold)</div>
+  <div class="it"><div class="dt" style="background:#22d3ee"></div>Consumption (BI + Reporting)</div>
+  <div class="it"><div class="dt" style="background:rgba(239,68,68,0.7)"></div>Quarantine</div>
+</div>
+
+<nav class="breadcrumb">
+  <span class="step" data-stage="sources">Sources</span><span class="arr">&#9656;</span>
+  <span class="step" data-stage="bronze">Bronze</span><span class="arr">&#9656;</span>
+  <span class="step" data-stage="silver">Silver</span><span class="arr">&#9656;</span>
+  <span class="step" data-stage="enrich">Enrichment</span><span class="arr">&#9656;</span>
+  <span class="step" data-stage="gold">Gold</span><span class="arr">&#9656;</span>
+  <span class="step" data-stage="consumption">Consumption</span>
+</nav>
+
+<svg class="main" viewBox="0 0 1360 640" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="svgTitle svgDesc">
+<title id="svgTitle">CLS Platform Data Pipeline Architecture</title>
+<desc id="svgDesc">Medallion architecture diagram showing data flow from Sources through Bronze (raw capture), Silver (cleansed), Enrichment, Gold (curated), to Consumption (dashboards, reports, APIs). Includes quarantine paths, regenerability arc, and system guarantees.</desc>
+<defs>
+  <!-- Stage gradients -->
+  <linearGradient id="gBz" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(205,127,50,0.18)"/><stop offset="100%" stop-color="rgba(205,127,50,0.02)"/></linearGradient>
+  <linearGradient id="gSv" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(168,168,192,0.14)"/><stop offset="100%" stop-color="rgba(168,168,192,0.02)"/></linearGradient>
+  <linearGradient id="gEn" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="rgba(168,168,192,0.12)"/><stop offset="100%" stop-color="rgba(255,215,0,0.1)"/></linearGradient>
+  <linearGradient id="gGd" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(255,215,0,0.16)"/><stop offset="100%" stop-color="rgba(255,215,0,0.02)"/></linearGradient>
+  <linearGradient id="gBI" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(34,211,238,0.12)"/><stop offset="100%" stop-color="rgba(34,211,238,0.02)"/></linearGradient>
+
+  <!-- Funnel gradient -->
+  <linearGradient id="gFunnel" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="rgba(205,127,50,0.03)"/><stop offset="30%" stop-color="rgba(168,168,192,0.025)"/><stop offset="60%" stop-color="rgba(255,215,0,0.02)"/><stop offset="100%" stop-color="rgba(34,211,238,0.015)"/></linearGradient>
+
+  <!-- Arrow markers -->
+  <marker id="aB" viewBox="0 0 10 8" refX="9" refY="4" markerWidth="7" markerHeight="6" orient="auto"><path d="M0,0 L10,4 L0,8Z" fill="#cd7f32" opacity="0.6"/></marker>
+  <marker id="aS" viewBox="0 0 10 8" refX="9" refY="4" markerWidth="7" markerHeight="6" orient="auto"><path d="M0,0 L10,4 L0,8Z" fill="#a8a8c0" opacity="0.6"/></marker>
+  <marker id="aG" viewBox="0 0 10 8" refX="9" refY="4" markerWidth="7" markerHeight="6" orient="auto"><path d="M0,0 L10,4 L0,8Z" fill="#ffd700" opacity="0.6"/></marker>
+  <marker id="aC" viewBox="0 0 10 8" refX="9" refY="4" markerWidth="7" markerHeight="6" orient="auto"><path d="M0,0 L10,4 L0,8Z" fill="#22d3ee" opacity="0.6"/></marker>
+  <marker id="aQ" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L8,4 L0,8Z" fill="#ef4444" opacity="0.5"/></marker>
+  <marker id="aR" viewBox="0 0 8 8" refX="1" refY="4" markerWidth="5" markerHeight="5" orient="auto"><path d="M8,0 L0,4 L8,8Z" fill="#34d399" opacity="0.5"/></marker>
+
+  <!-- Glow filters -->
+  <filter id="glB"><feDropShadow dx="0" dy="2" stdDeviation="8" flood-color="#cd7f32" flood-opacity="0.2"/></filter>
+  <filter id="glS"><feDropShadow dx="0" dy="2" stdDeviation="8" flood-color="#a8a8c0" flood-opacity="0.15"/></filter>
+  <filter id="glG"><feDropShadow dx="0" dy="2" stdDeviation="8" flood-color="#ffd700" flood-opacity="0.2"/></filter>
+  <filter id="glC"><feDropShadow dx="0" dy="2" stdDeviation="8" flood-color="#22d3ee" flood-opacity="0.2"/></filter>
+</defs>
+
+<!-- ─────────────────────────────────────── -->
+<!--  OWNERSHIP ZONES (subtle background)    -->
+<!-- ─────────────────────────────────────── -->
+<rect x="8" y="8" width="580" height="445" rx="16" fill="none" stroke="rgba(249,115,22,0.18)" stroke-width="1.5" stroke-dasharray="8 4"/>
+<text x="22" y="26" fill="#f97316" font-size="8" font-weight="700" letter-spacing="2" opacity="0.5">HARVESTER</text>
+
+<rect x="608" y="8" width="480" height="445" rx="16" fill="none" stroke="rgba(139,92,246,0.18)" stroke-width="1.5" stroke-dasharray="8 4"/>
+<text x="1078" y="26" fill="#8b5cf6" font-size="8" font-weight="700" letter-spacing="2" opacity="0.5" text-anchor="end">ANALYTICS &amp; ORCHESTRATION</text>
+
+<rect x="1092" y="8" width="260" height="445" rx="16" fill="none" stroke="rgba(34,211,238,0.18)" stroke-width="1.5" stroke-dasharray="8 4"/>
+<text x="1106" y="26" fill="#22d3ee" font-size="8" font-weight="700" letter-spacing="2" opacity="0.5">CONSUMPTION</text>
+
+
+<!-- ─── Data Volume Funnel (background) ─── -->
+<polygon points="120,36 1340,36 1280,288 180,288" fill="none" stroke="rgba(148,163,184,0.04)" stroke-width="0.8"/>
+<polygon points="130,42 1330,42 1275,284 185,284" fill="url(#gFunnel)" opacity="0.5"/>
+<text x="680" y="298" text-anchor="middle" fill="#64748b" font-size="5.5" opacity="0.3" font-style="italic">data volume reduces through each stage &#8594; aggregation, filtering, enrichment</text>
+
+<!-- ═══════════════════════════════════════ -->
+<!--  DATA SOURCES                           -->
+<!-- ═══════════════════════════════════════ -->
+<g data-tip="sources" transform="translate(28,60)">
+  <text x="40" y="0" text-anchor="middle" fill="#64748b" font-size="7.5" font-weight="700" letter-spacing="1">SOURCES</text>
+  <g transform="translate(0,14)">
+    <rect width="80" height="30" rx="6" fill="rgba(59,130,246,0.06)" stroke="rgba(59,130,246,0.2)" stroke-width="0.6"/>
+    <!-- DB icon -->
+    <ellipse cx="14" cy="11" rx="5" ry="3" fill="none" stroke="#60a5fa" stroke-width="0.7"/>
+    <path d="M9,11 L9,19 Q14,22 19,19 L19,11" fill="none" stroke="#60a5fa" stroke-width="0.7"/>
+    <text x="27" y="14" fill="#60a5fa" font-size="7" font-weight="700">LMS</text>
+    <text x="27" y="24" fill="#93c5fd" font-size="6" opacity="0.7">Loan Mgmt System</text>
+  </g>
+  <g transform="translate(0,52)">
+    <rect width="80" height="30" rx="6" fill="rgba(20,184,166,0.06)" stroke="rgba(20,184,166,0.2)" stroke-width="0.6"/>
+    <!-- Bank icon -->
+    <path d="M9,17 L19,17 M14,10 L14,17 M10,10 L18,10 L14,6 Z" fill="none" stroke="#2dd4bf" stroke-width="0.7"/>
+    <rect x="10" y="18" width="8" height="5" rx="1" fill="none" stroke="#2dd4bf" stroke-width="0.5"/>
+    <text x="27" y="14" fill="#2dd4bf" font-size="7" font-weight="700">Banks</text>
+    <text x="27" y="24" fill="#5eead4" font-size="6" opacity="0.7">Txns, BAI2, ACH</text>
+  </g>
+  <g transform="translate(0,90)">
+    <rect width="80" height="30" rx="6" fill="rgba(251,191,36,0.06)" stroke="rgba(251,191,36,0.2)" stroke-width="0.6"/>
+    <!-- Payment icon -->
+    <rect x="9" y="8" width="12" height="9" rx="2" fill="none" stroke="#fbbf24" stroke-width="0.7"/>
+    <line x1="9" y1="12" x2="21" y2="12" stroke="#fbbf24" stroke-width="0.5"/>
+    <text x="27" y="14" fill="#fbbf24" font-size="7" font-weight="700">Payments</text>
+    <text x="27" y="24" fill="#fde68a" font-size="6" opacity="0.7">Processors, Stripe</text>
+  </g>
+  <g transform="translate(0,128)">
+    <rect width="80" height="30" rx="6" fill="rgba(167,139,250,0.06)" stroke="rgba(167,139,250,0.2)" stroke-width="0.6"/>
+    <!-- Doc icon -->
+    <rect x="10" y="6" width="10" height="13" rx="1.5" fill="none" stroke="#a78bfa" stroke-width="0.7"/>
+    <line x1="12.5" y1="10" x2="17.5" y2="10" stroke="#a78bfa" stroke-width="0.4"/>
+    <line x1="12.5" y1="13" x2="16" y2="13" stroke="#a78bfa" stroke-width="0.4"/>
+    <text x="27" y="14" fill="#a78bfa" font-size="7" font-weight="700">Legal</text>
+    <text x="27" y="24" fill="#c4b5fd" font-size="6" opacity="0.7">Contracts, Docs</text>
+  </g>
+  <!-- Shared format types label -->
+  <rect x="-2" y="166" width="84" height="18" rx="4" fill="rgba(100,116,139,0.04)" stroke="rgba(100,116,139,0.1)" stroke-width="0.4"/>
+  <text x="40" y="176" text-anchor="middle" fill="#64748b" font-size="5.5" font-style="italic" opacity="0.6">CSV &middot; API &middot; JSON &middot; SQL &middot; PDF</text>
+</g>
+
+<!-- Source → Bronze flow arrows -->
+<g id="src-flow" class="flow-arrow">
+  <path d="M112,89 C130,89 140,120 155,120" stroke="#cd7f32" stroke-width="1" fill="none" opacity="0.4" stroke-dasharray="4 3" marker-end="url(#aB)"><animate attributeName="stroke-dashoffset" from="20" to="0" dur="1.5s" repeatCount="indefinite"/></path>
+  <path d="M112,127 C130,127 140,140 155,140" stroke="#cd7f32" stroke-width="1" fill="none" opacity="0.4" stroke-dasharray="4 3" marker-end="url(#aB)"><animate attributeName="stroke-dashoffset" from="20" to="0" dur="1.7s" repeatCount="indefinite"/></path>
+  <path d="M112,165 C130,165 140,160 155,160" stroke="#cd7f32" stroke-width="1" fill="none" opacity="0.4" stroke-dasharray="4 3" marker-end="url(#aB)"><animate attributeName="stroke-dashoffset" from="20" to="0" dur="1.9s" repeatCount="indefinite"/></path>
+  <path d="M112,203 C130,203 140,180 155,180" stroke="#cd7f32" stroke-width="1" fill="none" opacity="0.4" stroke-dasharray="4 3" marker-end="url(#aB)"><animate attributeName="stroke-dashoffset" from="20" to="0" dur="2.1s" repeatCount="indefinite"/></path>
+</g>
+<!-- Particles: Source → Bronze -->
+<circle r="2.5" fill="#cd7f32" opacity="0.5"><animateMotion dur="2s" begin="0s" repeatCount="indefinite" path="M112,89 C130,89 140,120 158,120"/></circle>
+<circle r="2" fill="#cd7f32" opacity="0.4"><animateMotion dur="2s" begin="0.5s" repeatCount="indefinite" path="M112,127 C130,127 140,140 158,140"/></circle>
+<circle r="2" fill="#cd7f32" opacity="0.35"><animateMotion dur="2s" begin="1s" repeatCount="indefinite" path="M112,165 C130,165 140,160 158,160"/></circle>
+<circle r="2.5" fill="#cd7f32" opacity="0.4"><animateMotion dur="2s" begin="1.5s" repeatCount="indefinite" path="M112,203 C130,203 140,180 158,180"/></circle>
+
+
+<!-- ═══════════════════════════════════════ -->
+<!--  STAGE 1: BRONZE                        -->
+<!-- ═══════════════════════════════════════ -->
+<g class="stage" data-tip="bronze" transform="translate(155,42)">
+  <rect class="card" width="175" height="240" rx="12" fill="url(#gBz)" stroke="#cd7f32" stroke-width="1.2" filter="url(#glB)"/>
+  <!-- Badge -->
+  <rect x="10" y="10" width="60" height="16" rx="8" fill="rgba(205,127,50,0.2)" stroke="#cd7f32" stroke-width="0.5"/>
+  <text x="40" y="21" text-anchor="middle" fill="#cd7f32" font-size="7" font-weight="800" letter-spacing="0.5">BRONZE</text>
+  <text x="80" y="21" fill="#e2a96d" font-size="9" font-weight="700">Raw Capture</text>
+  <!-- Stacked files illustration -->
+  <g transform="translate(52,38)">
+    <rect x="0" y="8" width="68" height="42" rx="4" fill="rgba(205,127,50,0.04)" stroke="rgba(205,127,50,0.15)" stroke-width="0.5"/>
+    <rect x="4" y="4" width="68" height="42" rx="4" fill="rgba(205,127,50,0.06)" stroke="rgba(205,127,50,0.2)" stroke-width="0.5"/>
+    <rect x="8" y="0" width="68" height="42" rx="4" fill="rgba(205,127,50,0.09)" stroke="#cd7f32" stroke-width="0.7"/>
+    <!-- File lines -->
+    <line x1="16" y1="12" x2="60" y2="12" stroke="#cd7f32" stroke-width="0.5" opacity="0.4"/>
+    <line x1="16" y1="18" x2="52" y2="18" stroke="#cd7f32" stroke-width="0.5" opacity="0.3"/>
+    <line x1="16" y1="24" x2="56" y2="24" stroke="#cd7f32" stroke-width="0.5" opacity="0.3"/>
+    <line x1="16" y1="30" x2="44" y2="30" stroke="#cd7f32" stroke-width="0.5" opacity="0.2"/>
+    <text x="42" y="38" text-anchor="middle" fill="#cd7f32" font-size="6" font-weight="600" opacity="0.5">SOURCE-AS-IS</text>
+  </g>
+  <!-- Attributes -->
+  <g transform="translate(14,100)">
+    <g><circle cx="5" cy="5" r="4" fill="rgba(205,127,50,0.1)" stroke="#cd7f32" stroke-width="0.4"/><path d="M3.5,5 L5,6.5 L7,3.5" fill="none" stroke="#cd7f32" stroke-width="0.6"/><text x="13" y="8" fill="#e2a96d" font-size="6.5">Immutable &amp; Append-only</text></g>
+    <g transform="translate(0,18)"><circle cx="5" cy="5" r="4" fill="rgba(205,127,50,0.1)" stroke="#cd7f32" stroke-width="0.4"/><path d="M3,5 L5,3 L7,5 L5,7Z" fill="none" stroke="#cd7f32" stroke-width="0.5"/><text x="13" y="8" fill="#e2a96d" font-size="6.5">Data Integrity Verification</text></g>
+    <g transform="translate(0,36)"><circle cx="5" cy="5" r="4" fill="rgba(205,127,50,0.1)" stroke="#cd7f32" stroke-width="0.4"/><path d="M3,4 L7,4 M3,6 L6,6" fill="none" stroke="#cd7f32" stroke-width="0.5"/><text x="13" y="8" fill="#e2a96d" font-size="6.5">Ingestion Metadata</text></g>
+    <g transform="translate(0,54)"><circle cx="5" cy="5" r="4" fill="rgba(205,127,50,0.1)" stroke="#cd7f32" stroke-width="0.4"/><line x1="3" y1="3" x2="7" y2="7" stroke="#cd7f32" stroke-width="0.6"/><line x1="7" y1="3" x2="3" y2="7" stroke="#cd7f32" stroke-width="0.6"/><text x="13" y="8" fill="#e2a96d" font-size="6.5">No Business Logic</text></g>
+  </g>
+  <!-- Storage -->
+  <rect x="10" y="212" width="155" height="16" rx="5" fill="rgba(205,127,50,0.05)" stroke="rgba(205,127,50,0.12)" stroke-width="0.4"/>
+  <text x="88" y="223" text-anchor="middle" fill="#cd7f32" font-size="6" font-family="'Courier New',monospace" opacity="0.6">raw/&lt;source&gt;/&lt;dataset&gt;/dt=...</text>
+</g>
+
+<!-- Quarantine (Bronze) -->
+<g data-tip="quarantine" transform="translate(170,310)">
+  <rect width="145" height="36" rx="8" fill="rgba(239,68,68,0.03)" stroke="rgba(239,68,68,0.2)" stroke-width="0.6" stroke-dasharray="3 2"/>
+  <circle cx="14" cy="18" r="6" fill="none" stroke="#ef4444" stroke-width="0.6" opacity="0.5"/>
+  <text x="14" y="21" text-anchor="middle" fill="#ef4444" font-size="7" font-weight="700">!</text>
+  <text x="26" y="16" fill="#f87171" font-size="6" font-weight="600">Quarantine</text>
+  <text x="26" y="27" fill="#fca5a5" font-size="6" opacity="0.7">Corrupt / Unreadable</text>
+</g>
+<path d="M242,282 L242,308" stroke="#ef4444" stroke-width="0.8" fill="none" opacity="0.25" stroke-dasharray="3 2" marker-end="url(#aQ)"/>
+<!-- Feedback: Review & Reprocess -->
+<path d="M260,308 C280,295 280,288 260,282" stroke="#34d399" stroke-width="0.7" fill="none" opacity="0.3" stroke-dasharray="3 2" marker-start="url(#aR)"/>
+<text x="290" y="298" fill="#34d399" font-size="5.5" opacity="0.45" font-style="italic">Review &amp; Reprocess</text>
+
+
+<!-- ═══ BRONZE → SILVER FLOW ═══ -->
+<g id="bz-sv-flow" class="flow-arrow"><path d="M332,162 Q355,162 375,162" stroke="#a8a8c0" stroke-width="1.5" fill="none" opacity="0.3" stroke-dasharray="6 4" marker-end="url(#aS)"><animate attributeName="stroke-dashoffset" from="30" to="0" dur="1.8s" repeatCount="indefinite"/></path>
+<circle r="3" fill="#c0c0d2" opacity="0.5"><animateMotion dur="2s" begin="0s" repeatCount="indefinite" path="M332,162 Q355,162 378,162"/></circle>
+<circle r="1.8" fill="#c0c0d2" opacity="0.3"><animateMotion dur="2s" begin="0.7s" repeatCount="indefinite" path="M332,162 Q355,162 378,162"/></circle>
+</g>
+
+
+<!-- ═══════════════════════════════════════ -->
+<!--  STAGE 2: SILVER                        -->
+<!-- ═══════════════════════════════════════ -->
+<g class="stage" data-tip="silver" transform="translate(380,42)">
+  <rect class="card" width="195" height="240" rx="12" fill="url(#gSv)" stroke="#a8a8c0" stroke-width="1.2" filter="url(#glS)"/>
+  <rect x="10" y="10" width="56" height="16" rx="8" fill="rgba(168,168,192,0.15)" stroke="#a8a8c0" stroke-width="0.5"/>
+  <text x="38" y="21" text-anchor="middle" fill="#c0c0d2" font-size="7" font-weight="800" letter-spacing="0.5">SILVER</text>
+  <text x="76" y="21" fill="#94a3b8" font-size="9" font-weight="700">Cleansed &amp; Conformed</text>
+  <!-- Funnel illustration -->
+  <g transform="translate(48,38)">
+    <polygon points="0,0 100,0 80,22 20,22" fill="rgba(168,168,192,0.05)" stroke="#a8a8c0" stroke-width="0.7"/>
+    <rect x="30" y="24" width="40" height="12" rx="4" fill="rgba(168,168,192,0.08)" stroke="#a8a8c0" stroke-width="0.6"/>
+    <!-- Animated sparkle at funnel top -->
+    <circle cx="50" cy="8" r="2" fill="#c0c0d2" opacity="0.3">
+      <animate attributeName="opacity" values="0.15;0.7;0.15" dur="2.5s" repeatCount="indefinite"/>
+      <animate attributeName="r" values="1.5;3.5;1.5" dur="2.5s" repeatCount="indefinite"/>
+    </circle>
+    <!-- Drip particles out the bottom -->
+    <circle cx="50" cy="40" r="1.5" fill="#a8a8c0" opacity="0.4">
+      <animate attributeName="cy" values="36;48;36" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.5;0;0.5" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <text x="50" y="14" text-anchor="middle" fill="#a8a8c0" font-size="6" font-weight="600" opacity="0.7">CONFORM</text>
+    <text x="50" y="33" text-anchor="middle" fill="#c0c0d2" font-size="6" font-weight="600">Parquet</text>
+  </g>
+  <!-- Attributes -->
+  <g transform="translate(14,100)">
+    <g><circle cx="5" cy="5" r="4" fill="rgba(168,168,192,0.08)" stroke="#a8a8c0" stroke-width="0.4"/><path d="M3,3 L7,3 L7,7 L3,7Z" fill="none" stroke="#a8a8c0" stroke-width="0.5"/><text x="13" y="8" fill="#94a3b8" font-size="6.5">Data Format &amp; Consistency Checks</text></g>
+    <g transform="translate(0,18)"><circle cx="5" cy="5" r="4" fill="rgba(168,168,192,0.08)" stroke="#a8a8c0" stroke-width="0.4"/><path d="M3,5 Q5,3 7,5 Q5,7 3,5" fill="none" stroke="#a8a8c0" stroke-width="0.5"/><text x="13" y="8" fill="#94a3b8" font-size="6.5">Normalize &amp; Deduplicate</text></g>
+    <g transform="translate(0,36)"><circle cx="5" cy="5" r="4" fill="rgba(168,168,192,0.08)" stroke="#a8a8c0" stroke-width="0.4"/><path d="M3,4.5 L5,3 L7,4.5 M3,5.5 L5,7 L7,5.5" fill="none" stroke="#a8a8c0" stroke-width="0.5"/><text x="13" y="8" fill="#94a3b8" font-size="6.5">PII Tokenize / Mask / Redact</text></g>
+    <g transform="translate(0,54)"><circle cx="5" cy="5" r="4" fill="rgba(168,168,192,0.08)" stroke="#a8a8c0" stroke-width="0.4"/><path d="M3,7 L5,3 L7,7" fill="none" stroke="#a8a8c0" stroke-width="0.5"/><text x="13" y="8" fill="#94a3b8" font-size="6.5">Data Quality Metrics</text></g>
+    <g transform="translate(0,72)"><circle cx="5" cy="5" r="4" fill="rgba(168,168,192,0.08)" stroke="#a8a8c0" stroke-width="0.4"/><path d="M7,3 Q3,5 7,7" fill="none" stroke="#a8a8c0" stroke-width="0.5"/><text x="13" y="8" fill="#94a3b8" font-size="6.5">Lineage to Raw</text></g>
+  </g>
+  <rect x="10" y="212" width="175" height="16" rx="5" fill="rgba(168,168,192,0.04)" stroke="rgba(168,168,192,0.1)" stroke-width="0.4"/>
+  <text x="98" y="223" text-anchor="middle" fill="#a8a8c0" font-size="6" font-family="'Courier New',monospace" opacity="0.6">silver/cleansed_conformed/.../Parquet</text>
+</g>
+
+<!-- Quarantine (Silver) -->
+<g data-tip="quarantine-s" transform="translate(400,310)">
+  <rect width="155" height="36" rx="8" fill="rgba(239,68,68,0.03)" stroke="rgba(239,68,68,0.2)" stroke-width="0.6" stroke-dasharray="3 2"/>
+  <circle cx="14" cy="18" r="6" fill="none" stroke="#ef4444" stroke-width="0.6" opacity="0.5"/>
+  <text x="14" y="21" text-anchor="middle" fill="#ef4444" font-size="7" font-weight="700">!</text>
+  <text x="26" y="16" fill="#f87171" font-size="6" font-weight="600">Quarantine</text>
+  <text x="26" y="27" fill="#fca5a5" font-size="6" opacity="0.7">Invalid / Non-conforming</text>
+</g>
+<path d="M477,282 L477,308" stroke="#ef4444" stroke-width="0.8" fill="none" opacity="0.25" stroke-dasharray="3 2" marker-end="url(#aQ)"/>
+<!-- Feedback: Review & Reprocess -->
+<path d="M495,308 C515,295 515,288 495,282" stroke="#34d399" stroke-width="0.7" fill="none" opacity="0.3" stroke-dasharray="3 2" marker-start="url(#aR)"/>
+<text x="525" y="298" fill="#34d399" font-size="5.5" opacity="0.45" font-style="italic">Review &amp; Reprocess</text>
+
+
+<!-- ═══ SILVER → ENRICHMENT FLOW ═══ -->
+<g id="sv-en-flow" class="flow-arrow"><path d="M577,162 Q600,162 620,162" stroke="rgba(167,139,250,0.4)" stroke-width="1.5" fill="none" stroke-dasharray="6 4" marker-end="url(#aS)"><animate attributeName="stroke-dashoffset" from="30" to="0" dur="1.8s" repeatCount="indefinite"/></path>
+<circle r="3" fill="#a78bfa" opacity="0.4"><animateMotion dur="2s" begin="0s" repeatCount="indefinite" path="M577,162 Q600,162 623,162"/></circle>
+<circle r="1.8" fill="#a78bfa" opacity="0.25"><animateMotion dur="2s" begin="0.7s" repeatCount="indefinite" path="M577,162 Q600,162 623,162"/></circle>
+</g>
+
+
+<!-- ═══════════════════════════════════════ -->
+<!--  STAGE 3: ENRICHMENT                    -->
+<!-- ═══════════════════════════════════════ -->
+<g class="stage" data-tip="enrich" transform="translate(625,42)">
+  <rect class="card" width="195" height="240" rx="12" fill="url(#gEn)" stroke="rgba(167,139,250,0.45)" stroke-width="1.2"/>
+  <!-- Dual badge -->
+  <rect x="10" y="10" width="36" height="16" rx="8" fill="rgba(168,168,192,0.12)" stroke="#a8a8c0" stroke-width="0.5"/>
+  <text x="28" y="21" text-anchor="middle" fill="#c0c0d2" font-size="6" font-weight="800">Ag</text>
+  <line x1="50" y1="18" x2="56" y2="18" stroke="#a78bfa" stroke-width="1" opacity="0.6"/>
+  <path d="M54,15 L58,18 L54,21" fill="none" stroke="#a78bfa" stroke-width="1" opacity="0.6"/>
+  <rect x="60" y="10" width="36" height="16" rx="8" fill="rgba(255,215,0,0.1)" stroke="#ffd700" stroke-width="0.5"/>
+  <text x="78" y="21" text-anchor="middle" fill="#ffd700" font-size="6" font-weight="800">Au</text>
+  <text x="104" y="21" fill="#a78bfa" font-size="9" font-weight="700">Enrichment</text>
+  <!-- Gear illustration -->
+  <g transform="translate(68,44)">
+    <circle cx="30" cy="22" r="18" fill="rgba(139,92,246,0.04)" stroke="rgba(139,92,246,0.15)" stroke-width="0.5"/>
+    <!-- Outer gear -->
+    <g>
+      <circle cx="30" cy="22" r="12" fill="none" stroke="#a78bfa" stroke-width="0.8" opacity="0.6"/>
+      <!-- Teeth -->
+      <g stroke="#a78bfa" stroke-width="1.2" opacity="0.4">
+        <line x1="30" y1="8" x2="30" y2="12"/>
+        <line x1="30" y1="32" x2="30" y2="36"/>
+        <line x1="16" y1="22" x2="20" y2="22"/>
+        <line x1="40" y1="22" x2="44" y2="22"/>
+        <line x1="21" y1="13" x2="23.5" y2="15.5"/>
+        <line x1="36.5" y1="28.5" x2="39" y2="31"/>
+        <line x1="39" y1="13" x2="36.5" y2="15.5"/>
+        <line x1="23.5" y1="28.5" x2="21" y2="31"/>
+      </g>
+      <animateTransform attributeName="transform" type="rotate" from="0 30 22" to="360 30 22" dur="12s" repeatCount="indefinite"/>
+    </g>
+    <!-- Inner gear -->
+    <circle cx="30" cy="22" r="5" fill="rgba(139,92,246,0.15)" stroke="#a78bfa" stroke-width="0.8">
+      <animateTransform attributeName="transform" type="rotate" from="360 30 22" to="0 30 22" dur="8s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+  <!-- Attributes -->
+  <g transform="translate(14,100)">
+    <g><circle cx="5" cy="5" r="4" fill="rgba(139,92,246,0.08)" stroke="#a78bfa" stroke-width="0.4"/><path d="M3,7 L5,3 L7,7 M4,5.5 L6,5.5" fill="none" stroke="#a78bfa" stroke-width="0.5"/><text x="13" y="8" fill="#c4b5fd" font-size="6.5">DPD, Borrowing Base, Flags</text></g>
+    <g transform="translate(0,18)"><circle cx="5" cy="5" r="4" fill="rgba(139,92,246,0.08)" stroke="#a78bfa" stroke-width="0.4"/><path d="M3,3 L5,5 L3,7 M7,3 L5,5 L7,7" fill="none" stroke="#a78bfa" stroke-width="0.5"/><text x="13" y="8" fill="#c4b5fd" font-size="6.5">Cross-dataset Joins</text></g>
+    <g transform="translate(0,36)"><circle cx="5" cy="5" r="4" fill="rgba(139,92,246,0.08)" stroke="#a78bfa" stroke-width="0.4"/><path d="M3,3 L7,3 L7,7 L3,7Z M5,5 L5,3" fill="none" stroke="#a78bfa" stroke-width="0.5"/><text x="13" y="8" fill="#c4b5fd" font-size="6.5">Versioned Business Logic</text></g>
+    <g transform="translate(0,56)">
+      <circle cx="5" cy="5" r="4" fill="rgba(168,168,192,0.06)" stroke="#a8a8c0" stroke-width="0.3"/>
+      <text x="13" y="8" fill="#94a3b8" font-size="5.5">Reusable Features (Silver)</text>
+    </g>
+    <g transform="translate(0,72)">
+      <circle cx="5" cy="5" r="4" fill="rgba(255,215,0,0.08)" stroke="#ffd700" stroke-width="0.3"/>
+      <text x="13" y="8" fill="#fde68a" font-size="5.5">KPIs &amp; Aggregates (Gold)</text>
+    </g>
+    <g transform="translate(0,90)">
+      <circle cx="5" cy="5" r="4" fill="rgba(96,165,250,0.08)" stroke="#60a5fa" stroke-width="0.3"/>
+      <path d="M3.5,5 L5,6.5 L7,3.5" fill="none" stroke="#60a5fa" stroke-width="0.5"/>
+      <text x="13" y="8" fill="#93c5fd" font-size="5.5">Loan Doc Verification</text>
+    </g>
+  </g>
+  <!-- Dual storage -->
+  <rect x="10" y="212" width="82" height="16" rx="5" fill="rgba(168,168,192,0.04)" stroke="rgba(168,168,192,0.1)" stroke-width="0.4"/>
+  <text x="51" y="223" text-anchor="middle" fill="#a8a8c0" font-size="6" font-family="'Courier New',monospace" opacity="0.6">silver/enriched/</text>
+  <rect x="100" y="212" width="85" height="16" rx="5" fill="rgba(255,215,0,0.04)" stroke="rgba(255,215,0,0.1)" stroke-width="0.4"/>
+  <text x="142" y="223" text-anchor="middle" fill="#ffd700" font-size="6" font-family="'Courier New',monospace" opacity="0.6">gold/curated/</text>
+</g>
+
+
+
+<!-- ═══ ENRICHMENT → GOLD FLOW ═══ -->
+<g id="en-gd-flow" class="flow-arrow"><path d="M822,162 Q845,162 865,162" stroke="rgba(255,215,0,0.35)" stroke-width="1.5" fill="none" stroke-dasharray="6 4" marker-end="url(#aG)"><animate attributeName="stroke-dashoffset" from="30" to="0" dur="1.8s" repeatCount="indefinite"/></path>
+<circle r="3.5" fill="#ffd700" opacity="0.4"><animateMotion dur="2s" begin="0s" repeatCount="indefinite" path="M822,162 Q845,162 868,162"/></circle>
+<circle r="2" fill="#ffd700" opacity="0.25"><animateMotion dur="2s" begin="0.7s" repeatCount="indefinite" path="M822,162 Q845,162 868,162"/></circle>
+</g>
+
+
+<!-- ═══════════════════════════════════════ -->
+<!--  STAGE 4: GOLD                          -->
+<!-- ═══════════════════════════════════════ -->
+<g class="stage" data-tip="gold" transform="translate(870,42)">
+  <rect class="card" width="175" height="240" rx="12" fill="url(#gGd)" stroke="#ffd700" stroke-width="1.2" filter="url(#glG)"/>
+  <rect x="10" y="10" width="48" height="16" rx="8" fill="rgba(255,215,0,0.15)" stroke="#ffd700" stroke-width="0.5"/>
+  <text x="34" y="21" text-anchor="middle" fill="#ffd700" font-size="7" font-weight="800" letter-spacing="0.5">GOLD</text>
+  <text x="68" y="21" fill="#fde68a" font-size="9" font-weight="700">Curated / Serving</text>
+  <!-- Trophy/star illustration -->
+  <g transform="translate(56,40)">
+    <polygon points="30,2 36,20 54,20 40,32 45,50 30,39 15,50 20,32 6,20 24,20" fill="rgba(255,215,0,0.06)" stroke="#ffd700" stroke-width="0.7" stroke-linejoin="round"/>
+    <!-- Animated glow -->
+    <circle cx="30" cy="26" r="8" fill="none" stroke="#ffd700" stroke-width="0.4" opacity="0.3">
+      <animate attributeName="r" values="8;14;8" dur="3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.3;0;0.3" dur="3s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+  <!-- Attributes -->
+  <g transform="translate(14,100)">
+    <g><circle cx="5" cy="5" r="4" fill="rgba(255,215,0,0.08)" stroke="#ffd700" stroke-width="0.4"/><path d="M3,3 L7,3 L7,7 L3,7Z M5,3 L5,7 M3,5 L7,5" fill="none" stroke="#ffd700" stroke-width="0.4"/><text x="13" y="8" fill="#fde68a" font-size="6.5">BI-ready Marts</text></g>
+    <g transform="translate(0,18)"><circle cx="5" cy="5" r="4" fill="rgba(255,215,0,0.08)" stroke="#ffd700" stroke-width="0.4"/><path d="M3,7 L3,3 L7,3" fill="none" stroke="#ffd700" stroke-width="0.5"/><text x="13" y="8" fill="#fde68a" font-size="6.5">Semantic Models</text></g>
+    <g transform="translate(0,36)"><circle cx="5" cy="5" r="4" fill="rgba(255,215,0,0.08)" stroke="#ffd700" stroke-width="0.4"/><path d="M3,5 L5,3 L7,5 L5,7Z" fill="none" stroke="#ffd700" stroke-width="0.5"/><text x="13" y="8" fill="#fde68a" font-size="6.5">Pre-aggregated Metrics</text></g>
+    <g transform="translate(0,54)"><circle cx="5" cy="5" r="4" fill="rgba(255,215,0,0.08)" stroke="#ffd700" stroke-width="0.4"/><path d="M3,3 Q5,7 7,3" fill="none" stroke="#ffd700" stroke-width="0.5"/><text x="13" y="8" fill="#fde68a" font-size="6.5">Investor &amp; Fund Reports</text></g>
+  </g>
+  <rect x="10" y="212" width="155" height="16" rx="5" fill="rgba(255,215,0,0.04)" stroke="rgba(255,215,0,0.1)" stroke-width="0.4"/>
+  <text x="88" y="223" text-anchor="middle" fill="#ffd700" font-size="6" font-family="'Courier New',monospace" opacity="0.6">gold/curated/ &middot; gold/serving/</text>
+</g>
+
+
+<!-- ═══ GOLD → CONSUMPTION FLOW ═══ -->
+<g id="gd-co-flow" class="flow-arrow"><path d="M1047,120 Q1075,120 1095,120" stroke="rgba(34,211,238,0.35)" stroke-width="1.2" fill="none" stroke-dasharray="5 3" marker-end="url(#aC)"><animate attributeName="stroke-dashoffset" from="24" to="0" dur="1.5s" repeatCount="indefinite"/></path>
+<path d="M1047,162 Q1075,162 1095,162" stroke="rgba(34,211,238,0.35)" stroke-width="1.2" fill="none" stroke-dasharray="5 3" marker-end="url(#aC)"><animate attributeName="stroke-dashoffset" from="24" to="0" dur="1.7s" repeatCount="indefinite"/></path>
+<path d="M1047,200 Q1075,200 1095,200" stroke="rgba(34,211,238,0.35)" stroke-width="1.2" fill="none" stroke-dasharray="5 3" marker-end="url(#aC)"><animate attributeName="stroke-dashoffset" from="24" to="0" dur="1.9s" repeatCount="indefinite"/></path>
+<circle r="2.5" fill="#22d3ee" opacity="0.4"><animateMotion dur="2s" begin="0s" repeatCount="indefinite" path="M1047,120 Q1075,120 1098,120"/></circle>
+<circle r="2" fill="#22d3ee" opacity="0.3"><animateMotion dur="2s" begin="0.5s" repeatCount="indefinite" path="M1047,162 Q1075,162 1098,162"/></circle>
+<circle r="2.5" fill="#22d3ee" opacity="0.35"><animateMotion dur="2s" begin="1s" repeatCount="indefinite" path="M1047,200 Q1075,200 1098,200"/></circle>
+</g>
+
+
+<!-- ═══════════════════════════════════════ -->
+<!--  STAGE 5: CONSUMPTION / BI              -->
+<!-- ═══════════════════════════════════════ -->
+<g class="stage" data-tip="consumption" transform="translate(1100,42)">
+  <rect class="card" width="220" height="240" rx="12" fill="url(#gBI)" stroke="#22d3ee" stroke-width="1.2" filter="url(#glC)"/>
+  <text x="16" y="21" fill="#22d3ee" font-size="8" font-weight="800">CONSUMPTION</text>
+
+  <!-- ── Dashboard card ── -->
+  <g transform="translate(14,36)">
+    <rect width="192" height="60" rx="6" fill="rgba(34,211,238,0.03)" stroke="rgba(34,211,238,0.12)" stroke-width="0.5"/>
+    <text x="8" y="13" fill="#22d3ee" font-size="6.5" font-weight="700">Dashboards &amp; BI</text>
+    <!-- Animated bar chart -->
+    <g transform="translate(10,18)">
+      <rect x="0" y="32" width="170" height="0.4" fill="rgba(34,211,238,0.15)"/>
+      <rect x="8" width="14" rx="2" fill="rgba(34,211,238,0.25)">
+        <animate attributeName="height" values="28;20;28" dur="2.5s" repeatCount="indefinite"/>
+        <animate attributeName="y" values="4;12;4" dur="2.5s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="28" width="14" rx="2" fill="rgba(34,211,238,0.35)">
+        <animate attributeName="height" values="24;30;24" dur="3s" repeatCount="indefinite"/>
+        <animate attributeName="y" values="8;2;8" dur="3s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="48" width="14" rx="2" fill="rgba(34,211,238,0.45)">
+        <animate attributeName="height" values="30;22;30" dur="2.2s" repeatCount="indefinite"/>
+        <animate attributeName="y" values="2;10;2" dur="2.2s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="68" width="14" rx="2" fill="rgba(34,211,238,0.3)">
+        <animate attributeName="height" values="18;26;18" dur="2.8s" repeatCount="indefinite"/>
+        <animate attributeName="y" values="14;6;14" dur="2.8s" repeatCount="indefinite"/>
+      </rect>
+      <!-- Line chart overlay -->
+      <polyline points="15,8 35,4 55,6 75,2 95,10 115,4 135,8 155,3" fill="none" stroke="#22d3ee" stroke-width="0.8" opacity="0.5">
+        <animate attributeName="opacity" values="0.3;0.7;0.3" dur="3s" repeatCount="indefinite"/>
+      </polyline>
+      <!-- Pie chart -->
+      <circle cx="135" cy="16" r="10" fill="none" stroke="rgba(34,211,238,0.2)" stroke-width="8"/>
+      <circle cx="135" cy="16" r="10" fill="none" stroke="rgba(34,211,238,0.5)" stroke-width="8" stroke-dasharray="20 43" stroke-dashoffset="0">
+        <animate attributeName="stroke-dashoffset" from="0" to="-63" dur="6s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+  </g>
+
+  <!-- ── Reports card ── -->
+  <g transform="translate(14,104)">
+    <rect width="92" height="44" rx="6" fill="rgba(34,211,238,0.03)" stroke="rgba(34,211,238,0.1)" stroke-width="0.5"/>
+    <text x="8" y="13" fill="#22d3ee" font-size="6.5" font-weight="700">Reports &amp; Extracts</text>
+    <!-- Stacked report pages -->
+    <g transform="translate(12,18)">
+      <rect x="0" y="2" width="18" height="20" rx="2" fill="rgba(34,211,238,0.05)" stroke="rgba(34,211,238,0.2)" stroke-width="0.4"/>
+      <rect x="3" y="0" width="18" height="20" rx="2" fill="rgba(34,211,238,0.08)" stroke="rgba(34,211,238,0.25)" stroke-width="0.4"/>
+      <line x1="6" y1="5" x2="18" y2="5" stroke="#22d3ee" stroke-width="0.3" opacity="0.4"/>
+      <line x1="6" y1="9" x2="16" y2="9" stroke="#22d3ee" stroke-width="0.3" opacity="0.3"/>
+      <line x1="6" y1="13" x2="14" y2="13" stroke="#22d3ee" stroke-width="0.3" opacity="0.2"/>
+    </g>
+    <text x="48" y="28" fill="#67e8f9" font-size="6" opacity="0.6">Daily emails</text>
+    <text x="48" y="37" fill="#67e8f9" font-size="6" opacity="0.6">Scheduled CSV</text>
+  </g>
+
+  <!-- ── APIs card ── -->
+  <g transform="translate(114,104)">
+    <rect width="92" height="44" rx="6" fill="rgba(34,211,238,0.03)" stroke="rgba(34,211,238,0.1)" stroke-width="0.5"/>
+    <text x="8" y="13" fill="#22d3ee" font-size="6.5" font-weight="700">APIs &amp; Integrations</text>
+    <!-- API endpoint icon -->
+    <g transform="translate(12,20)">
+      <circle cx="8" cy="8" r="6" fill="none" stroke="rgba(34,211,238,0.3)" stroke-width="0.5"/>
+      <text x="8" y="11" text-anchor="middle" fill="#22d3ee" font-size="6" font-weight="700">/</text>
+      <!-- Connection lines -->
+      <line x1="16" y1="4" x2="28" y2="4" stroke="#22d3ee" stroke-width="0.4" opacity="0.3"/>
+      <line x1="16" y1="8" x2="32" y2="8" stroke="#22d3ee" stroke-width="0.4" opacity="0.4"/>
+      <line x1="16" y1="12" x2="26" y2="12" stroke="#22d3ee" stroke-width="0.4" opacity="0.3"/>
+      <!-- Animated pulse on lines -->
+      <circle cx="22" cy="8" r="1.2" fill="#22d3ee" opacity="0.4">
+        <animate attributeName="cx" values="16;32;16" dur="2s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.6;0.1;0.6" dur="2s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+    <text x="48" y="30" fill="#67e8f9" font-size="6" opacity="0.6">REST / GraphQL</text>
+    <text x="48" y="39" fill="#67e8f9" font-size="6" opacity="0.6">Downstream feeds</text>
+  </g>
+
+  <!-- ── Stakeholders ── -->
+  <g transform="translate(14,158)">
+    <rect width="192" height="32" rx="6" fill="rgba(34,211,238,0.02)" stroke="rgba(34,211,238,0.08)" stroke-width="0.4"/>
+    <text x="96" y="13" text-anchor="middle" fill="#22d3ee" font-size="6" font-weight="600">Consumers</text>
+    <g transform="translate(8,18)">
+      <text x="0" y="6" fill="#67e8f9" font-size="5" opacity="0.6">Origination/Investment</text>
+      <text x="58" y="6" fill="#67e8f9" font-size="5" opacity="0.6">Fund Managers</text>
+      <text x="110" y="6" fill="#67e8f9" font-size="5" opacity="0.6">Investors/LPs</text>
+      <text x="154" y="6" fill="#67e8f9" font-size="5" opacity="0.6">Compliance</text>
+    </g>
+  </g>
+
+  <!-- ── Notifications live dot ── -->
+  <g transform="translate(14,198)">
+    <rect width="192" height="28" rx="6" fill="rgba(34,211,238,0.02)" stroke="rgba(34,211,238,0.06)" stroke-width="0.4"/>
+    <!-- Pulsing live indicator -->
+    <circle cx="14" cy="14" r="3" fill="#22d3ee" opacity="0.3">
+      <animate attributeName="opacity" values="0.2;0.7;0.2" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="r" values="2;4;2" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="14" cy="14" r="2" fill="#22d3ee" opacity="0.6"/>
+    <text x="24" y="12" fill="#67e8f9" font-size="6" font-weight="600">Live Alerts &amp; Notifications</text>
+    <text x="24" y="22" fill="#67e8f9" font-size="5.5" opacity="0.5">Covenant breaches &middot; Default notices &middot; NAV updates</text>
+  </g>
+</g>
+
+
+<!-- ═══════════════════════════════════════ -->
+<!--  REGENERABILITY ARC                     -->
+<!-- ═══════════════════════════════════════ -->
+<!-- Main arc line -->
+<path d="M1045,290 C1045,420 165,420 165,290" stroke="rgba(139,92,246,0.25)" stroke-width="1.8" fill="none" stroke-dasharray="8 4">
+  <animate attributeName="stroke-dashoffset" from="0" to="50" dur="4s" repeatCount="indefinite"/>
+</path>
+<!-- Glow behind arc -->
+<path d="M1045,290 C1045,420 165,420 165,290" stroke="rgba(139,92,246,0.08)" stroke-width="6" fill="none"/>
+<!-- Label with background pill -->
+<rect x="490" y="397" width="230" height="22" rx="11" fill="rgba(139,92,246,0.08)" stroke="rgba(139,92,246,0.18)" stroke-width="0.6"/>
+<text x="605" y="412" text-anchor="middle" fill="#8b5cf6" font-size="7.5" font-weight="700" opacity="0.7">&#8635;  Fully Regenerable from Raw</text>
+<!-- Larger animated particle -->
+<circle r="3.5" fill="#8b5cf6" opacity="0.5"><animateMotion dur="5s" repeatCount="indefinite" path="M1045,290 C1045,420 165,420 165,290"/></circle>
+<!-- Trail particle -->
+<circle r="2" fill="#a78bfa" opacity="0.3"><animateMotion dur="5s" begin="0.4s" repeatCount="indefinite" path="M1045,290 C1045,420 165,420 165,290"/></circle>
+
+
+<!-- ═══════════════════════════════════════ -->
+<!--  SYSTEM GUARANTEES                      -->
+<!-- ═══════════════════════════════════════ -->
+<g transform="translate(0,460)">
+  <line x1="40" y1="0" x2="1320" y2="0" stroke="rgba(255,255,255,0.03)" stroke-width="0.8"/>
+  <text x="680" y="20" text-anchor="middle" fill="#334155" font-size="7.5" font-weight="700" letter-spacing="2.5">SYSTEM GUARANTEES</text>
+
+  <!-- 7-Year Retention Policy -->
+  <g transform="translate(680,32)" text-anchor="middle">
+    <rect x="-155" y="-1" width="310" height="18" rx="9" fill="rgba(148,163,184,0.04)" stroke="rgba(148,163,184,0.1)" stroke-width="0.5"/>
+    <path d="M-140,3 L-140,13 M-143,3 L-137,3" fill="none" stroke="#94a3b8" stroke-width="0.7" opacity="0.5"/>
+    <circle cx="-140" cy="8" r="5" fill="none" stroke="#94a3b8" stroke-width="0.5" opacity="0.35"/>
+    <text x="5" y="12" fill="#94a3b8" font-size="5.5" font-weight="600" opacity="0.6">All layers: 7-year data retention policy (regulatory compliance)</text>
+  </g>
+
+  <g transform="translate(230,55)">
+    <!-- Regenerable -->
+    <g>
+      <rect width="195" height="52" rx="10" fill="rgba(139,92,246,0.03)" stroke="rgba(139,92,246,0.12)" stroke-width="0.5"/>
+      <g transform="translate(12,12)">
+        <circle cx="10" cy="10" r="9" fill="none" stroke="#a78bfa" stroke-width="0.6" opacity="0.5"/>
+        <g>
+          <path d="M6,10 Q10,4 14,10 Q10,16 6,10" fill="none" stroke="#a78bfa" stroke-width="0.7"/>
+          <animateTransform attributeName="transform" type="rotate" from="0 10 10" to="360 10 10" dur="6s" repeatCount="indefinite"/>
+        </g>
+      </g>
+      <text x="38" y="20" fill="#a78bfa" font-size="6.5" font-weight="700">Regenerable</text>
+      <text x="38" y="33" fill="#64748b" font-size="5.5">Silver + Gold fully rebuildable</text>
+      <text x="38" y="43" fill="#64748b" font-size="5.5">from Raw at any time</text>
+    </g>
+    <!-- Auditable -->
+    <g transform="translate(220,0)">
+      <rect width="195" height="52" rx="10" fill="rgba(52,211,153,0.03)" stroke="rgba(52,211,153,0.12)" stroke-width="0.5"/>
+      <g transform="translate(12,12)">
+        <rect x="2" y="2" width="16" height="16" rx="3" fill="none" stroke="#34d399" stroke-width="0.6" opacity="0.5"/>
+        <path d="M6,10 L9,13 L14,7" fill="none" stroke="#34d399" stroke-width="0.8"/>
+      </g>
+      <text x="38" y="20" fill="#34d399" font-size="6.5" font-weight="700">Auditable</text>
+      <text x="38" y="33" fill="#64748b" font-size="5.5">Checksums, lineage tracking,</text>
+      <text x="38" y="43" fill="#64748b" font-size="5.5">raw retention, completeness metrics</text>
+    </g>
+    <!-- No Silent Failures -->
+    <g transform="translate(440,0)">
+      <rect width="210" height="52" rx="10" fill="rgba(239,68,68,0.03)" stroke="rgba(239,68,68,0.1)" stroke-width="0.5"/>
+      <g transform="translate(12,12)">
+        <circle cx="10" cy="10" r="9" fill="none" stroke="#f87171" stroke-width="0.6" opacity="0.5"/>
+        <line x1="10" y1="6" x2="10" y2="12" stroke="#f87171" stroke-width="0.8"/>
+        <circle cx="10" cy="15" r="0.8" fill="#f87171"/>
+      </g>
+      <text x="38" y="20" fill="#f87171" font-size="6.5" font-weight="700">No Silent Failures</text>
+      <text x="38" y="33" fill="#64748b" font-size="5.5">All invalid data quarantined</text>
+      <text x="38" y="43" fill="#64748b" font-size="5.5">for human review &mdash; nothing dropped</text>
+    </g>
+    <!-- Clear Ownership -->
+    <g transform="translate(675,0)">
+      <rect width="225" height="52" rx="10" fill="rgba(251,191,36,0.03)" stroke="rgba(251,191,36,0.1)" stroke-width="0.5"/>
+      <g transform="translate(12,12)">
+        <path d="M2,10 L10,2 L18,10 L10,18Z" fill="none" stroke="#fbbf24" stroke-width="0.6" opacity="0.5"/>
+        <line x1="10" y1="2" x2="10" y2="18" stroke="#fbbf24" stroke-width="0.4" opacity="0.3"/>
+      </g>
+      <text x="38" y="20" fill="#fbbf24" font-size="6.5" font-weight="700">Clear Ownership</text>
+      <text x="38" y="30" fill="#64748b" font-size="5.5">Harvester: ingestion &amp; conformance</text>
+      <text x="38" y="39" fill="#64748b" font-size="5.5">Analytics: enrichment &amp; curation</text>
+      <text x="38" y="48" fill="#64748b" font-size="5.5">Consumption: BI &amp; reporting</text>
+    </g>
+  </g>
+</g>
+
+<!-- ─── Medallion flow label (bottom center) ─── -->
+<g transform="translate(680,580)" text-anchor="middle">
+  <text x="-220" y="0" fill="#cd7f32" font-size="8" font-weight="800" opacity="0.3">BRONZE</text>
+  <text x="-160" y="0" fill="#64748b" font-size="10" opacity="0.25">&#8594;</text>
+  <text x="-110" y="0" fill="#a8a8c0" font-size="8" font-weight="800" opacity="0.3">SILVER</text>
+  <text x="-50" y="0" fill="#64748b" font-size="10" opacity="0.25">&#8594;</text>
+  <text x="0" y="0" fill="#a78bfa" font-size="8" font-weight="800" opacity="0.3">ENRICH</text>
+  <text x="60" y="0" fill="#64748b" font-size="10" opacity="0.25">&#8594;</text>
+  <text x="110" y="0" fill="#ffd700" font-size="8" font-weight="800" opacity="0.3">GOLD</text>
+  <text x="160" y="0" fill="#64748b" font-size="10" opacity="0.25">&#8594;</text>
+  <text x="220" y="0" fill="#22d3ee" font-size="8" font-weight="800" opacity="0.3">CONSUME</text>
+</g>
+
+</svg>
+</div>
+
+<!-- Tooltip -->
+<div class="tip" id="tip"></div>
+
+<!-- Click-to-expand modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal-card" id="modal-card"></div>
+</div>
+
+<script>
+// ── Theme Toggle ──
+function toggleTheme(){
+  const html=document.documentElement;
+  const isDark=html.getAttribute('data-theme')==='dark';
+  const next=isDark?'light':'dark';
+  html.setAttribute('data-theme',next);
+  document.getElementById('theme-icon').innerHTML=isDark?'&#9728;':'&#9790;';
+  document.getElementById('theme-label').textContent=isDark?'Dark':'Light';
+  try{localStorage.setItem('cls-theme',next)}catch(e){}
+}
+try{const s=localStorage.getItem('cls-theme');if(s==='light')toggleTheme();}catch(e){}
+
+// ── Tip & Detail data ──
+const tips={
+  sources:{t:'Data Sources',bg:'SOURCES',c:'#60a5fa',b:'rgba(59,130,246,0.2)',
+    d:'External systems feeding raw data into the pipeline: LMS (Loan Management System), Banks (BAI2, ACH transactions), Payment Processors, and Legal documents. Data arrives in various formats: CSV, API, JSON, SQL, PDF.',
+    detail:{Systems:'LMS, Banks, Payment Processors, Legal',Formats:'CSV, API, JSON, SQL, PDF','Frequency':'Real-time + batch','Key Rule':'Each source can provide data in any format'}},
+  bronze:{t:'Bronze \u2014 Raw Capture',bg:'BRONZE',c:'#cd7f32',b:'rgba(205,127,50,0.2)',
+    d:'Source-as-is ingestion. Data stored exactly as received \u2014 immutable, append-only. Technical checks only (presence, integrity, checksums). No schema enforcement or business logic. Raw PII strictly access-controlled.',
+    detail:{Owner:'Harvester',Storage:'raw/&lt;source&gt;/&lt;dataset&gt;/dt=...',Format:'Source-native (CSV, JSON, XML, PDF)',Schema:'None \u2014 stored as-is','Key Rule':'Immutable &amp; append-only, no transforms'}},
+  silver:{t:'Silver \u2014 Cleansed &amp; Conformed',bg:'SILVER',c:'#c0c0d2',b:'rgba(168,168,192,0.2)',
+    d:'Canonical schemas (Pydantic / Pandera / SQL). Schema validation, strict type casting, deduplication, normalization. PII tokenized or masked. Invalid records quarantined.',
+    detail:{Owner:'Harvester',Storage:'silver/cleansed_conformed/.../Parquet',Format:'Parquet (columnar)',Schema:'Pydantic / Pandera validated','Key Rule':'All records must pass schema or go to quarantine'}},
+  enrich:{t:'Enrichment &amp; Feature Computation',bg:'SILVER \u2192 GOLD',c:'#a78bfa',b:'rgba(139,92,246,0.2)',
+    d:'Derived business metrics (DPD, borrowing base, flags). Cross-dataset joins. Versioned business logic. Loan doc verification. Features stay Silver; KPIs promoted to Gold.',
+    detail:{Owner:'Analytics &amp; Orchestration',Storage:'silver/enriched/ &amp; gold/curated/',Format:'Parquet / Delta',Schema:'Versioned business logic','Key Rule':'All logic testable, versioned, regenerable'}},
+  gold:{t:'Gold \u2014 Curated / Serving',bg:'GOLD',c:'#ffd700',b:'rgba(255,215,0,0.2)',
+    d:'BI-ready marts and semantic models. Pre-aggregated metrics and investor/fund reports. The final trusted layer feeding all downstream consumption.',
+    detail:{Owner:'Analytics &amp; Orchestration',Storage:'gold/curated/ &middot; gold/serving/',Format:'Parquet / Delta / SQL views',Schema:'Semantic models','Key Rule':'Single source of truth for all consumers'}},
+  consumption:{t:'Consumption Layer',bg:'CONSUME',c:'#22d3ee',b:'rgba(34,211,238,0.2)',
+    d:'Dashboards, BI tools, scheduled reports, daily email extracts, downstream REST/GraphQL APIs, live alerts. Consumed by origination/investment teams, fund managers, investors/LPs, and compliance.',
+    detail:{Owner:'Consumption',Outputs:'Dashboards, Reports, APIs, Live Alerts',Consumers:'Origination/Investment, Fund Managers, Investors/LPs, Compliance',Format:'Various (web, PDF, CSV, JSON)','Key Rule':'Read-only from Gold \u2014 never write back'}},
+  quarantine:{t:'Raw Quarantine',bg:'QUARANTINE',c:'#ef4444',b:'rgba(239,68,68,0.2)',
+    d:'Corrupt or unreadable files routed here for human review. Nothing is silently dropped. Records can be reviewed and reprocessed.'},
+  'quarantine-s':{t:'Silver Quarantine',bg:'QUARANTINE',c:'#ef4444',b:'rgba(239,68,68,0.2)',
+    d:'Records failing schema validation or conformance. Preserved for debugging and reprocessing.'}
+};
+
+// ── Tooltips ──
+const el=document.getElementById('tip');let vis=false;
+document.querySelectorAll('[data-tip]').forEach(g=>{
+  g.addEventListener('mouseenter',()=>{
+    const d=tips[g.getAttribute('data-tip')];if(!d)return;
+    el.innerHTML='<h4>'+d.t+'</h4><span class="bg" style="color:'+d.c+';background:'+d.b+'">'+d.bg+'</span><p>'+d.d+'</p>';
+    el.classList.add('show');vis=true;
+  });
+  g.addEventListener('mouseleave',()=>{el.classList.remove('show');vis=false;});
+});
+document.addEventListener('mousemove',e=>{
+  if(!vis)return;
+  const x=e.clientX+14,y=e.clientY+14,w=el.offsetWidth,h=el.offsetHeight;
+  el.style.left=(x+w>innerWidth?e.clientX-w-10:x)+'px';
+  el.style.top=(y+h>innerHeight?e.clientY-h-10:y)+'px';
+});
+
+// ── Click-to-expand modal ──
+const modal=document.getElementById('modal');
+const mcard=document.getElementById('modal-card');
+document.querySelectorAll('.stage[data-tip]').forEach(g=>{
+  g.addEventListener('click',()=>{
+    const key=g.getAttribute('data-tip');
+    const d=tips[key];if(!d)return;
+    let html='<h3>'+d.t+'</h3>';
+    html+='<span class="mbadge" style="color:'+d.c+';background:'+d.b+';border:1px solid '+d.c+'">'+d.bg+'</span>';
+    html+='<p>'+d.d+'</p>';
+    if(d.detail){
+      html+='<dl class="mdetail">';
+      for(const[k,v] of Object.entries(d.detail)){
+        html+='<dt>'+k+'</dt><dd>'+v+'</dd>';
+      }
+      html+='</dl>';
+    }
+    mcard.innerHTML=html;
+    modal.classList.add('show');
+    el.classList.remove('show');vis=false;
+  });
+});
+modal.addEventListener('click',e=>{
+  if(e.target===modal)modal.classList.remove('show');
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')modal.classList.remove('show');
+});
+
+// ── Hover flow highlighting (debounced for smooth feel) ──
+const svg=document.querySelector('svg.main');
+const stages=svg.querySelectorAll('.stage');
+const flowMap={
+  bronze:['src-flow','bz-sv-flow'],
+  silver:['bz-sv-flow','sv-en-flow'],
+  enrich:['sv-en-flow','en-gd-flow'],
+  gold:['en-gd-flow','gd-co-flow'],
+  consumption:['gd-co-flow']
+};
+let hoverTimer=null;
+stages.forEach(s=>{
+  s.addEventListener('mouseenter',()=>{
+    clearTimeout(hoverTimer);
+    const key=s.getAttribute('data-tip');
+    const flows=flowMap[key]||[];
+    svg.querySelectorAll('.active').forEach(e=>e.classList.remove('active'));
+    svg.classList.add('highlighting');
+    s.classList.add('active');
+    flows.forEach(id=>{
+      const el=svg.querySelector('#'+id);
+      if(el)el.classList.add('active');
+    });
+  });
+  s.addEventListener('mouseleave',()=>{
+    hoverTimer=setTimeout(()=>{
+      svg.classList.remove('highlighting');
+      svg.querySelectorAll('.active').forEach(e=>e.classList.remove('active'));
+    },150);
+  });
+});
+
+// ── Stage entrance animation (stages only — flow arrows stay always visible) ──
+const stageOrder=['sources','bronze','silver','enrich','gold','consumption'];
+stageOrder.forEach((id,i)=>{
+  const el=svg.querySelector('[data-tip="'+id+'"]');
+  if(el)setTimeout(()=>el.classList.add('entered'),100+i*200);
+});
+
+// ── Breadcrumb nav ──
+const stagePositions={sources:28,bronze:155,silver:380,enrich:625,gold:870,consumption:1100};
+document.querySelectorAll('.breadcrumb .step').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const key=btn.getAttribute('data-stage');
+    const x=stagePositions[key];if(x===undefined)return;
+    // Highlight breadcrumb
+    document.querySelectorAll('.breadcrumb .step').forEach(b=>b.classList.remove('hl'));
+    btn.classList.add('hl');
+    // Flash the stage
+    const stage=svg.querySelector('.stage[data-tip="'+key+'"]')||svg.querySelector('g[data-tip="'+key+'"]');
+    if(stage){
+      stage.style.transition='filter 0.3s ease';
+      stage.style.filter='brightness(1.4) drop-shadow(0 0 8px rgba(255,255,255,0.3))';
+      setTimeout(()=>{stage.style.filter='';},1200);
+      // Scroll SVG into view
+      stage.scrollIntoView({behavior:'smooth',block:'center',inline:'center'});
+    }
+  });
+});
+</script>
+</body>
+</html>

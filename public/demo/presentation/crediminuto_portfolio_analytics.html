@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Crediminuto | Micro-Credit Portfolio Analytics</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#06090f;--c1:#0d1420;--c2:#131c2e;--c3:#1a2540;--brd:#1e2d4a;--t1:#e8edf5;--t2:#8899b4;--t3:#556a8a;--ac:#818cf8;--tl:#2dd4bf;--am:#fbbf24;--co:#fb923c;--rd:#f87171;--gn:#4ade80;--bl:#60a5fa;--pk:#f472b6;--r:10px}
+body{background:var(--bg);color:var(--t1);font-family:'DM Sans',sans-serif;overflow-x:hidden}
+.w{max-width:1440px;margin:0 auto;padding:20px 28px}
+h1{font-size:26px;font-weight:700;letter-spacing:-.4px}
+.hdr{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:4px;padding-bottom:16px;border-bottom:1px solid var(--brd)}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:600}
+.tabs{display:flex;gap:4px;margin:16px 0;flex-wrap:wrap}
+.tab{padding:7px 16px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--brd);color:var(--t3);background:transparent;transition:all .2s;font-family:inherit}
+.tab:hover{border-color:var(--ac);color:var(--t1)}.tab.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.g{display:grid;gap:14px;margin-bottom:20px}
+.g7{grid-template-columns:repeat(7,1fr)}.g5{grid-template-columns:repeat(5,1fr)}.g4{grid-template-columns:repeat(4,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:1200px){.g7{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:1000px){.g7,.g5,.g4{grid-template-columns:repeat(2,1fr)}}
+.m{background:var(--c1);border:1px solid var(--brd);border-radius:var(--r);padding:16px 18px;position:relative;overflow:hidden;transition:transform .2s,border-color .3s}
+.m:hover{transform:translateY(-1px);border-color:var(--ac)}
+.m .lb{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px}
+.m .vl{font-size:22px;font-weight:700;font-family:'JetBrains Mono',monospace;letter-spacing:-.5px}
+.m .s2{font-size:11px;color:var(--t3);margin-top:3px}
+.cd{background:var(--c1);border:1px solid var(--brd);border-radius:var(--r);padding:18px 22px}
+.cd h3{font-size:14px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.ch{position:relative;width:100%;height:280px}
+.lg{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:10px;font-size:11px;color:var(--t2)}
+.lg span{display:flex;align-items:center;gap:4px}
+.dt{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+.pr{height:8px;border-radius:4px;background:var(--brd);overflow:hidden;margin:4px 0}
+.pf{height:100%;border-radius:4px;transition:width 1.2s cubic-bezier(.22,1,.36,1)}
+.sec{display:none}.sec.on{display:block}
+.sb{display:flex;height:28px;border-radius:6px;overflow:hidden;margin:6px 0}
+.sg{display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:600;transition:all .3s;cursor:pointer;min-width:2px}
+.sg:hover{filter:brightness(1.25)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:8px 6px;border-bottom:1px solid var(--brd);color:var(--t3);font-weight:500;font-size:11px;cursor:pointer;white-space:nowrap}
+td{padding:8px 6px;border-bottom:1px solid rgba(30,45,74,.4);white-space:nowrap}
+tr:hover td{background:rgba(129,140,248,.03)}
+.pl{display:inline-block;padding:2px 9px;border-radius:16px;font-size:10px;font-weight:600}
+.pl-g{background:rgba(45,212,191,.1);color:var(--tl)}.pl-r{background:rgba(248,113,113,.1);color:var(--rd)}.pl-y{background:rgba(251,191,36,.1);color:var(--am)}.pl-b{background:rgba(96,165,250,.1);color:var(--bl)}
+.dp{height:5px;border-radius:3px;background:var(--brd);overflow:hidden;width:50px;display:inline-block;vertical-align:middle;margin-right:5px}
+.dpf{height:100%;border-radius:3px}
+@keyframes su{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fi{from{opacity:0}to{opacity:1}}
+.su{animation:su .5s ease-out both}.fi{animation:fi .6s ease-out both}
+.pulse{animation:pulse 2.5s infinite}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.glow{position:absolute;top:-1px;left:0;right:0;height:2px;border-radius:2px;opacity:0;transition:opacity .3s}
+.m:hover .glow{opacity:1}
+.wf-row{display:flex;align-items:center;gap:12px;margin-bottom:8px;font-size:12px}
+.wf-bar{height:28px;border-radius:5px;display:flex;align-items:center;justify-content:flex-end;padding:0 8px;font-size:11px;font-weight:600;font-family:'JetBrains Mono',monospace;color:#fff;min-width:40px;transition:width 1s ease}
+.wf-label{width:220px;flex-shrink:0;color:var(--t2);text-align:right}
+.wf-val{width:100px;flex-shrink:0;font-family:'JetBrains Mono',monospace;font-weight:600;font-size:12px}
+.tbl-scroll{overflow-x:auto;max-height:500px;overflow-y:auto}
+.tbl-scroll::-webkit-scrollbar{height:6px;width:6px}
+.tbl-scroll::-webkit-scrollbar-track{background:var(--c1)}
+.tbl-scroll::-webkit-scrollbar-thumb{background:var(--brd);border-radius:3px}
+.xirr-hi{color:var(--tl);font-weight:700;font-family:'JetBrains Mono',monospace}
+.mult-hi{color:var(--am);font-weight:700;font-family:'JetBrains Mono',monospace}
+[data-theme="light"]{--bg:#f8fafc;--c1:#ffffff;--c2:#f1f5f9;--c3:#e2e8f0;--brd:#e2e8f0;--t1:#0f172a;--t2:#475569;--t3:#94a3b8}
+[data-theme="light"] .sg{color:#fff}
+[data-theme="light"] tr:hover td{background:rgba(129,140,248,.06)}
+.fbtn{padding:4px 12px;border-radius:16px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--brd);color:var(--t3);background:transparent;transition:all .2s;font-family:inherit}
+.fbtn:hover{border-color:var(--ac);color:var(--t1)}
+.fbtn.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.theme-btn{position:absolute;right:0;top:0;padding:4px 10px;border-radius:8px;font-size:14px;cursor:pointer;border:1px solid var(--brd);background:var(--c1);transition:all .2s;line-height:1}
+.theme-btn:hover{border-color:var(--ac)}
+</style></head><body>
+<div class="w">
+<div class="hdr" style="position:relative">
+<div><h1 style="background:linear-gradient(135deg,#818cf8,#2dd4bf);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Micro-Credit Portfolio Analytics</h1><p style="color:var(--t3);font-size:12px;margin-top:3px">Colombian SME Lending &middot; As of March 16, 2026 &middot; CRM Facility</p></div>
+<div style="display:flex;align-items:center;gap:12px"><div id="health"></div><button class="theme-btn" id="themeToggle" title="Toggle theme">&#9728;&#65039;</button></div>
+</div>
+<div class="tabs" id="tabs">
+<button class="tab on" data-v="overview">Overview</button>
+<button class="tab" data-v="bb">Borrowing Base</button>
+<button class="tab" data-v="delinquency">Delinquency</button>
+<button class="tab" data-v="collectability">Collectability</button>
+<button class="tab" data-v="collections">Collections</button>
+<button class="tab" data-v="fpd">FPD</button>
+<button class="tab" data-v="waterfall">Waterfall</button>
+<button class="tab" data-v="loans">Loan Explorer</button>
+</div>
+
+<!-- OVERVIEW -->
+<div id="overview" class="sec on">
+<div class="g g7" id="mets"></div>
+<div class="g g2">
+<div class="cd"><h3><span class="dt" style="background:var(--ac)"></span>DPD Distribution</h3><div class="sb" id="dpdBar"></div><div class="lg" id="dpdLeg"></div><div class="ch"><canvas id="dpdChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--tl)"></span>Endorsed vs Non-Endorsed</h3><div class="ch"><canvas id="endorsedChart"></canvas></div></div>
+</div>
+<div class="g g2" style="margin-top:14px">
+<div class="cd"><h3><span class="dt" style="background:var(--am)"></span>Term Distribution</h3><div class="ch"><canvas id="termChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--bl)"></span>BB Summary</h3><div id="bbSummary"></div></div>
+</div>
+</div>
+
+<!-- BORROWING BASE -->
+<div id="bb" class="sec">
+<div class="cd"><h3><span class="dt" style="background:var(--ac)"></span>Borrowing Base Waterfall</h3><div class="ch" style="height:380px"><canvas id="bbWaterfallChart"></canvas></div></div>
+<div class="g g2" style="margin-top:14px">
+<div class="cd"><h3><span class="dt" style="background:var(--tl)"></span>Term Concentration Limits</h3><div class="ch"><canvas id="termConcChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--am)"></span>Advance Rate History</h3><div class="ch"><canvas id="arChart"></canvas></div></div>
+</div>
+<div class="cd" style="margin-top:14px"><h3><span class="dt" style="background:var(--bl)"></span>BB Trend (Last 18 Months)</h3><div class="ch" style="height:300px"><canvas id="bbTrendChart"></canvas></div></div>
+</div>
+
+<!-- DELINQUENCY -->
+<div id="delinquency" class="sec">
+<div class="g g4" id="dqMets"></div>
+<div class="cd"><h3><span class="dt" style="background:var(--rd)"></span>DPD Buckets (Stacked Bar)</h3><div class="ch" style="height:320px"><canvas id="dpdStackedChart"></canvas></div></div>
+<div class="g g2" style="margin-top:14px">
+<div class="cd"><h3><span class="dt" style="background:var(--co)"></span>DPD Trend Over Time</h3><div class="ch" style="height:300px"><canvas id="dpdTrendChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--am)"></span>Delinquent by Vintage</h3><div class="ch" style="height:300px"><canvas id="dqVintageChart"></canvas></div></div>
+</div>
+</div>
+
+<!-- COLLECTABILITY -->
+<div id="collectability" class="sec">
+<div class="cd"><h3><span class="dt" style="background:var(--tl)"></span>Vintage Collection Curves</h3><div class="lg" id="collVintLeg"></div><div class="ch" style="height:380px"><canvas id="collVintChart"></canvas></div></div>
+<div class="cd" style="margin-top:14px"><h3><span class="dt" style="background:var(--am)"></span>Collectability by Vintage</h3><div class="tbl-scroll"><table id="collTable"></table></div></div>
+</div>
+
+<!-- COLLECTIONS -->
+<div id="collections" class="sec">
+<div class="g g3" id="collMets"></div>
+<div class="g g2">
+<div class="cd"><h3><span class="dt" style="background:var(--ac)"></span>Payment Method Breakdown</h3><div class="ch"><canvas id="payMethodChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--tl)"></span>Collection Reconciliation (CM vs Efecty)</h3><div class="ch"><canvas id="reconChart"></canvas></div></div>
+</div>
+<div class="cd" style="margin-top:14px"><h3><span class="dt" style="background:var(--bl)"></span>Daily Collection Trend (Last 30 Days)</h3><div class="ch" style="height:300px"><canvas id="dailyCollChart"></canvas></div></div>
+</div>
+
+<!-- FPD -->
+<div id="fpd" class="sec">
+<div class="g g2" id="fpdMets"></div>
+<div class="g g2">
+<div class="cd"><h3><span class="dt" style="background:var(--rd)"></span>FPD Rate by Count</h3><div class="ch" style="height:300px"><canvas id="fpdCountChart"></canvas></div></div>
+<div class="cd"><h3><span class="dt" style="background:var(--co)"></span>FPD Rate by Amount</h3><div class="ch" style="height:300px"><canvas id="fpdAmtChart"></canvas></div></div>
+</div>
+</div>
+
+<!-- WATERFALL -->
+<div id="waterfall" class="sec">
+<div class="cd"><h3><span class="dt" style="background:var(--ac)"></span>Cash Flow Waterfall (March 2026)</h3><div class="ch" style="height:320px"><canvas id="cashWaterfallChart"></canvas></div></div>
+<div class="g g4" style="margin-top:14px" id="wfMets"></div>
+</div>
+
+<!-- LOAN EXPLORER -->
+<div id="loans" class="sec">
+<div class="cd">
+<div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap">
+  <input type="text" id="loanSearch" placeholder="Search loans..." style="padding:6px 12px;border-radius:8px;border:1px solid var(--brd);background:var(--c1);color:var(--t1);font-family:inherit;font-size:12px;width:200px;outline:none" />
+  <span style="font-size:11px;color:var(--t3)">Status:</span>
+  <button class="fbtn" data-fg="status" data-fv="Active">Active</button>
+  <button class="fbtn" data-fg="status" data-fv="Current">Current</button>
+  <button class="fbtn" data-fg="status" data-fv="Late">Late</button>
+  <button class="fbtn" data-fg="status" data-fv="Delinquent">Delinquent</button>
+  <span style="font-size:11px;color:var(--t3);margin-left:4px">Pay:</span>
+  <button class="fbtn" data-fg="payMethod" data-fv="Efecty">Efecty</button>
+  <button class="fbtn" data-fg="payMethod" data-fv="PSE">PSE</button>
+  <button class="fbtn" data-fg="payMethod" data-fv="Direct">Direct</button>
+  <span style="font-size:11px;color:var(--t3);margin-left:4px">DPD:</span>
+  <button class="fbtn" data-fg="dpd" data-fv="0">Current</button>
+  <button class="fbtn" data-fg="dpd" data-fv="1-15">1-15</button>
+  <button class="fbtn" data-fg="dpd" data-fv="16-30">16-30</button>
+  <button class="fbtn" data-fg="dpd" data-fv="31-45">31-45</button>
+  <button class="fbtn" data-fg="dpd" data-fv="45+">45+</button>
+  <span style="font-size:11px;color:var(--t3);margin-left:4px">Endorsed:</span>
+  <button class="fbtn" data-fg="endorsed" data-fv="Yes">Yes</button>
+  <button class="fbtn" data-fg="endorsed" data-fv="No">No</button>
+  <span style="color:var(--t3);font-size:11px;margin-left:8px" id="loanCount"></span>
+</div>
+<div class="tbl-scroll"><table><thead id="lHead"></thead><tbody id="lBody"></tbody></table></div>
+</div>
+</div>
+</div>
+
+<script>
+// ========== SYNTHETIC DATA ==========
+const FX = 3696.8;
+const fmtCOP = n => {
+  if(Math.abs(n)>=1e9) return 'COP '+( n/1e9).toFixed(1)+'B';
+  if(Math.abs(n)>=1e6) return 'COP '+(n/1e6).toFixed(0)+'M';
+  if(Math.abs(n)>=1e3) return 'COP '+(n/1e3).toFixed(0)+'K';
+  return 'COP '+Math.round(n);
+};
+const fmtUSD = n => {
+  if(Math.abs(n)>=1e6) return '$'+(n/1e6).toFixed(2)+'M';
+  if(Math.abs(n)>=1e3) return '$'+(n/1e3).toFixed(0)+'K';
+  return '$'+Math.round(n);
+};
+const fmtCOPShort = n => {
+  if(Math.abs(n)>=1e9) return (n/1e9).toFixed(1)+'B';
+  if(Math.abs(n)>=1e6) return (n/1e6).toFixed(0)+'M';
+  return (n/1e3).toFixed(0)+'K';
+};
+const pct = n => n.toFixed(1)+'%';
+const C = {ac:'#818cf8',tl:'#2dd4bf',am:'#fbbf24',co:'#fb923c',rd:'#f87171',gn:'#4ade80',bl:'#60a5fa',pk:'#f472b6'};
+const DPD_C = [C.tl, C.bl, C.am, C.co, C.rd];
+
+// DPD distribution
+const dpdBuckets = [
+  {l:'Current (0)',cnt:9338,amt:34.9e9},
+  {l:'1-15 DPD',cnt:1245,amt:4.6e9},
+  {l:'16-30 DPD',cnt:747,amt:2.8e9},
+  {l:'31-45 DPD',cnt:498,amt:1.9e9},
+  {l:'45+ DPD',cnt:622,amt:2.4e9}
+];
+
+// Term distribution
+const termDist = [
+  {l:'3-7 months',cnt:8093,pct:65,amt:30.0e9},
+  {l:'7-9 months',cnt:2490,pct:20,amt:9.3e9},
+  {l:'9-11 months',cnt:1245,pct:10,amt:4.6e9},
+  {l:'11-13 months',cnt:622,pct:5,amt:2.4e9}
+];
+
+// Payment methods
+const payMethods = [
+  {l:'Efecty',pct:55,amt:24.9e9,color:C.co},
+  {l:'PSE',pct:30,amt:13.5e9,color:C.ac},
+  {l:'Direct',pct:15,amt:6.7e9,color:C.tl}
+];
+
+// BB waterfall data
+const bbWF = [
+  {l:'Total Portfolio',v:46.6e9,type:'total'},
+  {l:'Less: Loans too large (>3.64M COP)',v:-5.4e9,type:'sub'},
+  {l:'Less: DPD >= 45 days',v:-7.7e9,type:'sub'},
+  {l:'Less: Matured',v:-2.8e9,type:'sub'},
+  {l:'Less: Extended to other loan',v:-4.5e9,type:'sub'},
+  {l:'Eligible Pool',v:26.2e9,type:'subtotal'},
+  {l:'Apply AR (100%)',v:0,type:'sub'},
+  {l:'Less: Term concentration limits',v:-1.6e9,type:'sub'},
+  {l:'Final Borrowing Base',v:24.6e9,type:'total'}
+];
+
+// Advance rate history
+const arHistory = [
+  {m:'Jun 2021',rate:60},{m:'Dec 2021',rate:60},{m:'Jun 2022',rate:80},{m:'Dec 2022',rate:80},
+  {m:'Jun 2023',rate:93},{m:'Dec 2023',rate:93},{m:'Jun 2024',rate:80},{m:'Dec 2024',rate:80},
+  {m:'Jun 2025',rate:100},{m:'Dec 2025',rate:100},{m:'Mar 2026',rate:100}
+];
+
+// BB trend (18 months)
+const bbTrend = [
+  {m:"Oct '24",bb:16.0e9,usd:4.33e6},{m:"Nov '24",bb:16.9e9,usd:4.57e6},{m:"Dec '24",bb:17.7e9,usd:4.79e6},
+  {m:"Jan '25",bb:18.4e9,usd:4.98e6},{m:"Feb '25",bb:19.2e9,usd:5.19e6},{m:"Mar '25",bb:19.6e9,usd:5.30e6},
+  {m:"Apr '25",bb:20.1e9,usd:5.44e6},{m:"May '25",bb:20.6e9,usd:5.57e6},{m:"Jun '25",bb:21.0e9,usd:5.68e6},
+  {m:"Jul '25",bb:21.4e9,usd:5.79e6},{m:"Aug '25",bb:21.8e9,usd:5.90e6},{m:"Sep '25",bb:22.2e9,usd:6.01e6},
+  {m:"Oct '25",bb:22.5e9,usd:6.09e6},{m:"Nov '25",bb:22.9e9,usd:6.20e6},{m:"Dec '25",bb:23.3e9,usd:6.30e6},
+  {m:"Jan '26",bb:23.7e9,usd:6.41e6},{m:"Feb '26",bb:24.1e9,usd:6.52e6},{m:"Mar '26",bb:24.6e9,usd:6.66e6}
+];
+
+// Monthly DPD trend for stacked bar & line
+const months18 = ["Oct '24","Nov '24","Dec '24","Jan '25","Feb '25","Mar '25","Apr '25","May '25","Jun '25","Jul '25","Aug '25","Sep '25","Oct '25","Nov '25","Dec '25","Jan '26","Feb '26","Mar '26"];
+const dpdTrendData = {
+  current:  [73,74,74,75,74,75,75,76,75,75,74,75,75,76,75,75,74,75],
+  d1_15:    [11,10,11,10,11,10,10, 9,10,10,11,10,10, 9,10,10,11,10],
+  d16_30:   [ 7, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6],
+  d31_45:   [ 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
+  d45p:     [ 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]
+};
+
+// Delinquent by vintage
+const dqVintages = ['Q3 2024','Q4 2024','Q1 2025','Q2 2025','Q3 2025','Q4 2025','Q1 2026'];
+const dqVintData = [3.2, 4.1, 5.8, 7.2, 8.5, 6.1, 4.3];
+
+// Collectability vintage data
+const vintageMonths = ['Jun 2021','Sep 2021','Dec 2021','Mar 2022','Jun 2022','Sep 2022','Dec 2022','Mar 2023','Jun 2023','Sep 2023','Dec 2023','Mar 2024','Jun 2024','Sep 2024','Dec 2024','Mar 2025','Jun 2025','Sep 2025','Dec 2025','Mar 2026'];
+function genCollCurve(maxMo, xirr, mult) {
+  const r = [];
+  for(let i=0;i<=12;i++) {
+    if(i>maxMo) { r.push(null); continue; }
+    if(i===0) { r.push(0); continue; }
+    const progress = i/Math.min(maxMo,12);
+    r.push(Math.round(mult*100*Math.pow(progress, 0.6)*10)/10);
+  }
+  return r;
+}
+const collVintData = vintageMonths.map((v,idx) => {
+  const maxMo = Math.min(12, vintageMonths.length - idx);
+  const xirr = 18 + Math.random()*24;
+  const mult = 1.15 + Math.random()*0.50;
+  const originated = Math.round(400+Math.random()*800);
+  const origAmt = originated * (2.2e6 + Math.random()*1.2e6);
+  return {
+    vintage: v,
+    originated: originated,
+    origAmt: origAmt,
+    xirr: Math.round(xirr*10)/10,
+    multiple: Math.round(mult*100)/100,
+    curve: genCollCurve(maxMo, xirr, mult)
+  };
+});
+
+// Quarterly collection curves for chart
+const qLabels = ['Q3 2021','Q1 2022','Q3 2022','Q1 2023','Q3 2023','Q1 2024','Q3 2024','Q1 2025','Q3 2025'];
+const qCurves = qLabels.map((q,i) => {
+  const maxMo = Math.min(12, qLabels.length - i + 4);
+  const pts = [];
+  for(let m=0;m<=12;m++){
+    if(m > maxMo) { pts.push(null); continue; }
+    if(m===0){pts.push(0);continue;}
+    pts.push(Math.round((15+Math.random()*60)*Math.pow(m/12,0.55)*10)/10);
+  }
+  return {label:q, data:pts};
+});
+
+// Collection reconciliation (CM vs Efecty)
+const reconMonths = ["Oct '25","Nov '25","Dec '25","Jan '26","Feb '26","Mar '26"];
+const reconData = {
+  cm:     [1850,1920,2050,2120,2180,2240].map(v=>v*1e6),
+  efecty: [1780,1870,1980,2080,2130,2190].map(v=>v*1e6)
+};
+
+// Daily collections (30 days)
+const dailyColl = [];
+for(let i=0;i<30;i++){
+  const d = new Date(2026,1,11+i);
+  const isWeekend = d.getDay()===0||d.getDay()===6;
+  dailyColl.push({
+    day: (d.getMonth()+1)+'/'+d.getDate(),
+    amt: isWeekend ? Math.round(20e6+Math.random()*40e6) : Math.round(60e6+Math.random()*120e6)
+  });
+}
+
+// FPD data by origination month
+const fpdMonths = ["Jun '24","Jul '24","Aug '24","Sep '24","Oct '24","Nov '24","Dec '24","Jan '25","Feb '25","Mar '25","Apr '25","May '25","Jun '25","Jul '25","Aug '25","Sep '25","Oct '25","Nov '25","Dec '25","Jan '26","Feb '26"];
+const fpdCountRate = [8.2,7.5,9.1,10.3,8.8,7.2,6.5,7.8,8.4,9.6,10.1,11.2,9.8,8.5,7.9,6.8,7.1,8.3,9.5,10.8,11.5];
+const fpdAmtRate =   [7.1,6.8,8.3,9.5,7.9,6.5,5.8,7.0,7.6,8.8,9.2,10.1,8.9,7.7,7.1,6.1,6.4,7.5,8.6,9.8,10.4];
+
+// Cash waterfall
+const cashWF = [
+  {l:'Total Collections',v:2240e6,type:'in'},
+  {l:'Interest Payment',v:-680e6,type:'out'},
+  {l:'DSRA Contribution',v:-155e6,type:'out'},
+  {l:'Management Fees',v:-89e6,type:'out'},
+  {l:'Servicing Fees',v:-67e6,type:'out'},
+  {l:'Available for Distribution',v:1249e6,type:'net'}
+];
+
+// 50 sample loans for loan explorer
+const products = ['Micro-Credit','SME Working Capital','Invoice Factoring','Payroll Advance'];
+const statuses = ['Active','Current','Late','Delinquent','Matured'];
+const payMethodNames = ['Efecty','PSE','Direct'];
+const sampleLoans = [];
+for(let i=0;i<50;i++){
+  const fv = Math.round(1.5e6 + Math.random()*4e6);
+  const dpd = [0,0,0,0,0,0,0,0,2,5,8,12,18,25,35,48,55,62][Math.floor(Math.random()*18)];
+  const factor = dpd>=45?0:dpd>=31?0.3:dpd>=16?0.7:1.0;
+  const ar = dpd>=45?0:1.0;
+  const outstanding = Math.round(fv*(0.4+Math.random()*0.55));
+  const bb = Math.round(outstanding*factor*ar);
+  const endorsed = Math.random()>0.18;
+  const pm = payMethodNames[Math.floor(Math.random()*3)];
+  const vintIdx = Math.floor(Math.random()*vintageMonths.length);
+  const status = dpd===0?'Current':dpd<16?'Active':dpd<45?'Late':'Delinquent';
+  sampleLoans.push({
+    id:'CRM-'+String(100000+i).slice(1),
+    product:products[Math.floor(Math.random()*4)],
+    faceValue:fv,
+    outstanding:outstanding,
+    dpd:dpd,
+    factor:factor,
+    ar:ar,
+    bb:bb,
+    endorsed:endorsed,
+    payMethod:pm,
+    vintage:vintageMonths[vintIdx],
+    status:status
+  });
+}
+
+// ========== TAB NAVIGATION ==========
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.sec').forEach(x=>x.classList.remove('on'));
+  t.classList.add('on');document.getElementById(t.dataset.v).classList.add('on');
+}));
+
+// ========== HEALTH BADGE ==========
+const h=document.getElementById('health');
+h.innerHTML='<div class="badge" style="background:rgba(45,212,191,.12);color:'+C.tl+'"><span class="pulse" style="width:8px;height:8px;border-radius:50%;background:'+C.tl+'"></span>Healthy</div>';
+
+// ========== CHART DEFAULTS ==========
+Chart.defaults.font.family = "'DM Sans', sans-serif";
+Chart.defaults.color = '#8899b4';
+
+// ========== OVERVIEW TAB ==========
+const mb=document.getElementById('mets');
+[
+  {l:'Borrowing Base',v:'$6.66M',s:'COP 24.6B',gl:C.tl},
+  {l:'Active Loans',v:'12,450',s:'Avg COP 2.8M each',gl:C.ac},
+  {l:'Facility Utilization',v:'89%',s:'$6.66M of $7.5M',gl:C.bl},
+  {l:'Endorsed Loans',v:'10,200',s:'82% of portfolio',gl:C.gn},
+  {l:'Wtd Avg DPD',v:'5.8 days',s:'vs 6.2 last month',gl:C.am},
+  {l:'Collection Rate (MTD)',v:'88.5%',s:'Target: 90%',gl:C.co},
+  {l:'DSRA Balance',v:'COP 1,559M',s:'100% of target',gl:C.pk}
+].forEach((m,i)=>{
+  const d=document.createElement('div');d.className='m su';d.style.animationDelay=(i*.06)+'s';
+  d.innerHTML='<div class="glow" style="background:linear-gradient(90deg,'+m.gl+','+C.ac+')"></div><div class="lb">'+m.l+'</div><div class="vl">'+m.v+'</div><div class="s2">'+m.s+'</div>';
+  mb.appendChild(d);
+});
+
+// DPD bar + donut
+const dBar=document.getElementById('dpdBar');const dLeg=document.getElementById('dpdLeg');
+const totalCnt=dpdBuckets.reduce((s,b)=>s+b.cnt,0);
+dpdBuckets.forEach((b,i)=>{
+  const w=b.cnt/totalCnt*100;
+  const s=document.createElement('div');s.className='sg';s.style.width=w+'%';s.style.background=DPD_C[i];s.title=b.l+': '+b.cnt;
+  if(w>8)s.textContent=Math.round(w)+'%';dBar.appendChild(s);
+  dLeg.innerHTML+='<span><span class="dt" style="background:'+DPD_C[i]+'"></span>'+b.l+' ('+b.cnt.toLocaleString()+')</span>';
+});
+
+new Chart(document.getElementById('dpdChart'),{type:'doughnut',data:{labels:dpdBuckets.map(d=>d.l),datasets:[{data:dpdBuckets.map(d=>d.cnt),backgroundColor:DPD_C,borderWidth:2,borderColor:'#0d1420'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.label+': '+ctx.raw.toLocaleString()+' loans'}}}}});
+
+// Endorsed chart
+new Chart(document.getElementById('endorsedChart'),{type:'bar',data:{labels:['Endorsed','Non-Endorsed'],datasets:[{label:'Loan Count',data:[10200,2250],backgroundColor:[C.tl+'cc',C.rd+'88'],borderRadius:8},{label:'Outstanding (B COP)',data:[38.1,8.5],backgroundColor:[C.tl+'44',C.rd+'33'],borderRadius:8,yAxisID:'y1'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#8899b4'},grid:{color:'rgba(30,45,74,.3)'}},y:{position:'left',ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.25)'}},y1:{position:'right',grid:{drawOnChartArea:false},ticks:{color:'#556a8a'}}}}});
+
+// Term distribution chart
+new Chart(document.getElementById('termChart'),{type:'bar',data:{labels:termDist.map(t=>t.l),datasets:[{label:'Loan Count',data:termDist.map(t=>t.cnt),backgroundColor:[C.tl+'cc',C.bl+'cc',C.am+'cc',C.rd+'cc'],borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.raw.toLocaleString()+' loans ('+termDist[ctx.dataIndex].pct+'%)'}}},scales:{x:{ticks:{color:'#8899b4',font:{size:10}},grid:{color:'rgba(30,45,74,.3)'}},y:{ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// BB Summary
+const bbs=document.getElementById('bbSummary');
+const bbItems=[
+  {l:'Total Portfolio',v:fmtCOP(46.6e9),c:C.bl,pct:100},
+  {l:'Eligible Pool',v:fmtCOP(26.2e9),c:C.ac,pct:56.2},
+  {l:'After AR (100%)',v:fmtCOP(26.2e9),c:C.am,pct:56.2},
+  {l:'Less: Concentration',v:fmtCOP(-1.6e9),c:C.rd,pct:3.4},
+  {l:'Final BB',v:fmtCOP(24.6e9),c:C.tl,pct:52.8}
+];
+bbItems.forEach((item,i)=>{
+  bbs.innerHTML+='<div class="su" style="margin-bottom:12px;animation-delay:'+(i*.1)+'s"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:12px;color:var(--t2)">'+item.l+'</span><span style="font-size:13px;font-weight:600;font-family:JetBrains Mono;color:'+item.c+'">'+item.v+'</span></div><div class="pr"><div class="pf" style="background:'+item.c+';width:'+item.pct+'%"></div></div></div>';
+});
+
+// ========== BORROWING BASE TAB ==========
+// BB Waterfall chart
+const bbWFLabels = bbWF.map(r=>r.l);
+const bbWFData = [];
+let running = 0;
+const bbWFBase = [];
+const bbWFColors = [];
+bbWF.forEach((r,i) => {
+  if(r.type==='total' || r.type==='subtotal') {
+    bbWFBase.push(0);
+    bbWFData.push(r.v/1e9);
+    bbWFColors.push(r.type==='total'?C.tl:C.ac);
+    running = r.v;
+  } else {
+    const newRunning = running + r.v;
+    bbWFBase.push(Math.min(running,newRunning)/1e9);
+    bbWFData.push(Math.abs(r.v)/1e9);
+    bbWFColors.push(r.v<0?C.rd:C.gn);
+    running = newRunning;
+  }
+});
+new Chart(document.getElementById('bbWaterfallChart'),{type:'bar',data:{labels:bbWFLabels,datasets:[{label:'Base',data:bbWFBase,backgroundColor:'transparent',borderWidth:0,stack:'s'},{label:'Value',data:bbWFData,backgroundColor:bbWFColors,borderRadius:4,stack:'s'}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>{if(ctx.datasetIndex===0)return'';return ctx.label+': COP '+(ctx.raw).toFixed(1)+'B'}}}},scales:{x:{ticks:{color:'#556a8a',callback:v=>'COP '+v+'B'},grid:{color:'rgba(30,45,74,.25)'}},y:{ticks:{color:'#8899b4',font:{size:11}},grid:{display:false}}}}});
+
+// Term concentration limits
+const termConcLabels = ['3-7mo','7-9mo','9-11mo','11-13mo'];
+const termConcActual = [65,20,10,5];
+const termConcLimit = [100,30,10,5];
+new Chart(document.getElementById('termConcChart'),{type:'bar',data:{labels:termConcLabels,datasets:[{label:'Actual %',data:termConcActual,backgroundColor:[C.tl+'cc',C.am+'cc',C.am+'cc',C.rd+'cc'],borderRadius:6},{label:'Limit %',data:termConcLimit,type:'line',borderColor:C.rd,pointBackgroundColor:C.rd,pointRadius:6,borderWidth:2,borderDash:[5,5],fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#8899b4'},grid:{color:'rgba(30,45,74,.3)'}},y:{max:110,ticks:{color:'#556a8a',callback:v=>v+'%'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// Advance rate history (step chart)
+new Chart(document.getElementById('arChart'),{type:'line',data:{labels:arHistory.map(a=>a.m),datasets:[{label:'Advance Rate',data:arHistory.map(a=>a.rate),borderColor:C.ac,backgroundColor:C.ac+'22',fill:true,stepped:'before',pointRadius:5,pointBackgroundColor:C.ac,borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#556a8a',font:{size:10},maxRotation:45},grid:{color:'rgba(30,45,74,.3)'}},y:{min:40,max:110,ticks:{color:'#556a8a',callback:v=>v+'%'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// BB trend
+new Chart(document.getElementById('bbTrendChart'),{type:'line',data:{labels:bbTrend.map(b=>b.m),datasets:[{label:'BB (COP B)',data:bbTrend.map(b=>b.bb/1e9),borderColor:C.ac,backgroundColor:C.ac+'18',fill:true,pointRadius:4,pointBackgroundColor:C.ac,borderWidth:2,tension:.3,yAxisID:'y'},{label:'BB (USD M)',data:bbTrend.map(b=>b.usd/1e6),borderColor:C.tl,pointBackgroundColor:C.tl,pointRadius:4,borderWidth:2,tension:.3,yAxisID:'y1'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#556a8a',font:{size:10},maxRotation:45},grid:{color:'rgba(30,45,74,.3)'}},y:{position:'left',title:{display:true,text:'COP (Billions)',color:'#556a8a'},ticks:{color:'#556a8a',callback:v=>v.toFixed(1)+'B'},grid:{color:'rgba(30,45,74,.25)'}},y1:{position:'right',title:{display:true,text:'USD (Millions)',color:'#556a8a'},grid:{drawOnChartArea:false},ticks:{color:'#556a8a',callback:v=>'$'+v.toFixed(1)+'M'}}}}});
+
+// ========== DELINQUENCY TAB ==========
+const dqm=document.getElementById('dqMets');
+[{l:'Current Loans',v:'9,338',s:'75.0%'},{l:'1-15 DPD',v:'1,245',s:'10.0%'},{l:'16-45 DPD',v:'1,245',s:'10.0%'},{l:'45+ DPD (Excluded)',v:'622',s:'5.0%'}].forEach((m,i)=>{
+  dqm.innerHTML+='<div class="m su" style="animation-delay:'+(i*.07)+'s"><div class="glow" style="background:linear-gradient(90deg,'+[C.tl,C.bl,C.am,C.rd][i]+','+C.ac+')"></div><div class="lb">'+m.l+'</div><div class="vl">'+m.v+'</div><div class="s2">'+m.s+' of portfolio</div></div>';
+});
+
+// DPD stacked bar
+new Chart(document.getElementById('dpdStackedChart'),{type:'bar',data:{labels:months18,datasets:[
+  {label:'Current',data:dpdTrendData.current,backgroundColor:C.tl+'cc',stack:'s',borderRadius:0},
+  {label:'1-15 DPD',data:dpdTrendData.d1_15,backgroundColor:C.bl+'cc',stack:'s'},
+  {label:'16-30 DPD',data:dpdTrendData.d16_30,backgroundColor:C.am+'cc',stack:'s'},
+  {label:'31-45 DPD',data:dpdTrendData.d31_45,backgroundColor:C.co+'cc',stack:'s'},
+  {label:'45+ DPD',data:dpdTrendData.d45p,backgroundColor:C.rd+'cc',stack:'s',borderRadius:{topLeft:4,topRight:4}}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+ctx.raw+'%'}}},scales:{x:{stacked:true,ticks:{color:'#556a8a',font:{size:10},maxRotation:45},grid:{color:'rgba(30,45,74,.3)'}},y:{stacked:true,max:100,ticks:{color:'#556a8a',callback:v=>v+'%'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// DPD trend line
+const wtdDPD = months18.map((_,i) => 5.2 + Math.sin(i*0.4)*0.8 + Math.random()*0.5);
+new Chart(document.getElementById('dpdTrendChart'),{type:'line',data:{labels:months18,datasets:[{label:'Wtd Avg DPD',data:wtdDPD.map(v=>Math.round(v*10)/10),borderColor:C.ac,backgroundColor:C.ac+'18',fill:true,pointRadius:4,pointBackgroundColor:C.ac,borderWidth:2,tension:.3},{label:'Threshold (10d)',data:months18.map(()=>10),borderColor:C.rd,borderDash:[4,4],borderWidth:1,pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}}},scales:{x:{ticks:{color:'#556a8a',font:{size:10},maxRotation:45},grid:{color:'rgba(30,45,74,.3)'}},y:{min:0,max:15,ticks:{color:'#556a8a',callback:v=>v+' days'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// Delinquent by vintage
+new Chart(document.getElementById('dqVintageChart'),{type:'bar',data:{labels:dqVintages,datasets:[{label:'DPD 30+ Rate %',data:dqVintData,backgroundColor:dqVintData.map(v=>v>7?C.rd+'cc':v>5?C.am+'cc':C.tl+'cc'),borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.raw+'% DPD 30+'}}},scales:{x:{ticks:{color:'#8899b4',font:{size:10}},grid:{color:'rgba(30,45,74,.3)'}},y:{ticks:{color:'#556a8a',callback:v=>v+'%'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// ========== COLLECTABILITY TAB ==========
+const vColors = [C.rd,C.co,C.am,C.ac,C.bl,C.tl,C.gn,C.pk,'#a78bfa','#38bdf8'];
+const cvLeg = document.getElementById('collVintLeg');
+const cvDS = qCurves.map((q,i) => {
+  const col = vColors[i%vColors.length];
+  cvLeg.innerHTML+='<span><span class="dt" style="background:'+col+'"></span>'+q.label+'</span>';
+  return {label:q.label,data:q.data,borderColor:col,backgroundColor:col+'10',borderWidth:2,pointRadius:3,pointBackgroundColor:col,tension:.3,spanGaps:false};
+});
+new Chart(document.getElementById('collVintChart'),{type:'line',data:{labels:Array.from({length:13},(_,i)=>'M'+i),datasets:cvDS},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{afterLabel:ctx=>'Cumulative collection: '+ctx.raw+'%'}}},scales:{x:{title:{display:true,text:'Months since origination',color:'#556a8a'},ticks:{color:'#556a8a'},grid:{color:'rgba(30,45,74,.2)'}},y:{min:0,title:{display:true,text:'Cumulative Collection %',color:'#556a8a'},ticks:{color:'#556a8a',callback:v=>v+'%'},grid:{color:'rgba(30,45,74,.2)'}}}}});
+
+// Collectability table
+const ct = document.getElementById('collTable');
+let thead='<thead><tr><th>Vintage</th><th>Originated</th><th>Orig Amt</th><th style="color:var(--tl)">XIRR</th><th style="color:var(--am)">Multiple</th>';
+for(let i=1;i<=12;i++) thead+='<th>M'+i+'</th>';
+thead+='</tr></thead>';
+let tbody='<tbody>';
+collVintData.forEach((v,idx) => {
+  tbody+='<tr><td style="font-weight:600">'+v.vintage+'</td>';
+  tbody+='<td>'+v.originated.toLocaleString()+'</td>';
+  tbody+='<td>'+fmtCOP(v.origAmt)+'</td>';
+  tbody+='<td class="xirr-hi">'+v.xirr+'%</td>';
+  tbody+='<td class="mult-hi">'+v.multiple+'x</td>';
+  for(let i=1;i<=12;i++){
+    const val = v.curve[i];
+    if(val===null) tbody+='<td style="color:var(--t3)">-</td>';
+    else {
+      const col = val>80?C.tl:val>50?C.bl:val>25?C.am:C.rd;
+      tbody+='<td style="color:'+col+';font-family:JetBrains Mono;font-size:11px">'+val+'%</td>';
+    }
+  }
+  tbody+='</tr>';
+});
+tbody+='</tbody>';
+ct.innerHTML=thead+tbody;
+
+// ========== COLLECTIONS TAB ==========
+const cm=document.getElementById('collMets');
+[{l:'MTD Collections',v:fmtCOP(2240e6),s:fmtUSD(2240e6/FX)},{l:'Efecty Volume',v:fmtCOP(1232e6),s:'55% of total'},{l:'Reconciliation Gap',v:fmtCOP(50e6),s:'2.2% variance'}].forEach((m,i)=>{
+  cm.innerHTML+='<div class="m su" style="animation-delay:'+(i*.07)+'s"><div class="glow" style="background:linear-gradient(90deg,'+C.ac+','+C.tl+')"></div><div class="lb">'+m.l+'</div><div class="vl">'+m.v+'</div><div class="s2">'+m.s+'</div></div>';
+});
+
+// Payment method donut
+new Chart(document.getElementById('payMethodChart'),{type:'doughnut',data:{labels:payMethods.map(p=>p.l),datasets:[{data:payMethods.map(p=>p.pct),backgroundColor:payMethods.map(p=>p.color),borderWidth:2,borderColor:'#0d1420'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:12},usePointStyle:true,pointStyle:'rect',padding:16}},tooltip:{callbacks:{label:ctx=>ctx.label+': '+ctx.raw+'% ('+fmtCOP(payMethods[ctx.dataIndex].amt)+')'}}}}});
+
+// Reconciliation chart
+new Chart(document.getElementById('reconChart'),{type:'bar',data:{labels:reconMonths,datasets:[{label:'CM Reported',data:reconData.cm.map(v=>v/1e6),backgroundColor:C.ac+'aa',borderRadius:5},{label:'Efecty Confirmed',data:reconData.efecty.map(v=>v/1e6),backgroundColor:C.tl+'aa',borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:'#8899b4',font:{size:11},usePointStyle:true,pointStyle:'rect'}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': COP '+ctx.raw+'M'}}},scales:{x:{ticks:{color:'#8899b4',font:{size:10}},grid:{color:'rgba(30,45,74,.3)'}},y:{ticks:{color:'#556a8a',callback:v=>'COP '+v+'M'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// Daily collection trend
+new Chart(document.getElementById('dailyCollChart'),{type:'bar',data:{labels:dailyColl.map(d=>d.day),datasets:[{label:'Daily Collections',data:dailyColl.map(d=>d.amt/1e6),backgroundColor:dailyColl.map(d=>d.amt>100e6?C.tl+'aa':d.amt>50e6?C.bl+'aa':C.am+'aa'),borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>'COP '+Math.round(ctx.raw)+'M'}}},scales:{x:{ticks:{color:'#556a8a',font:{size:9},maxRotation:90,autoSkip:true,maxTicksLimit:15},grid:{color:'rgba(30,45,74,.3)'}},y:{ticks:{color:'#556a8a',callback:v=>'COP '+v+'M'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// ========== FPD TAB ==========
+const fpdm=document.getElementById('fpdMets');
+[{l:'Avg FPD Rate (Count)',v:'8.7%',s:'Last 12 months'},{l:'Avg FPD Rate (Amount)',v:'7.9%',s:'Last 12 months'}].forEach((m,i)=>{
+  fpdm.innerHTML+='<div class="m su" style="animation-delay:'+(i*.07)+'s"><div class="glow" style="background:linear-gradient(90deg,'+C.rd+','+C.ac+')"></div><div class="lb">'+m.l+'</div><div class="vl">'+m.v+'</div><div class="s2">'+m.s+'</div></div>';
+});
+
+// FPD by count
+new Chart(document.getElementById('fpdCountChart'),{type:'bar',data:{labels:fpdMonths,datasets:[{label:'FPD Rate (Count)',data:fpdCountRate,backgroundColor:fpdCountRate.map(v=>v>10?C.rd+'cc':v>8?C.am+'cc':C.tl+'cc'),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.raw+'% FPD rate'}}},scales:{x:{ticks:{color:'#556a8a',font:{size:9},maxRotation:45},grid:{color:'rgba(30,45,74,.3)'}},y:{ticks:{color:'#556a8a',callback:v=>v+'%'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// FPD by amount
+new Chart(document.getElementById('fpdAmtChart'),{type:'bar',data:{labels:fpdMonths,datasets:[{label:'FPD Rate (Amount)',data:fpdAmtRate,backgroundColor:fpdAmtRate.map(v=>v>9?C.rd+'cc':v>7?C.am+'cc':C.tl+'cc'),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.raw+'% FPD rate'}}},scales:{x:{ticks:{color:'#556a8a',font:{size:9},maxRotation:45},grid:{color:'rgba(30,45,74,.3)'}},y:{ticks:{color:'#556a8a',callback:v=>v+'%'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+// ========== WATERFALL TAB ==========
+const wfLabels = cashWF.map(r=>r.l);
+const wfAmts = cashWF.map(r=>r.v/1e6);
+const wfBases = [];
+const wfVals = [];
+const wfCols = [];
+let wfRun = 0;
+cashWF.forEach((r,i)=>{
+  if(r.type==='in'){
+    wfBases.push(0);
+    wfVals.push(r.v/1e6);
+    wfCols.push(C.tl);
+    wfRun = r.v;
+  } else if(r.type==='out'){
+    wfRun += r.v;
+    wfBases.push(wfRun/1e6);
+    wfVals.push(Math.abs(r.v)/1e6);
+    wfCols.push(C.rd);
+  } else {
+    wfBases.push(0);
+    wfVals.push(r.v/1e6);
+    wfCols.push(C.ac);
+  }
+});
+new Chart(document.getElementById('cashWaterfallChart'),{type:'bar',data:{labels:wfLabels,datasets:[{label:'Base',data:wfBases,backgroundColor:'transparent',borderWidth:0,stack:'s'},{label:'Value',data:wfVals,backgroundColor:wfCols,borderRadius:5,stack:'s'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>{if(ctx.datasetIndex===0)return'';return ctx.label+': COP '+Math.round(ctx.raw)+'M'}}}},scales:{x:{ticks:{color:'#8899b4',font:{size:10},maxRotation:20},grid:{color:'rgba(30,45,74,.3)'}},y:{ticks:{color:'#556a8a',callback:v=>'COP '+v+'M'},grid:{color:'rgba(30,45,74,.25)'}}}}});
+
+const wfm=document.getElementById('wfMets');
+[{l:'Total Collections',v:fmtCOP(2240e6),c:C.tl},{l:'Total Outflows',v:fmtCOP(991e6),c:C.rd},{l:'Available',v:fmtCOP(1249e6),c:C.ac},{l:'Payout Ratio',v:'55.8%',c:C.gn}].forEach((m,i)=>{
+  wfm.innerHTML+='<div class="m su" style="animation-delay:'+(i*.07)+'s"><div class="glow" style="background:linear-gradient(90deg,'+m.c+','+C.ac+')"></div><div class="lb">'+m.l+'</div><div class="vl" style="color:'+m.c+'">'+m.v+'</div></div>';
+});
+
+// ========== LOAN EXPLORER TAB ==========
+let sk='faceValue',sd=-1;
+const activeFilters={status:null,payMethod:null,dpd:null,endorsed:null};
+
+document.querySelectorAll('.fbtn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const grp=btn.dataset.fg,val=btn.dataset.fv;
+    if(activeFilters[grp]===val){activeFilters[grp]=null;btn.classList.remove('on')}
+    else{document.querySelectorAll('.fbtn[data-fg="'+grp+'"]').forEach(b=>b.classList.remove('on'));activeFilters[grp]=val;btn.classList.add('on')}
+    renderLoans();
+  });
+});
+
+function filterLoans(){
+  let ls=[...sampleLoans];
+  const st=(document.getElementById('loanSearch').value||'').toLowerCase();
+  if(st) ls=ls.filter(l=>l.id.toLowerCase().includes(st)||l.product.toLowerCase().includes(st)||l.payMethod.toLowerCase().includes(st)||l.vintage.toLowerCase().includes(st)||l.status.toLowerCase().includes(st));
+  if(activeFilters.status) ls=ls.filter(l=>l.status===activeFilters.status);
+  if(activeFilters.payMethod) ls=ls.filter(l=>l.payMethod===activeFilters.payMethod);
+  if(activeFilters.endorsed) ls=ls.filter(l=>activeFilters.endorsed==='Yes'?l.endorsed:!l.endorsed);
+  if(activeFilters.dpd){
+    const d=activeFilters.dpd;
+    if(d==='0') ls=ls.filter(l=>l.dpd===0);
+    else if(d==='1-15') ls=ls.filter(l=>l.dpd>=1&&l.dpd<=15);
+    else if(d==='16-30') ls=ls.filter(l=>l.dpd>=16&&l.dpd<=30);
+    else if(d==='31-45') ls=ls.filter(l=>l.dpd>=31&&l.dpd<=45);
+    else if(d==='45+') ls=ls.filter(l=>l.dpd>45);
+  }
+  return ls;
+}
+
+function renderLoans(){
+  const filtered=filterLoans();
+  document.getElementById('loanCount').textContent=filtered.length+' of '+sampleLoans.length+' loans';
+  const ls=filtered.sort((a,b)=>{
+    const av=typeof a[sk]==='string'?a[sk]:a[sk];
+    const bv=typeof b[sk]==='string'?b[sk]:b[sk];
+    if(typeof av==='string') return sd*av.localeCompare(bv);
+    return sd*(av-bv);
+  });
+  const cols=[
+    {k:'id',l:'Loan ID',w:90},{k:'product',l:'Product',w:130},{k:'faceValue',l:'Face Value',w:100},
+    {k:'outstanding',l:'Outstanding',w:100},{k:'dpd',l:'DPD',w:70},{k:'factor',l:'Factor',w:60},
+    {k:'ar',l:'AR',w:50},{k:'bb',l:'BB (COP)',w:100},{k:'endorsed',l:'Endorsed',w:70},
+    {k:'payMethod',l:'Pay Method',w:80},{k:'vintage',l:'Vintage',w:90},{k:'status',l:'Status',w:80}
+  ];
+  document.getElementById('lHead').innerHTML='<tr>'+cols.map(c=>'<th style="width:'+c.w+'px" data-k="'+c.k+'">'+c.l+(sk===c.k?(sd<0?' ↓':' ↑'):'')+'</th>').join('')+'</tr>';
+  document.getElementById('lHead').querySelectorAll('th').forEach(th=>{th.onclick=()=>{const k=th.dataset.k;if(sk===k)sd*=-1;else{sk=k;sd=-1}renderLoans()}});
+  const maxD=Math.max(...sampleLoans.map(l=>l.dpd),1);
+  document.getElementById('lBody').innerHTML=ls.map((l,i)=>{
+    const dc=l.dpd>=45?C.rd:l.dpd>=16?C.co:l.dpd>0?C.bl:C.tl;
+    const stCol=l.status==='Current'?'pl-g':l.status==='Late'?'pl-y':l.status==='Delinquent'?'pl-r':'pl-b';
+    return '<tr style="animation:fi .3s ease-out '+Math.min(i*.02,.5)+'s both">'+
+      '<td style="font-family:JetBrains Mono;font-size:11px">'+l.id+'</td>'+
+      '<td style="font-size:11px">'+l.product+'</td>'+
+      '<td style="font-family:JetBrains Mono;font-size:11px">'+fmtCOP(l.faceValue)+'</td>'+
+      '<td style="font-family:JetBrains Mono;font-size:11px">'+fmtCOP(l.outstanding)+'</td>'+
+      '<td><div class="dp"><div class="dpf" style="width:'+Math.max(4,l.dpd/maxD*100)+'%;background:'+dc+'"></div></div><span style="color:'+dc+';font-weight:600;font-size:11px">'+l.dpd+'</span></td>'+
+      '<td style="font-family:JetBrains Mono;font-size:11px">'+l.factor.toFixed(1)+'</td>'+
+      '<td style="font-family:JetBrains Mono;font-size:11px">'+(l.ar*100)+'%</td>'+
+      '<td style="font-family:JetBrains Mono;font-size:11px">'+fmtCOP(l.bb)+'</td>'+
+      '<td>'+(l.endorsed?'<span class="pl pl-g">Yes</span>':'<span class="pl pl-r">No</span>')+'</td>'+
+      '<td style="font-size:11px">'+l.payMethod+'</td>'+
+      '<td style="font-size:11px">'+l.vintage+'</td>'+
+      '<td><span class="pl '+stCol+'">'+l.status+'</span></td>'+
+      '</tr>';
+  }).join('');
+}
+document.getElementById('loanSearch').addEventListener('input',()=>renderLoans());
+renderLoans();
+
+// ========== THEME TOGGLE ==========
+document.getElementById('themeToggle').addEventListener('click',()=>{
+  const html=document.documentElement;
+  const next=html.getAttribute('data-theme')==='light'?'dark':'light';
+  html.setAttribute('data-theme',next);
+  document.getElementById('themeToggle').innerHTML=next==='light'?'&#127769;':'&#9728;&#65039;';
+  Chart.defaults.color=next==='light'?'#475569':'#8899b4';
+  Chart.helpers.each(Chart.instances,(c)=>{
+    if(c.options.scales){
+      Object.values(c.options.scales).forEach(s=>{if(s.ticks)s.ticks.color=next==='light'?'#475569':'#556a8a';if(s.grid)s.grid.color=next==='light'?'rgba(0,0,0,.08)':'rgba(30,45,74,.25)';if(s.title&&s.title.color)s.title.color=next==='light'?'#475569':'#556a8a'});
+    }
+    c.update('none');
+  });
+});
+</script></body></html>
