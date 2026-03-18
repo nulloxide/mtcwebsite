@@ -142,9 +142,48 @@ aside.notes { display: none; }
 /* Fragment custom animations */
 .reveal .slides section .fragment.fade-up { transform: translateY(20px); }
 .reveal .slides section .fragment.fade-up.visible { transform: translateY(0); }
+
+/* Theme toggle button */
+#pres-theme-toggle { position:fixed; top:12px; right:16px; z-index:100; background:rgba(30,41,59,0.7); border:1px solid rgba(100,160,255,0.15); border-radius:8px; padding:5px 10px; cursor:pointer; font-size:16px; color:#94a3b8; backdrop-filter:blur(8px); transition:all .2s; }
+#pres-theme-toggle:hover { border-color:var(--accent); color:#e2e8f0; }
+
+/* ===== LIGHT THEME ===== */
+[data-pres-theme="light"] {
+  --r-background-color: #f8fafc;
+  --r-main-color: #1e293b;
+  --r-heading-color: #0f172a;
+  --r-link-color: #4f46e5;
+  --r-link-color-hover: #6366f1;
+  --r-selection-background-color: rgba(99,102,241,0.2);
+  --accent: #4f46e5;
+  --muted: #64748b;
+  --subtle: #cbd5e1;
+}
+[data-pres-theme="light"] .reveal .slides { background: radial-gradient(ellipse at 20% 20%, rgba(59,130,246,0.04) 0%, transparent 50%), radial-gradient(ellipse at 80% 70%, rgba(139,92,246,0.03) 0%, transparent 50%); }
+[data-pres-theme="light"] .reveal ul li { color: #475569; }
+[data-pres-theme="light"] .reveal ul li strong { color: #0f172a; }
+[data-pres-theme="light"] .reveal ul li::before { background: var(--accent); }
+[data-pres-theme="light"] .metric-card { background: rgba(241,245,249,0.8); border-color: rgba(99,102,241,0.12); }
+[data-pres-theme="light"] .source-item { background: rgba(241,245,249,0.7); border-color: rgba(99,102,241,0.1); }
+[data-pres-theme="light"] .demo-card { background: rgba(241,245,249,0.7); border-color: rgba(99,102,241,0.1); }
+[data-pres-theme="light"] .demo-card:hover { border-color: var(--accent); }
+[data-pres-theme="light"] .impact-item { background: rgba(241,245,249,0.6); }
+[data-pres-theme="light"] .v-panel { background: rgba(241,245,249,0.7); }
+[data-pres-theme="light"] .v-panel.servicer { border-color: rgba(239,68,68,0.3); }
+[data-pres-theme="light"] .v-panel.ours { border-color: rgba(16,185,129,0.3); }
+[data-pres-theme="light"] .v-metric { color: #0f172a; }
+[data-pres-theme="light"] .slide-footer { color: rgba(71,85,105,0.5); }
+[data-pres-theme="light"] .gradient-text { background: linear-gradient(135deg, #4f46e5, #7c3aed, #0d9488); -webkit-background-clip: text; background-clip: text; }
+[data-pres-theme="light"] .medal.bronze { background: rgba(205,127,50,0.1); }
+[data-pres-theme="light"] .medal.silver { background: rgba(148,148,172,0.1); }
+[data-pres-theme="light"] .medal.gold { background: rgba(202,138,4,0.1); }
+[data-pres-theme="light"] #pres-theme-toggle { background: rgba(241,245,249,0.8); border-color: rgba(99,102,241,0.15); color: #475569; }
+[data-pres-theme="light"] .tl-dot { border-color: #f8fafc; }
+[data-pres-theme="light"] section[data-background-color="#050a15"] { --r-background-color: #f0f4f8; }
 </style>
 </head>
 <body>
+<button id="pres-theme-toggle" title="Toggle light/dark theme">&#9788;</button>
 <div class="slide-footer">Monachil Credit Partners</div>
 <div class="reveal">
 <div class="slides">
@@ -696,6 +735,21 @@ Reveal.initialize({
     56: function() { Reveal.slide(16) }, // 8 = Auto Purchasing
     57: function() { Reveal.slide(17) }, // 9 = Flight School Lending
   }
+});
+
+// Theme toggle
+const ptBtn = document.getElementById('pres-theme-toggle');
+ptBtn.addEventListener('click', () => {
+  const html = document.documentElement;
+  const cur = html.getAttribute('data-pres-theme');
+  const next = cur === 'light' ? 'dark' : 'light';
+  html.setAttribute('data-pres-theme', next);
+  ptBtn.innerHTML = next === 'light' ? '&#9789;' : '&#9788;';
+  // Update background color for slides that set it explicitly
+  document.querySelectorAll('section[data-background-color="#050a15"]').forEach(s => {
+    s.setAttribute('data-background-color', next === 'light' ? '#f0f4f8' : '#050a15');
+  });
+  Reveal.sync();
 });
 </script>
 </body>
