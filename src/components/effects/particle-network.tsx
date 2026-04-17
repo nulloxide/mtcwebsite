@@ -148,10 +148,12 @@ export function ParticleNetwork({
       const lineStr = style.getPropertyValue("--particle-line-color").trim();
       const accentStr = style.getPropertyValue("--accent").trim() || "#0080FF";
       const sizeScaleStr = style.getPropertyValue("--particle-size-scale").trim();
+      const lineWidthStr = style.getPropertyValue("--particle-line-width").trim();
       const connStrStr = style
         .getPropertyValue("--particle-connection-strength")
         .trim();
       const sizeScale = parseFloat(sizeScaleStr) || 1;
+      const lineWidth = parseFloat(lineWidthStr) || CONNECTION_LINE_WIDTH;
       const connStrength = parseFloat(connStrStr) || DEFAULT_CONNECTION_MAX_OPACITY;
       return {
         particle: particleStr || "rgba(255,255,255,0.5)",
@@ -159,6 +161,7 @@ export function ParticleNetwork({
         lineRgb: parseRgba(lineStr),
         accent: accentStr,
         sizeScale,
+        lineWidth,
         connStrength,
       };
     };
@@ -245,7 +248,7 @@ export function ParticleNetwork({
         ctx.fill();
       }
 
-      ctx.lineWidth = CONNECTION_LINE_WIDTH * colors.sizeScale;
+      ctx.lineWidth = colors.lineWidth;
       const connMax = colors.connStrength;
       const connMaxBoosted = Math.min(1, connMax + 0.35);
       for (let i = 0; i < particles.length; i++) {
