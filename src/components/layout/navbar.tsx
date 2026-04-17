@@ -10,8 +10,8 @@ const SCROLL_THRESHOLD = 50;
 
 const navLinks = [
   { label: "About", href: "#about" },
-  { label: "Platform", href: "#platform" },
   { label: "Capabilities", href: "#capabilities" },
+  { label: "Platform", href: "#platform" },
   { label: "Careers", href: "#careers" },
   { label: "Contact", href: "#contact" },
 ];
@@ -72,8 +72,12 @@ export function Navbar() {
           <ThemeToggle />
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
-              <button className="flex h-9 w-9 items-center justify-center rounded-lg border border-border" aria-label="Open menu">
-                <Menu className="h-5 w-5" />
+              <button
+                type="button"
+                className="flex h-9 w-9 items-center justify-center rounded-lg border border-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                aria-label="Open menu"
+              >
+                <Menu className="h-5 w-5" aria-hidden="true" />
               </button>
             </SheetTrigger>
             <SheetContent side="right" className="w-72 bg-background">

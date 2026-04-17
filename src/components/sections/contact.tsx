@@ -1,14 +1,63 @@
 "use client";
 
+import { useState } from "react";
 import { ScrollReveal } from "@/components/effects/scroll-reveal";
 import { TextReveal } from "@/components/effects/text-reveal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, CheckCircle2, AlertCircle } from "lucide-react";
+
+const FORMSUBMIT_ENDPOINT = "https://formsubmit.co/ajax/info@monachiltech.com";
+
+type Status = "idle" | "submitting" | "success" | "error";
 
 export function Contact() {
+  const [status, setStatus] = useState<Status>("idle");
+  const [errorMessage, setErrorMessage] = useState<string>("");
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
+    if (formData.get("_honey")) return;
+
+    const email = formData.get("email");
+    if (typeof email === "string" && email.length > 0) {
+      formData.set("_replyto", email);
+    }
+
+    setStatus("submitting");
+    setErrorMessage("");
+
+    try {
+      const response = await fetch(FORMSUBMIT_ENDPOINT, {
+        method: "POST",
+        body: formData,
+        headers: { Accept: "application/json" },
+      });
+      const data = (await response.json().catch(() => ({}))) as {
+        success?: string | boolean;
+      };
+      const ok =
+        response.ok && data.success !== false && String(data.success) !== "false";
+      if (!ok) {
+        throw new Error("Submission failed");
+      }
+      form.reset();
+      setStatus("success");
+    } catch {
+      setStatus("error");
+      setErrorMessage(
+        "Something went wrong. Please try again or email info@monachiltech.com directly."
+      );
+    }
+  }
+
+  const submitting = status === "submitting";
+
   return (
     <section id="contact" className="relative py-32 md:py-48">
       <div className="mx-auto max-w-7xl px-6">
@@ -65,29 +114,68 @@ export function Contact() {
           {/* Form */}
           <ScrollReveal delay={0.15} direction="left">
             <form
-              onSubmit={(e) => e.preventDefault()}
+              onSubmit={handleSubmit}
+              action={FORMSUBMIT_ENDPOINT}
+              method="POST"
+              noValidate
               className="card-surface space-y-5 rounded-2xl border border-border bg-surface p-8"
               style={{ boxShadow: "var(--card-shadow)" }}
             >
+              <input
+                type="hidden"
+                name="_subject"
+                value="Contact Form — Monachil Technologies"
+              />
+              <input type="hidden" name="_template" value="table" />
+              <input type="hidden" name="_captcha" value="false" />
+              <input
+                type="text"
+                name="_honey"
+                tabIndex={-1}
+                autoComplete="off"
+                hidden
+                aria-hidden="true"
+              />
+
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="name" className="text-xs font-light tracking-wide">
                     Name
                   </Label>
-                  <Input id="name" placeholder="Your name" required />
+                  <Input
+                    id="name"
+                    name="name"
+                    placeholder="Your name"
+                    required
+                    aria-required="true"
+                    autoComplete="name"
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-xs font-light tracking-wide">
                     Email
                   </Label>
-                  <Input id="email" type="email" placeholder="you@company.com" required />
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="you@company.com"
+                    required
+                    aria-required="true"
+                    autoComplete="email"
+                  />
                 </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="company" className="text-xs font-light tracking-wide">
                   Company
                 </Label>
-                <Input id="company" placeholder="Your company" />
+                <Input
+                  id="company"
+                  name="company"
+                  placeholder="Your company"
+                  autoComplete="organization"
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="message" className="text-xs font-light tracking-wide">
@@ -95,17 +183,50 @@ export function Contact() {
                 </Label>
                 <Textarea
                   id="message"
+                  name="message"
                   placeholder="How can we help?"
                   rows={5}
                   required
+                  aria-required="true"
                 />
               </div>
+
+              {status === "success" && (
+                <div
+                  role="status"
+                  className="flex items-start gap-3 rounded-lg border border-brand-blue/30 bg-brand-blue/10 p-4 text-sm font-light text-text-primary"
+                >
+                  <CheckCircle2
+                    className="mt-0.5 h-4 w-4 flex-shrink-0 text-brand-blue"
+                    aria-hidden="true"
+                  />
+                  <span>
+                    Thank you — your message has been sent. We will be in touch
+                    shortly.
+                  </span>
+                </div>
+              )}
+
+              {status === "error" && (
+                <div
+                  role="alert"
+                  className="flex items-start gap-3 rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm font-light text-text-primary"
+                >
+                  <AlertCircle
+                    className="mt-0.5 h-4 w-4 flex-shrink-0 text-destructive"
+                    aria-hidden="true"
+                  />
+                  <span>{errorMessage}</span>
+                </div>
+              )}
+
               <Button
                 type="submit"
-                className="w-full gap-2 bg-brand-blue text-white shadow-lg shadow-brand-blue/20 hover:bg-accent"
+                disabled={submitting}
+                className="w-full gap-2 bg-brand-blue text-white shadow-lg shadow-brand-blue/20 hover:bg-accent disabled:opacity-60"
               >
-                Send Message
-                <ArrowRight className="h-4 w-4" />
+                {submitting ? "Sending..." : "Send Message"}
+                {!submitting && <ArrowRight className="h-4 w-4" />}
               </Button>
             </form>
           </ScrollReveal>

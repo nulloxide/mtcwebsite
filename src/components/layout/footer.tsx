@@ -2,8 +2,8 @@ import { MountainIcon } from "@/components/logo";
 
 const footerLinks = [
   { label: "About", href: "#about" },
-  { label: "Platform", href: "#platform" },
   { label: "Capabilities", href: "#capabilities" },
+  { label: "Platform", href: "#platform" },
   { label: "Careers", href: "#careers" },
   { label: "Contact", href: "#contact" },
 ];
