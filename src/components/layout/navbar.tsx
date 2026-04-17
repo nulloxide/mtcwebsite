@@ -33,6 +33,15 @@ export function Navbar() {
     if (el) {
       el.scrollIntoView({ behavior: "smooth" });
     }
+    // Update the URL hash so sections listening for hashchange (e.g. Connect tabs) react
+    if (href.startsWith("#") && window.location.hash !== href) {
+      if (history.replaceState) {
+        history.replaceState(null, "", href);
+      } else {
+        window.location.hash = href;
+      }
+      window.dispatchEvent(new HashChangeEvent("hashchange"));
+    }
   };
 
   return (

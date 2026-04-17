@@ -131,9 +131,11 @@
   }
   html {
     scroll-behavior: smooth;
+    background: var(--background);
   }
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
+    background: transparent;
   }
 }
 
@@ -215,31 +217,3 @@
   50% { opacity: 0.5; r: 14; }
 }
 
-/* ─── Custom cursor (desktop only) ─── */
-@media (pointer: fine) {
-  .cursor-dot {
-    width: 8px;
-    height: 8px;
-    background: var(--brand-blue);
-    border-radius: 50%;
-    position: fixed;
-    pointer-events: none;
-    z-index: 9999;
-    transition: transform 0.15s ease;
-  }
-  .cursor-ring {
-    width: 40px;
-    height: 40px;
-    border: 1.5px solid var(--accent);
-    border-radius: 50%;
-    position: fixed;
-    pointer-events: none;
-    z-index: 9998;
-    opacity: 0.5;
-    transition: opacity 0.3s ease, border-color 0.3s ease;
-  }
-  .cursor-ring.hovering {
-    opacity: 0.8;
-    border-color: var(--brand-blue);
-  }
-}

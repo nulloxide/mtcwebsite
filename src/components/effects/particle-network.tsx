@@ -2,21 +2,26 @@
 
 import { useRef, useEffect, useCallback, useState } from "react";
 
-const MAX_INITIAL_VELOCITY = 0.3;
-const MIN_PARTICLE_RADIUS = 0.5;
+const MAX_INITIAL_VELOCITY = 0.25;
+const MIN_PARTICLE_RADIUS = 0.6;
 const PARTICLE_RADIUS_RANGE = 1.2;
 const MOBILE_BREAKPOINT = 768;
-const VELOCITY_DAMPING = 0.99;
-const CONNECTION_MAX_OPACITY = 0.12;
-const CONNECTION_LINE_WIDTH = 0.5;
+const VELOCITY_DAMPING = 0.985;
+const MAX_SPEED = 1.2;
+const CONNECTION_MAX_OPACITY = 0.18;
+const CONNECTION_LINE_WIDTH = 0.6;
 const MOUSE_OFFSCREEN = -9999;
-const DESKTOP_PARTICLE_COUNT = 50;
-const MOBILE_PARTICLE_COUNT = 25;
+const DESKTOP_PARTICLE_COUNT = 70;
+const MOBILE_PARTICLE_COUNT = 32;
+const MOUSE_GLOW_RADIUS = 220;
 
 interface ParticleNetworkProps {
   connectionDistance?: number;
   mouseRadius?: number;
   mouseForce?: number;
+  /** Whether the canvas should be fixed to the viewport (for use as a global background) */
+  fixed?: boolean;
+  className?: string;
 }
 
 interface Particle {
@@ -28,22 +33,22 @@ interface Particle {
 }
 
 export function ParticleNetwork({
-  connectionDistance = 120,
-  mouseRadius = 100,
-  mouseForce = 0.015,
+  connectionDistance = 130,
+  mouseRadius = 160,
+  mouseForce = 0.04,
+  fixed = false,
+  className,
 }: ParticleNetworkProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const particlesRef = useRef<Particle[]>([]);
-  const mouseRef = useRef({ x: MOUSE_OFFSCREEN, y: MOUSE_OFFSCREEN });
+  const mouseRef = useRef({ x: MOUSE_OFFSCREEN, y: MOUSE_OFFSCREEN, active: false });
   const rafRef = useRef<number>(0);
   const sizeRef = useRef({ w: 0, h: 0 });
-  const reducedMotionRef = useRef(false);
   const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const isMobile = window.innerWidth < MOBILE_BREAKPOINT;
-    setEnabled(!reduced && !isMobile);
+    setEnabled(!reduced);
   }, []);
 
   const initParticles = useCallback(
@@ -71,13 +76,9 @@ export function ParticleNetwork({
     const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
 
-    reducedMotionRef.current = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
-
     const isMobile = window.innerWidth < MOBILE_BREAKPOINT;
     const count = isMobile ? MOBILE_PARTICLE_COUNT : DESKTOP_PARTICLE_COUNT;
-    const connDist = connectionDistance;
+    const connDist = isMobile ? connectionDistance * 0.85 : connectionDistance;
     const connDistSq = connDist * connDist;
     const mRadius = mouseRadius;
     const mRadiusSq = mRadius * mRadius;
@@ -96,38 +97,40 @@ export function ParticleNetwork({
     particlesRef.current = initParticles(sizeRef.current.w, sizeRef.current.h, count);
 
     const ro = new ResizeObserver(() => {
+      const prev = sizeRef.current;
       resize();
-      particlesRef.current = initParticles(
-        sizeRef.current.w,
-        sizeRef.current.h,
-        count
-      );
+      const { w, h } = sizeRef.current;
+      if (prev.w === 0 || prev.h === 0) {
+        particlesRef.current = initParticles(w, h, count);
+        return;
+      }
+      const sx = w / prev.w;
+      const sy = h / prev.h;
+      for (const p of particlesRef.current) {
+        p.x *= sx;
+        p.y *= sy;
+      }
     });
     ro.observe(canvas);
 
-    // Cache mouse position from canvas rect — avoid getBoundingClientRect on every move
-    let canvasLeft = 0;
-    let canvasTop = 0;
-    const updateCanvasPos = () => {
+    const onPointerMove = (e: PointerEvent) => {
+      // Always fixed or positioned — use viewport coords minus canvas rect
       const rect = canvas.getBoundingClientRect();
-      canvasLeft = rect.left;
-      canvasTop = rect.top;
+      mouseRef.current = {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+        active: true,
+      };
     };
-    updateCanvasPos();
-    // Update cached position on scroll/resize, not on every mousemove
-    window.addEventListener("scroll", updateCanvasPos, { passive: true });
-
-    const onMouseMove = (e: MouseEvent) => {
-      mouseRef.current = { x: e.clientX - canvasLeft, y: e.clientY - canvasTop };
-    };
-    const onMouseLeave = () => {
-      mouseRef.current = { x: MOUSE_OFFSCREEN, y: MOUSE_OFFSCREEN };
+    const onPointerLeave = () => {
+      mouseRef.current = { x: MOUSE_OFFSCREEN, y: MOUSE_OFFSCREEN, active: false };
     };
 
-    canvas.addEventListener("mousemove", onMouseMove, { passive: true });
-    canvas.addEventListener("mouseleave", onMouseLeave);
+    // Listen at window level so the cursor is tracked even when canvas is pointer-events:none
+    window.addEventListener("pointermove", onPointerMove, { passive: true });
+    window.addEventListener("pointerleave", onPointerLeave);
+    window.addEventListener("blur", onPointerLeave);
 
-    // Pre-compute colors as rgba arrays, not strings parsed per-frame
     const parseRgba = (str: string): [number, number, number, number] => {
       const m = str.match(/[\d.]+/g);
       if (!m || m.length < 3) return [255, 255, 255, 0.5];
@@ -143,18 +146,21 @@ export function ParticleNetwork({
       const style = getComputedStyle(document.documentElement);
       const particleStr = style.getPropertyValue("--particle-color").trim();
       const lineStr = style.getPropertyValue("--particle-line-color").trim();
+      const accentStr = style.getPropertyValue("--accent").trim() || "#0080FF";
       return {
         particle: particleStr,
+        particleRgb: parseRgba(particleStr),
         lineRgb: parseRgba(lineStr),
+        accent: accentStr,
       };
     };
 
     let colors = getColors();
 
-    const observer = new MutationObserver(() => {
+    const themeObserver = new MutationObserver(() => {
       colors = getColors();
     });
-    observer.observe(document.documentElement, {
+    themeObserver.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ["class"],
     });
@@ -164,15 +170,14 @@ export function ParticleNetwork({
       const particles = particlesRef.current;
       const mouse = mouseRef.current;
       const [lr, lg, lb] = colors.lineRgb;
+      const [pr, pg, pb] = colors.particleRgb;
 
       ctx.clearRect(0, 0, w, h);
 
-      // Batch all particle dots first, then lines — fewer state changes
-      ctx.fillStyle = colors.particle;
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
 
-        if (!reducedMotionRef.current) {
+        if (mouse.active) {
           const mdx = p.x - mouse.x;
           const mdy = p.y - mouse.y;
           const mdSq = mdx * mdx + mdy * mdy;
@@ -182,24 +187,48 @@ export function ParticleNetwork({
             p.vx += (mdx / dist) * force;
             p.vy += (mdy / dist) * force;
           }
-
-          p.vx *= VELOCITY_DAMPING;
-          p.vy *= VELOCITY_DAMPING;
-          p.x += p.vx;
-          p.y += p.vy;
-
-          if (p.x < 0) p.x = w;
-          if (p.x > w) p.x = 0;
-          if (p.y < 0) p.y = h;
-          if (p.y > h) p.y = 0;
         }
 
+        p.vx *= VELOCITY_DAMPING;
+        p.vy *= VELOCITY_DAMPING;
+
+        // Cap speed so interactions don't spiral out
+        const speedSq = p.vx * p.vx + p.vy * p.vy;
+        if (speedSq > MAX_SPEED * MAX_SPEED) {
+          const s = MAX_SPEED / Math.sqrt(speedSq);
+          p.vx *= s;
+          p.vy *= s;
+        }
+
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0) p.x = w;
+        else if (p.x > w) p.x = 0;
+        if (p.y < 0) p.y = h;
+        else if (p.y > h) p.y = 0;
+
+        // Fade in particle with mouse proximity
+        let alpha = 1;
+        if (mouse.active) {
+          const gdx = p.x - mouse.x;
+          const gdy = p.y - mouse.y;
+          const gdSq = gdx * gdx + gdy * gdy;
+          if (gdSq < MOUSE_GLOW_RADIUS * MOUSE_GLOW_RADIUS) {
+            const t = 1 - Math.sqrt(gdSq) / MOUSE_GLOW_RADIUS;
+            alpha = 1 + t * 1.4;
+          }
+        }
+
+        ctx.fillStyle =
+          alpha > 1
+            ? `rgba(${pr},${pg},${pb},${Math.min(1, (colors.particleRgb[3] ?? 1) * alpha)})`
+            : colors.particle;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
         ctx.fill();
       }
 
-      // Draw all connection lines with batched lineWidth
       ctx.lineWidth = CONNECTION_LINE_WIDTH;
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
@@ -209,7 +238,16 @@ export function ParticleNetwork({
           const dy = p.y - q.y;
           const dSq = dx * dx + dy * dy;
           if (dSq < connDistSq) {
-            const alpha = (1 - Math.sqrt(dSq) / connDist) * CONNECTION_MAX_OPACITY;
+            let alpha = (1 - Math.sqrt(dSq) / connDist) * CONNECTION_MAX_OPACITY;
+            if (mouse.active) {
+              const mx = (p.x + q.x) * 0.5 - mouse.x;
+              const my = (p.y + q.y) * 0.5 - mouse.y;
+              const mdSq = mx * mx + my * my;
+              if (mdSq < MOUSE_GLOW_RADIUS * MOUSE_GLOW_RADIUS) {
+                const t = 1 - Math.sqrt(mdSq) / MOUSE_GLOW_RADIUS;
+                alpha = Math.min(0.6, alpha + t * 0.35);
+              }
+            }
             ctx.strokeStyle = `rgba(${lr},${lg},${lb},${alpha})`;
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
@@ -219,23 +257,18 @@ export function ParticleNetwork({
         }
       }
 
-      if (!reducedMotionRef.current) {
-        rafRef.current = requestAnimationFrame(draw);
-      }
+      rafRef.current = requestAnimationFrame(draw);
     };
 
     draw();
-    if (reducedMotionRef.current) {
-      cancelAnimationFrame(rafRef.current);
-    }
 
     return () => {
       cancelAnimationFrame(rafRef.current);
       ro.disconnect();
-      observer.disconnect();
-      window.removeEventListener("scroll", updateCanvasPos);
-      canvas.removeEventListener("mousemove", onMouseMove);
-      canvas.removeEventListener("mouseleave", onMouseLeave);
+      themeObserver.disconnect();
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("pointerleave", onPointerLeave);
+      window.removeEventListener("blur", onPointerLeave);
     };
   }, [enabled, connectionDistance, mouseRadius, mouseForce, initParticles]);
 
@@ -244,7 +277,11 @@ export function ParticleNetwork({
   return (
     <canvas
       ref={canvasRef}
-      className="pointer-events-auto absolute inset-0 h-full w-full"
+      className={
+        fixed
+          ? `pointer-events-none fixed inset-0 z-0 h-full w-full ${className ?? ""}`
+          : `pointer-events-none absolute inset-0 h-full w-full ${className ?? ""}`
+      }
       aria-hidden="true"
     />
   );

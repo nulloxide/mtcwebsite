@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { ParticleNetwork } from "@/components/effects/particle-network";
 import { MagneticButton } from "@/components/effects/magnetic-button";
 import { ArrowDown } from "lucide-react";
 import { loadGsap } from "@/lib/gsap";
@@ -61,8 +60,6 @@ export function Hero() {
 
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden">
-      <ParticleNetwork />
-
       <div className="relative z-10 mx-auto max-w-5xl px-6 text-center">
         <h1
           ref={headlineRef}
