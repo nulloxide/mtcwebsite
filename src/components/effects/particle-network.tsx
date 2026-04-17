@@ -33,7 +33,7 @@ interface Particle {
 }
 
 export function ParticleNetwork({
-  connectionDistance = 130,
+  connectionDistance = 180,
   mouseRadius = 160,
   mouseForce = 0.04,
   fixed = false,
