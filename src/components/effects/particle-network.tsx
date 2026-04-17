@@ -259,7 +259,9 @@ export function ParticleNetwork({
           const dy = p.y - q.y;
           const dSq = dx * dx + dy * dy;
           if (dSq < connDistSq) {
-            let alpha = (1 - Math.sqrt(dSq) / connDist) * connMax;
+            // Softer falloff so mid-distance lines stay visible
+            const normalized = 1 - Math.sqrt(dSq) / connDist;
+            let alpha = Math.sqrt(normalized) * connMax;
             if (mouse.active) {
               const mx = (p.x + q.x) * 0.5 - mouse.x;
               const my = (p.y + q.y) * 0.5 - mouse.y;

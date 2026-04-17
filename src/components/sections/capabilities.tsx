@@ -183,7 +183,7 @@ const capabilities = [
 
 export function Capabilities() {
   return (
-    <section id="capabilities" className="relative py-32 md:py-48">
+    <section id="capabilities" className="relative overflow-hidden py-32 md:py-48">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mx-auto max-w-3xl text-center">
           <ScrollReveal>

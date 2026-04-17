@@ -5,7 +5,7 @@ import { TextReveal } from "@/components/effects/text-reveal";
 
 export function About() {
   return (
-    <section id="about" className="relative py-32 md:py-48">
+    <section id="about" className="relative overflow-hidden py-32 md:py-48">
       <div className="mx-auto max-w-4xl px-6">
         <ScrollReveal>
           <div className="h-px w-16 bg-brand-blue/40" />

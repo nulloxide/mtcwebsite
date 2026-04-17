@@ -130,7 +130,7 @@ export function Connect() {
   }, []);
 
   return (
-    <section id="contact" className="relative py-32 md:py-48">
+    <section id="contact" className="relative overflow-hidden py-32 md:py-48">
       <span id="careers" className="pointer-events-none absolute -top-24" aria-hidden="true" />
       <div className="mx-auto max-w-7xl px-6">
         <div className="text-center">

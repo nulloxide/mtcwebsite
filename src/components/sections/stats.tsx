@@ -11,7 +11,7 @@ const stats = [
 
 export function Stats() {
   return (
-    <section className="relative py-32 md:py-48">
+    <section className="relative overflow-hidden py-32 md:py-48">
       <div className="mx-auto max-w-5xl px-6">
         <div className="grid grid-cols-1 gap-16 md:grid-cols-3">
           {stats.map((stat, i) => (

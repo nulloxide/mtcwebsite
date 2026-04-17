@@ -208,7 +208,7 @@ function PipelineFlowDiagram() {
 
 export function DataPlatform() {
   return (
-    <section id="platform" className="relative py-32 md:py-48">
+    <section id="platform" className="relative overflow-hidden py-32 md:py-48">
       {/* Subtle background glow */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div

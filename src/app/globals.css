@@ -115,11 +115,11 @@
   --noise-opacity: 0.025;
   --glow-opacity: 0.06;
 
-  --particle-color: rgba(1, 60, 120, 0.85);
-  --particle-line-color: rgba(1, 114, 189, 1);
+  --particle-color: rgba(1, 60, 120, 0.9);
+  --particle-line-color: rgba(1, 60, 120, 1);
   --particle-size-scale: 1.6;
-  --particle-line-width: 1.8;
-  --particle-connection-strength: 0.6;
+  --particle-line-width: 2;
+  --particle-connection-strength: 0.9;
 
   --spotlight-color: rgba(1, 114, 189, 0.08);
   --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 16px rgba(0, 0, 0, 0.04);
