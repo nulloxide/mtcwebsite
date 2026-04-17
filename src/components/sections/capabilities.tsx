@@ -195,7 +195,7 @@ export function Capabilities() {
             as="h2"
             className="mt-4 text-3xl font-light tracking-tight text-text-primary md:text-5xl lg:text-6xl"
           >
-            Full-Stack Technology for Private Credit
+            Full-Stack Technology for Specialty Finance
           </TextReveal>
         </div>
 

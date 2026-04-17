@@ -22,17 +22,18 @@ export function About() {
           <p className="mt-8 text-lg font-light leading-relaxed text-text-secondary md:text-xl">
             Monachil Technologies is the technology division of{" "}
             <a
-              href="https://monachilpartners.com"
+              href="https://monachill.com"
               target="_blank"
               rel="noopener noreferrer"
               className="text-accent underline decoration-accent/30 underline-offset-2 hover:decoration-accent"
             >
               Monachil Capital Partners LP
             </a>
-            , an SEC-registered private credit manager focused on opportunistic,
-            asset-backed investing. We build the proprietary systems that power
-            the investment process — from deal sourcing and underwriting through
-            daily portfolio monitoring and investor reporting.
+            , an SEC-registered investment manager focused on asset-backed
+            lending and specialty finance. We build the proprietary systems
+            that power the investment process — from deal sourcing and
+            underwriting through daily portfolio monitoring and investor
+            reporting.
           </p>
         </ScrollReveal>
 

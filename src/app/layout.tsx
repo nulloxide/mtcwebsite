@@ -20,7 +20,7 @@ const geistMono = Geist_Mono({
 
 const SITE_URL = "https://monachiltech.com";
 const SITE_TITLE =
-  "Monachil Technologies | Data Infrastructure for Alternative Assets";
+  "Monachil Technologies | Data Infrastructure for Asset-Backed Lending";
 const SITE_DESCRIPTION =
   "The proprietary data platform — ingestion, verification, enrichment, and analytics — behind Monachil Capital Partners. Nine asset classes, four countries, one unified system.";
 
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
   openGraph: {
     title: "Monachil Technologies",
-    description: "The proprietary data platform behind Monachil Capital Partners — ingestion, verification, enrichment, and analytics for private credit.",
+    description: "The proprietary data platform behind Monachil Capital Partners — ingestion, verification, enrichment, and analytics for asset-backed lending and specialty finance.",
     url: SITE_URL,
     siteName: "Monachil Technologies",
     locale: "en_CA",
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Monachil Technologies",
-    description: "The proprietary data platform behind Monachil Capital Partners — ingestion, verification, enrichment, and analytics for private credit.",
+    description: "The proprietary data platform behind Monachil Capital Partners — ingestion, verification, enrichment, and analytics for asset-backed lending and specialty finance.",
   },
   robots: { index: true, follow: true },
 };

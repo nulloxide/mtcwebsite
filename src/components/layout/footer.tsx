@@ -37,7 +37,7 @@ export function Footer() {
         <p className="text-xs text-text-secondary">
           &copy; {new Date().getFullYear()} Monachil Technologies.{" "}
           <a
-            href="https://monachilpartners.com"
+            href="https://monachill.com"
             target="_blank"
             rel="noopener noreferrer"
             className="text-accent underline decoration-accent/30 underline-offset-2 hover:decoration-accent"
