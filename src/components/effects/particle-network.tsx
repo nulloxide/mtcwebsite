@@ -8,7 +8,7 @@ const PARTICLE_RADIUS_RANGE = 1.2;
 const MOBILE_BREAKPOINT = 768;
 const VELOCITY_DAMPING = 0.985;
 const MAX_SPEED = 1.2;
-const CONNECTION_MAX_OPACITY = 0.18;
+const DEFAULT_CONNECTION_MAX_OPACITY = 0.18;
 const CONNECTION_LINE_WIDTH = 0.6;
 const MOUSE_OFFSCREEN = -9999;
 const DESKTOP_PARTICLE_COUNT = 70;
@@ -147,11 +147,19 @@ export function ParticleNetwork({
       const particleStr = style.getPropertyValue("--particle-color").trim();
       const lineStr = style.getPropertyValue("--particle-line-color").trim();
       const accentStr = style.getPropertyValue("--accent").trim() || "#0080FF";
+      const sizeScaleStr = style.getPropertyValue("--particle-size-scale").trim();
+      const connStrStr = style
+        .getPropertyValue("--particle-connection-strength")
+        .trim();
+      const sizeScale = parseFloat(sizeScaleStr) || 1;
+      const connStrength = parseFloat(connStrStr) || DEFAULT_CONNECTION_MAX_OPACITY;
       return {
-        particle: particleStr,
+        particle: particleStr || "rgba(255,255,255,0.5)",
         particleRgb: parseRgba(particleStr),
         lineRgb: parseRgba(lineStr),
         accent: accentStr,
+        sizeScale,
+        connStrength,
       };
     };
 
@@ -164,6 +172,14 @@ export function ParticleNetwork({
       attributes: true,
       attributeFilter: ["class"],
     });
+
+    // Re-read colors on next paint and after a short delay to catch any late CSS application
+    const raf1 = requestAnimationFrame(() => {
+      colors = getColors();
+    });
+    const late = window.setTimeout(() => {
+      colors = getColors();
+    }, 300);
 
     const draw = () => {
       const { w, h } = sizeRef.current;
@@ -225,11 +241,13 @@ export function ParticleNetwork({
             ? `rgba(${pr},${pg},${pb},${Math.min(1, (colors.particleRgb[3] ?? 1) * alpha)})`
             : colors.particle;
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, p.radius * colors.sizeScale, 0, Math.PI * 2);
         ctx.fill();
       }
 
-      ctx.lineWidth = CONNECTION_LINE_WIDTH;
+      ctx.lineWidth = CONNECTION_LINE_WIDTH * colors.sizeScale;
+      const connMax = colors.connStrength;
+      const connMaxBoosted = Math.min(1, connMax + 0.35);
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
         for (let j = i + 1; j < particles.length; j++) {
@@ -238,14 +256,14 @@ export function ParticleNetwork({
           const dy = p.y - q.y;
           const dSq = dx * dx + dy * dy;
           if (dSq < connDistSq) {
-            let alpha = (1 - Math.sqrt(dSq) / connDist) * CONNECTION_MAX_OPACITY;
+            let alpha = (1 - Math.sqrt(dSq) / connDist) * connMax;
             if (mouse.active) {
               const mx = (p.x + q.x) * 0.5 - mouse.x;
               const my = (p.y + q.y) * 0.5 - mouse.y;
               const mdSq = mx * mx + my * my;
               if (mdSq < MOUSE_GLOW_RADIUS * MOUSE_GLOW_RADIUS) {
                 const t = 1 - Math.sqrt(mdSq) / MOUSE_GLOW_RADIUS;
-                alpha = Math.min(0.6, alpha + t * 0.35);
+                alpha = Math.min(connMaxBoosted, alpha + t * 0.35);
               }
             }
             ctx.strokeStyle = `rgba(${lr},${lg},${lb},${alpha})`;
@@ -264,6 +282,8 @@ export function ParticleNetwork({
 
     return () => {
       cancelAnimationFrame(rafRef.current);
+      cancelAnimationFrame(raf1);
+      window.clearTimeout(late);
       ro.disconnect();
       themeObserver.disconnect();
       window.removeEventListener("pointermove", onPointerMove);
