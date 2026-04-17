@@ -11,8 +11,8 @@ const MAX_SPEED = 1.2;
 const DEFAULT_CONNECTION_MAX_OPACITY = 0.18;
 const CONNECTION_LINE_WIDTH = 0.6;
 const MOUSE_OFFSCREEN = -9999;
-const DESKTOP_PARTICLE_COUNT = 70;
-const MOBILE_PARTICLE_COUNT = 32;
+const DESKTOP_PARTICLE_COUNT = 100;
+const MOBILE_PARTICLE_COUNT = 40;
 const MOUSE_GLOW_RADIUS = 220;
 
 interface ParticleNetworkProps {
@@ -33,7 +33,7 @@ interface Particle {
 }
 
 export function ParticleNetwork({
-  connectionDistance = 180,
+  connectionDistance = 200,
   mouseRadius = 160,
   mouseForce = 0.04,
   fixed = false,
