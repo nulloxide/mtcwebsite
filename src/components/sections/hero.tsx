@@ -75,7 +75,7 @@ export function Hero() {
         >
           We build the proprietary data platform — ingestion, verification,
           enrichment, and analytics — that Monachil Capital Partners runs on.
-          Nine asset classes, four countries, one unified system.
+          Fifteen-plus asset classes, four countries, one unified system.
         </p>
 
         <div ref={ctaRef} className="mt-12 flex justify-center opacity-0">

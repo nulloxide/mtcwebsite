@@ -4,7 +4,7 @@ import { ScrollReveal } from "@/components/effects/scroll-reveal";
 import { AnimatedCounter } from "@/components/effects/animated-counter";
 
 const stats = [
-  { value: "9", label: "Asset Classes in Production", suffix: "+" },
+  { value: "15", label: "Asset Classes in Production", suffix: "+" },
   { value: "4", label: "Countries", suffix: "+" },
   { value: "1", label: "Unified Platform" },
 ];

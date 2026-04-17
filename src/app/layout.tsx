@@ -22,7 +22,7 @@ const SITE_URL = "https://monachiltech.com";
 const SITE_TITLE =
   "Monachil Technologies | Data Infrastructure for Asset-Backed Lending";
 const SITE_DESCRIPTION =
-  "The proprietary data platform — ingestion, verification, enrichment, and analytics — behind Monachil Capital Partners. Nine asset classes, four countries, one unified system.";
+  "The proprietary data platform — ingestion, verification, enrichment, and analytics — behind Monachil Capital Partners. Fifteen-plus asset classes, four countries, one unified system.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
