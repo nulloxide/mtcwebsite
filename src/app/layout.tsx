@@ -22,7 +22,7 @@ const SITE_URL = "https://monachiltech.com";
 const SITE_TITLE =
   "Monachil Technologies | Data Infrastructure for Alternative Assets";
 const SITE_DESCRIPTION =
-  "Monachil Technologies builds proprietary data infrastructure and analytics for private credit investing.";
+  "The proprietary data platform — ingestion, verification, enrichment, and analytics — behind Monachil Capital Partners. Nine asset classes, four countries, one unified system.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
   openGraph: {
     title: "Monachil Technologies",
-    description: "Engineering the intelligence layer for alternative assets.",
+    description: "The proprietary data platform behind Monachil Capital Partners — ingestion, verification, enrichment, and analytics for private credit.",
     url: SITE_URL,
     siteName: "Monachil Technologies",
     locale: "en_CA",
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Monachil Technologies",
-    description: "Engineering the intelligence layer for alternative assets.",
+    description: "The proprietary data platform behind Monachil Capital Partners — ingestion, verification, enrichment, and analytics for private credit.",
   },
   robots: { index: true, follow: true },
 };

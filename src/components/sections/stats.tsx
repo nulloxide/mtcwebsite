@@ -4,9 +4,9 @@ import { ScrollReveal } from "@/components/effects/scroll-reveal";
 import { AnimatedCounter } from "@/components/effects/animated-counter";
 
 const stats = [
-  { value: "2021", label: "Year Founded" },
-  { value: "24/7", label: "System Monitoring" },
-  { value: "100", label: "Uptime SLA", suffix: "%" },
+  { value: "9", label: "Asset Classes in Production", suffix: "+" },
+  { value: "4", label: "Countries", suffix: "+" },
+  { value: "1", label: "Unified Platform" },
 ];
 
 export function Stats() {

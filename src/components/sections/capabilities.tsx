@@ -147,8 +147,8 @@ const capabilities = [
     icon: BarChart3,
     title: "Data & Analytics",
     description:
-      "Real-time portfolio monitoring, risk analysis, and performance attribution. We turn complex loan-level data into clear, actionable dashboards for investment decision-makers.",
-    tags: ["Portfolio Analytics", "Risk Modeling", "Reporting"],
+      "We independently re-derive DPD, borrowing base, and covenant calculations from raw source data and reconcile against servicer reports. Discrepancies surface in the dashboard, not in month-end. Daily, loan-level, auditable.",
+    tags: ["Independent Verification", "Portfolio Analytics", "Reconciliation"],
     span: "md:col-span-2 md:row-span-2",
     visual: true,
   },
@@ -156,8 +156,8 @@ const capabilities = [
     icon: Server,
     title: "Infrastructure",
     description:
-      "Cloud-native environments engineered for institutional-scale data workloads. Automated provisioning, high availability, and enterprise-grade reliability.",
-    tags: ["Cloud", "CI/CD", "Automation"],
+      "Cloud-native pipelines running daily reconciliation across loan servicers, multiple banks (BAI2, ACH, wire), payment processors, and market feeds (SOFR, FX). Built for scale without proportional headcount growth.",
+    tags: ["Azure", "CI/CD", "IaC"],
     span: "",
     visual: false,
   },
@@ -165,17 +165,17 @@ const capabilities = [
     icon: ShieldCheck,
     title: "Cybersecurity",
     description:
-      "Comprehensive governance, risk, and compliance frameworks protecting sensitive financial data at every layer.",
-    tags: ["GRC", "Data Protection", "Compliance"],
+      "Security and compliance engineering for an SEC-registered investment adviser. Identity, access, and data-protection controls hardened for the regulatory environment we operate in.",
+    tags: ["SEC Registered", "IAM", "Data Protection"],
     span: "",
     visual: false,
   },
   {
     icon: Brain,
-    title: "Quantitative Research",
+    title: "Enrichment & Business Logic",
     description:
-      "Machine learning models and statistical analysis powering credit assessment, pricing, and portfolio construction.",
-    tags: ["ML/AI", "Python", "Research"],
+      "The Gold layer is where the investment process lives in code — DPD buckets, borrowing base math, covenant tracking, cross-dataset joins between loan tapes, bank statements, and contracts. Every output is traceable to raw source.",
+    tags: ["Python", "Pydantic", "FastAPI"],
     span: "md:col-span-2",
     visual: false,
   },
@@ -195,7 +195,7 @@ export function Capabilities() {
             as="h2"
             className="mt-4 text-3xl font-light tracking-tight text-text-primary md:text-5xl lg:text-6xl"
           >
-            Full-Stack Technology for Finance
+            Full-Stack Technology for Private Credit
           </TextReveal>
         </div>
 

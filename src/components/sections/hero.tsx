@@ -73,9 +73,9 @@ export function Hero() {
           ref={subRef}
           className="mx-auto mt-8 max-w-2xl text-lg font-light leading-relaxed text-text-secondary opacity-0 md:text-xl"
         >
-          Monachil Technologies builds proprietary data infrastructure and
-          analytics platforms that transform alternative asset data into
-          institutional-grade decision support.
+          We build the proprietary data platform — ingestion, verification,
+          enrichment, and analytics — that Monachil Capital Partners runs on.
+          Nine asset classes, four countries, one unified system.
         </p>
 
         <div ref={ctaRef} className="mt-12 flex justify-center opacity-0">

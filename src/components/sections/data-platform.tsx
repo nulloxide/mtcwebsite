@@ -45,12 +45,12 @@ const platformCards = [
 ];
 
 const flowNodes = [
-  "Raw Data Capture",
-  "Data Cleansing & Conformation",
-  "Data Enrichment",
-  "Data Curation",
-  "BI-Ready Datasets",
-  "BI",
+  "Ingestion",
+  "Bronze",
+  "Silver",
+  "Gold",
+  "Consumption",
+  "Audit",
 ];
 
 // 6 nodes evenly at x: 80, 260, 440, 620, 800, 960
@@ -232,13 +232,14 @@ export function DataPlatform() {
             as="h2"
             className="mt-4 text-3xl font-light tracking-tight text-text-primary md:text-5xl lg:text-6xl"
           >
-            From Raw Data to Investment Insight
+            Medallion Architecture, Purpose-Built for Credit
           </TextReveal>
           <ScrollReveal delay={0.2}>
             <p className="mt-6 text-lg font-light leading-relaxed text-text-secondary">
-              Our proprietary platform transforms complex, unstructured
-              alternative asset data into institutional-grade analytics —
-              purpose-built for private credit.
+              Raw servicer tapes, bank statements, and contract PDFs enter
+              Bronze. Silver cleans, deduplicates, and validates. Gold holds
+              the enriched layer — DPD, borrowing base, covenant checks, and
+              cross-dataset joins — every number regenerable from source.
             </p>
           </ScrollReveal>
         </div>
