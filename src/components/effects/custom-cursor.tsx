@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { gsap } from "gsap";
+import { useEffect, useRef, useState } from "react";
+import { loadGsap } from "@/lib/gsap";
 
 const DOT_SIZE = 8;
 const RING_SIZE = 40;
@@ -14,59 +14,72 @@ const INTERACTIVE_SELECTOR = "a, button, [role='button'], input, textarea, label
 export function CustomCursor() {
   const dotRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<HTMLDivElement>(null);
+  const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
-    if (!window.matchMedia("(pointer: fine)").matches) return;
+    const mql = window.matchMedia("(pointer: fine)");
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    setEnabled(mql.matches && !reduced);
+  }, []);
+
+  useEffect(() => {
+    if (!enabled) return;
 
     const dot = dotRef.current;
     const ring = ringRef.current;
     if (!dot || !ring) return;
 
-    // gsap.quickTo creates a reusable tween — no allocation per mousemove
-    const dotX = gsap.quickTo(dot, "x", { duration: DOT_FOLLOW_DURATION, ease: "power2.out" });
-    const dotY = gsap.quickTo(dot, "y", { duration: DOT_FOLLOW_DURATION, ease: "power2.out" });
-    const ringX = gsap.quickTo(ring, "x", { duration: RING_FOLLOW_DURATION, ease: "power2.out" });
-    const ringY = gsap.quickTo(ring, "y", { duration: RING_FOLLOW_DURATION, ease: "power2.out" });
+    let cancelled = false;
+    let cleanup: (() => void) | null = null;
 
-    const onMove = (e: MouseEvent) => {
-      dotX(e.clientX - DOT_OFFSET);
-      dotY(e.clientY - DOT_OFFSET);
-      ringX(e.clientX - RING_OFFSET);
-      ringY(e.clientY - RING_OFFSET);
-    };
+    (async () => {
+      const gsap = await loadGsap();
+      if (cancelled) return;
 
-    const onEnter = () => ring.classList.add("hovering");
-    const onLeave = () => ring.classList.remove("hovering");
+      const dotX = gsap.quickTo(dot, "x", { duration: DOT_FOLLOW_DURATION, ease: "power2.out" });
+      const dotY = gsap.quickTo(dot, "y", { duration: DOT_FOLLOW_DURATION, ease: "power2.out" });
+      const ringX = gsap.quickTo(ring, "x", { duration: RING_FOLLOW_DURATION, ease: "power2.out" });
+      const ringY = gsap.quickTo(ring, "y", { duration: RING_FOLLOW_DURATION, ease: "power2.out" });
 
-    window.addEventListener("mousemove", onMove, { passive: true });
+      const onMove = (e: MouseEvent) => {
+        dotX(e.clientX - DOT_OFFSET);
+        dotY(e.clientY - DOT_OFFSET);
+        ringX(e.clientX - RING_OFFSET);
+        ringY(e.clientY - RING_OFFSET);
+      };
 
-    const onOverCapture = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (target.closest(INTERACTIVE_SELECTOR)) {
-        onEnter();
-      }
-    };
-    const onOutCapture = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (target.closest(INTERACTIVE_SELECTOR)) {
-        onLeave();
-      }
-    };
+      const onOverCapture = (e: MouseEvent) => {
+        const target = e.target as HTMLElement;
+        if (target.closest(INTERACTIVE_SELECTOR)) ring.classList.add("hovering");
+      };
+      const onOutCapture = (e: MouseEvent) => {
+        const target = e.target as HTMLElement;
+        if (target.closest(INTERACTIVE_SELECTOR)) ring.classList.remove("hovering");
+      };
 
-    document.addEventListener("mouseover", onOverCapture, { passive: true });
-    document.addEventListener("mouseout", onOutCapture, { passive: true });
+      window.addEventListener("mousemove", onMove, { passive: true });
+      document.addEventListener("mouseover", onOverCapture, { passive: true });
+      document.addEventListener("mouseout", onOutCapture, { passive: true });
+
+      cleanup = () => {
+        window.removeEventListener("mousemove", onMove);
+        document.removeEventListener("mouseover", onOverCapture);
+        document.removeEventListener("mouseout", onOutCapture);
+      };
+    })();
 
     return () => {
-      window.removeEventListener("mousemove", onMove);
-      document.removeEventListener("mouseover", onOverCapture);
-      document.removeEventListener("mouseout", onOutCapture);
+      cancelled = true;
+      cleanup?.();
     };
-  }, []);
+  }, [enabled]);
+
+  if (!enabled) return null;
 
   return (
     <>
-      <div ref={dotRef} className="cursor-dot hidden md:block" aria-hidden="true" />
-      <div ref={ringRef} className="cursor-ring hidden md:block" aria-hidden="true" />
+      <div ref={dotRef} className="cursor-dot" aria-hidden="true" />
+      <div ref={ringRef} className="cursor-ring" aria-hidden="true" />
     </>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useCallback } from "react";
+import { useRef, useEffect, useCallback, useState } from "react";
 
 const MAX_INITIAL_VELOCITY = 0.3;
 const MIN_PARTICLE_RADIUS = 0.5;
@@ -38,6 +38,13 @@ export function ParticleNetwork({
   const rafRef = useRef<number>(0);
   const sizeRef = useRef({ w: 0, h: 0 });
   const reducedMotionRef = useRef(false);
+  const [enabled, setEnabled] = useState(false);
+
+  useEffect(() => {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const isMobile = window.innerWidth < MOBILE_BREAKPOINT;
+    setEnabled(!reduced && !isMobile);
+  }, []);
 
   const initParticles = useCallback(
     (width: number, height: number, count: number) => {
@@ -57,6 +64,7 @@ export function ParticleNetwork({
   );
 
   useEffect(() => {
+    if (!enabled) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -229,7 +237,9 @@ export function ParticleNetwork({
       canvas.removeEventListener("mousemove", onMouseMove);
       canvas.removeEventListener("mouseleave", onMouseLeave);
     };
-  }, [connectionDistance, mouseRadius, mouseForce, initParticles]);
+  }, [enabled, connectionDistance, mouseRadius, mouseForce, initParticles]);
+
+  if (!enabled) return null;
 
   return (
     <canvas

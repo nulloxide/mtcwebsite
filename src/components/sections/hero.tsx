@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { ParticleNetwork } from "@/components/effects/particle-network";
 import { MagneticButton } from "@/components/effects/magnetic-button";
 import { ArrowDown } from "lucide-react";
+import { loadGsap } from "@/lib/gsap";
 
 export function Hero() {
   const headlineRef = useRef<HTMLHeadingElement>(null);
@@ -16,7 +17,7 @@ export function Hero() {
     let cancelled = false;
 
     (async () => {
-      const { gsap } = await import("gsap");
+      const gsap = await loadGsap();
       if (cancelled) return;
 
       const timeline = gsap.timeline({ defaults: { ease: "power3.out" } });
@@ -83,9 +84,9 @@ export function Hero() {
         <div ref={ctaRef} className="mt-12 flex justify-center opacity-0">
           <MagneticButton
             className="bg-brand-blue text-white shadow-lg shadow-brand-blue/20 hover:bg-accent hover:shadow-accent/30"
-            onClick={() => scrollTo("#platform")}
+            onClick={() => scrollTo("#capabilities")}
           >
-            Explore the Platform
+            Explore Our Capabilities
           </MagneticButton>
         </div>
 

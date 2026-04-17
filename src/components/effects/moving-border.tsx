@@ -20,6 +20,11 @@ export function MovingBorder({
 }: MovingBorderProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
+  const [animate, setAnimate] = useState(true);
+
+  useEffect(() => {
+    setAnimate(!window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  }, []);
 
   useEffect(() => {
     const el = ref.current;
@@ -39,7 +44,8 @@ export function MovingBorder({
       className={cn("relative overflow-hidden p-px", containerClassName)}
       style={{
         borderRadius,
-        animation: visible ? `rotate-border ${duration} linear infinite` : "none",
+        animation:
+          animate && visible ? `rotate-border ${duration} linear infinite` : "none",
         background: `conic-gradient(from var(--border-angle), transparent 30%, var(--brand-blue) 50%, transparent 70%)`,
       }}
     >
