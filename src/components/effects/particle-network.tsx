@@ -11,8 +11,9 @@ const MAX_SPEED = 1.2;
 const DEFAULT_CONNECTION_MAX_OPACITY = 0.18;
 const CONNECTION_LINE_WIDTH = 0.6;
 const MOUSE_OFFSCREEN = -9999;
-const DESKTOP_PARTICLE_COUNT = 100;
+const DESKTOP_PARTICLE_COUNT = 60;
 const MOBILE_PARTICLE_COUNT = 22;
+const MIN_VISIBLE_LINE_ALPHA = 0.015;
 const MOUSE_GLOW_RADIUS = 220;
 
 interface ParticleNetworkProps {
@@ -33,7 +34,7 @@ interface Particle {
 }
 
 export function ParticleNetwork({
-  connectionDistance = 200,
+  connectionDistance = 160,
   mouseRadius = 160,
   mouseForce = 0.04,
   fixed = false,
@@ -301,6 +302,8 @@ export function ParticleNetwork({
                 alpha = Math.min(connMaxBoosted, alpha + t * 0.35);
               }
             }
+            // Skip sub-threshold lines — saves ~30% of drawcalls on sparse networks
+            if (alpha < MIN_VISIBLE_LINE_ALPHA) continue;
             ctx.strokeStyle = `rgba(${lr},${lg},${lb},${alpha})`;
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
@@ -315,12 +318,24 @@ export function ParticleNetwork({
 
     draw();
 
+    // Pause RAF when tab is hidden so the animation doesn't accumulate GC pressure in the background
+    const onVisibility = () => {
+      if (document.hidden) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = 0;
+      } else if (!rafRef.current) {
+        rafRef.current = requestAnimationFrame(draw);
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+
     return () => {
       cancelAnimationFrame(rafRef.current);
       cancelAnimationFrame(raf1);
       window.clearTimeout(late);
       ro.disconnect();
       themeObserver.disconnect();
+      document.removeEventListener("visibilitychange", onVisibility);
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerleave", onPointerLeave);
       window.removeEventListener("blur", onPointerLeave);
