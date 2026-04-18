@@ -1,7 +1,6 @@
 "use client";
 
 import { ScrollReveal } from "@/components/effects/scroll-reveal";
-import { TextReveal } from "@/components/effects/text-reveal";
 import { TiltCard } from "@/components/effects/tilt-card";
 import { BarChart3, Server, ShieldCheck, Brain } from "lucide-react";
 
@@ -24,7 +23,10 @@ const VINTAGE_CURVES = [
 
 function AnalyticsVisuals() {
   return (
-    <div className="mt-6 grid grid-cols-3 gap-4" aria-hidden="true">
+    <div
+      className="analytics-visuals mt-6 grid grid-cols-3 gap-4"
+      aria-hidden="true"
+    >
       {/* Portfolio Performance — area chart with traveling dot */}
       <div className="col-span-2 overflow-hidden rounded-lg bg-background/50 p-3">
         <p className="mb-2 text-[10px] font-light uppercase tracking-widest text-text-secondary/50">
@@ -191,12 +193,11 @@ export function Capabilities() {
               Capabilities
             </p>
           </ScrollReveal>
-          <TextReveal
-            as="h2"
-            className="mt-4 text-3xl font-light tracking-tight text-text-primary md:text-5xl lg:text-6xl"
-          >
-            Full-Stack Technology for Specialty Finance
-          </TextReveal>
+          <ScrollReveal delay={0.05}>
+            <h2 className="mt-4 text-3xl font-light tracking-tight text-text-primary md:text-5xl lg:text-6xl">
+              Full-Stack Technology for Specialty Finance
+            </h2>
+          </ScrollReveal>
         </div>
 
         {/* Bento Grid */}

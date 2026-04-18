@@ -12,7 +12,7 @@ const DEFAULT_CONNECTION_MAX_OPACITY = 0.18;
 const CONNECTION_LINE_WIDTH = 0.6;
 const MOUSE_OFFSCREEN = -9999;
 const DESKTOP_PARTICLE_COUNT = 100;
-const MOBILE_PARTICLE_COUNT = 40;
+const MOBILE_PARTICLE_COUNT = 22;
 const MOUSE_GLOW_RADIUS = 220;
 
 interface ParticleNetworkProps {
@@ -78,7 +78,7 @@ export function ParticleNetwork({
 
     const isMobile = window.innerWidth < MOBILE_BREAKPOINT;
     const count = isMobile ? MOBILE_PARTICLE_COUNT : DESKTOP_PARTICLE_COUNT;
-    const connDist = isMobile ? connectionDistance * 0.85 : connectionDistance;
+    const connDist = isMobile ? 110 : connectionDistance;
     const connDistSq = connDist * connDist;
     const mRadius = mouseRadius;
     const mRadiusSq = mRadius * mRadius;

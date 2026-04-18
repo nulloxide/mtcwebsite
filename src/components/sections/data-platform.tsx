@@ -1,7 +1,6 @@
 "use client";
 
 import { ScrollReveal } from "@/components/effects/scroll-reveal";
-import { TextReveal } from "@/components/effects/text-reveal";
 import { MovingBorder } from "@/components/effects/moving-border";
 import {
   Calculator,
@@ -228,12 +227,11 @@ export function DataPlatform() {
               Our Platform
             </p>
           </ScrollReveal>
-          <TextReveal
-            as="h2"
-            className="mt-4 text-3xl font-light tracking-tight text-text-primary md:text-5xl lg:text-6xl"
-          >
-            Medallion Architecture, Purpose-Built for Credit
-          </TextReveal>
+          <ScrollReveal delay={0.05}>
+            <h2 className="mt-4 text-3xl font-light tracking-tight text-text-primary md:text-5xl lg:text-6xl">
+              Medallion Architecture, Purpose-Built for Credit
+            </h2>
+          </ScrollReveal>
           <ScrollReveal delay={0.2}>
             <p className="mt-6 text-lg font-light leading-relaxed text-text-secondary">
               Raw servicer tapes, bank statements, and contract PDFs enter

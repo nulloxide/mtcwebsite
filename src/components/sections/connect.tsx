@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from "react";
 import { ScrollReveal } from "@/components/effects/scroll-reveal";
-import { TextReveal } from "@/components/effects/text-reveal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -139,12 +138,11 @@ export function Connect() {
               Connect
             </p>
           </ScrollReveal>
-          <TextReveal
-            as="h2"
-            className="mt-4 text-3xl font-light tracking-tight text-text-primary md:text-5xl lg:text-6xl"
-          >
-            Let&apos;s Build Together
-          </TextReveal>
+          <ScrollReveal delay={0.05}>
+            <h2 className="mt-4 text-3xl font-light tracking-tight text-text-primary md:text-5xl lg:text-6xl">
+              Let&apos;s Build Together
+            </h2>
+          </ScrollReveal>
           <ScrollReveal delay={0.15}>
             <p className="mx-auto mt-6 max-w-2xl text-lg font-light leading-relaxed text-text-secondary">
               Reach out about our platform, or explore engineering roles on the
@@ -158,7 +156,7 @@ export function Connect() {
           <div
             role="tablist"
             aria-label="Connect options"
-            className="inline-flex rounded-full border border-border bg-surface p-1"
+            className="inline-flex rounded-full border border-border bg-surface p-1 shadow-sm"
           >
             <TabButton
               id="tab-contact"
@@ -216,10 +214,10 @@ function TabButton({
       aria-controls={panelId}
       aria-selected={active}
       onClick={onClick}
-      className={`rounded-full px-5 py-2 text-sm font-light tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+      className={`rounded-full px-5 py-2 text-sm font-medium tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
         active
           ? "bg-brand-blue text-white shadow-sm shadow-brand-blue/20"
-          : "text-text-secondary hover:text-text-primary"
+          : "text-text-primary hover:bg-surface-elevated"
       }`}
     >
       {children}

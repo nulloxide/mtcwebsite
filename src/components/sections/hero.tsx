@@ -2,14 +2,19 @@
 
 import { useEffect, useRef } from "react";
 import { MagneticButton } from "@/components/effects/magnetic-button";
-import { ArrowDown } from "lucide-react";
 import { loadGsap } from "@/lib/gsap";
+
+const heroStats = [
+  { value: "15+", label: "Asset Classes in Production" },
+  { value: "4+", label: "Countries" },
+  { value: "1", label: "Unified Platform" },
+];
 
 export function Hero() {
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const subRef = useRef<HTMLParagraphElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const statsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let tl: { kill: () => void } | null = null;
@@ -25,26 +30,26 @@ export function Hero() {
       timeline
         .fromTo(
           headlineRef.current,
-          { opacity: 0, y: 60, clipPath: "inset(100% 0 0 0)" },
-          { opacity: 1, y: 0, clipPath: "inset(0% 0 0 0)", duration: 1.2 }
+          { opacity: 0, y: 24 },
+          { opacity: 1, y: 0, duration: 0.7 }
         )
         .fromTo(
           subRef.current,
-          { opacity: 0, y: 30, filter: "blur(6px)" },
-          { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.9 },
-          "-=0.6"
+          { opacity: 0, y: 16 },
+          { opacity: 1, y: 0, duration: 0.5 },
+          "-=0.3"
         )
         .fromTo(
           ctaRef.current,
-          { opacity: 0, y: 20 },
-          { opacity: 1, y: 0, duration: 0.6 },
-          "-=0.4"
+          { opacity: 0, y: 12 },
+          { opacity: 1, y: 0, duration: 0.4 },
+          "-=0.2"
         )
         .fromTo(
-          scrollRef.current,
-          { opacity: 0 },
-          { opacity: 1, duration: 0.8 },
-          "-=0.2"
+          statsRef.current,
+          { opacity: 0, y: 12 },
+          { opacity: 1, y: 0, duration: 0.5 },
+          "-=0.1"
         );
     })();
 
@@ -87,16 +92,23 @@ export function Hero() {
           </MagneticButton>
         </div>
 
-        {/* Scroll indicator */}
-        <div ref={scrollRef} className="mt-24 flex justify-center opacity-0">
-          <button
-            onClick={() => scrollTo("#about")}
-            className="flex flex-col items-center gap-2 text-text-secondary/50 transition-colors hover:text-text-secondary"
-            aria-label="Scroll down"
-          >
-            <span className="text-[11px] uppercase tracking-[0.3em]">Scroll</span>
-            <ArrowDown className="h-3 w-3 animate-bounce" />
-          </button>
+        <div
+          ref={statsRef}
+          className="mx-auto mt-20 grid max-w-3xl grid-cols-3 gap-6 opacity-0 sm:gap-10"
+        >
+          {heroStats.map((stat) => (
+            <div key={stat.label} className="text-center">
+              <div className="text-3xl font-light text-text-primary sm:text-4xl md:text-5xl">
+                {stat.value.replace(/\+$/, "")}
+                {stat.value.endsWith("+") && (
+                  <span className="text-brand-blue">+</span>
+                )}
+              </div>
+              <div className="mt-2 text-[11px] font-light uppercase tracking-[0.15em] text-text-secondary sm:text-xs">
+                {stat.label}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>

@@ -92,20 +92,20 @@
   --surface-elevated: #F4F5F7;
   --brand-blue: #0172BD;
   --accent: #005DA6;
-  --text-primary: #111827;
-  --text-secondary: #4B5563;
+  --text-primary: #1F2937;
+  --text-secondary: #374151;
 
-  --foreground: #111827;
+  --foreground: #1F2937;
   --card: #FFFFFF;
-  --card-foreground: #111827;
+  --card-foreground: #1F2937;
   --popover: #FFFFFF;
-  --popover-foreground: #111827;
+  --popover-foreground: #1F2937;
   --primary: #0172BD;
   --primary-foreground: #FFFFFF;
   --secondary: #F4F5F7;
-  --secondary-foreground: #111827;
+  --secondary-foreground: #1F2937;
   --muted: #F4F5F7;
-  --muted-foreground: #4B5563;
+  --muted-foreground: #374151;
   --accent-foreground: #FFFFFF;
   --destructive: #DC2626;
   --border: rgba(0, 0, 0, 0.12);
@@ -183,6 +183,11 @@
 }
 .light .card-surface:hover {
   box-shadow: var(--card-shadow-hover);
+}
+
+/* Soften decorative analytics chart in light mode so the body copy reads stronger */
+.light .analytics-visuals {
+  opacity: 0.7;
 }
 
 /* ─── Conic Gradient Border ─── */
