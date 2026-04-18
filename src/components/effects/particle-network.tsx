@@ -132,6 +132,36 @@ export function ParticleNetwork({
     window.addEventListener("blur", onPointerLeave);
 
     const parseRgba = (str: string): [number, number, number, number] => {
+      // Hex: #rgb, #rrggbb, #rrggbbaa
+      const hex = str.trim().match(/^#([0-9a-fA-F]{3,8})$/);
+      if (hex) {
+        const h = hex[1];
+        if (h.length === 3) {
+          return [
+            parseInt(h[0] + h[0], 16),
+            parseInt(h[1] + h[1], 16),
+            parseInt(h[2] + h[2], 16),
+            1,
+          ];
+        }
+        if (h.length === 6) {
+          return [
+            parseInt(h.slice(0, 2), 16),
+            parseInt(h.slice(2, 4), 16),
+            parseInt(h.slice(4, 6), 16),
+            1,
+          ];
+        }
+        if (h.length === 8) {
+          return [
+            parseInt(h.slice(0, 2), 16),
+            parseInt(h.slice(2, 4), 16),
+            parseInt(h.slice(4, 6), 16),
+            parseInt(h.slice(6, 8), 16) / 255,
+          ];
+        }
+      }
+      // rgb() / rgba() fallback
       const m = str.match(/[\d.]+/g);
       if (!m || m.length < 3) return [255, 255, 255, 0.5];
       return [
