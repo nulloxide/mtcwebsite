@@ -31,6 +31,12 @@ export function Footer() {
               {link.label}
             </a>
           ))}
+          <a
+            href="/demo/"
+            className="text-xs text-text-secondary transition-colors hover:text-text-primary hover:underline"
+          >
+            Investor Demo
+          </a>
         </div>
 
         {/* Copyright */}
