@@ -81,6 +81,7 @@ body::after{
 }
 .theme-toggle:hover{border-color:var(--text-muted)}
 .theme-toggle .icon{font-size:0.85rem}
+html[data-embedded="true"] .theme-toggle{display:none !important}
 
 /* Legend row */
 .legend{display:flex;justify-content:center;gap:28px;margin:10px 0 8px;flex-wrap:wrap}
@@ -1012,16 +1013,42 @@ svg.main.highlighting .flow-arrow.active{opacity:0.8!important;transition:opacit
 
 <script>
 // ── Theme Toggle ──
-function toggleTheme(){
+function applyLocalTheme(next){
   const html=document.documentElement;
-  const isDark=html.getAttribute('data-theme')==='dark';
-  const next=isDark?'light':'dark';
   html.setAttribute('data-theme',next);
-  document.getElementById('theme-icon').innerHTML=isDark?'&#9728;':'&#9790;';
-  document.getElementById('theme-label').textContent=isDark?'Dark':'Light';
-  try{localStorage.setItem('cls-theme',next)}catch(e){}
+  const icon=document.getElementById('theme-icon');
+  const label=document.getElementById('theme-label');
+  if(icon)  icon.innerHTML  = next==='light'?'&#9790;':'&#9728;';
+  if(label) label.textContent = next==='light'?'Light':'Dark';
+  try{localStorage.setItem('mcp-theme',next)}catch(e){}
 }
-try{const s=localStorage.getItem('cls-theme');if(s==='light')toggleTheme();}catch(e){}
+function toggleTheme(){
+  const cur=document.documentElement.getAttribute('data-theme')==='dark'?'dark':'light';
+  const next=cur==='dark'?'light':'dark';
+  applyLocalTheme(next);
+  try{window.parent!==window&&window.parent.postMessage({type:'pres:theme',theme:next},'*')}catch(e){}
+}
+// Migrate old key and pick initial theme
+try{
+  const legacy=localStorage.getItem('cls-theme');
+  if(legacy&&!localStorage.getItem('mcp-theme')){localStorage.setItem('mcp-theme',legacy);localStorage.removeItem('cls-theme')}
+}catch(e){}
+(function(){
+  const url=new URLSearchParams(location.search).get('theme');
+  let t=url;
+  if(!t){try{t=localStorage.getItem('mcp-theme')}catch(e){}}
+  if(!t){try{t=matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'}catch(e){t='dark'}}
+  applyLocalTheme(t);
+})();
+// Accept theme updates from the parent deck
+window.addEventListener('message',e=>{
+  const d=e.data;
+  if(d&&typeof d==='object'&&d.type==='pres:theme'&&(d.theme==='light'||d.theme==='dark')){
+    applyLocalTheme(d.theme);
+  }
+});
+// Ask the parent for the authoritative theme on load
+if(window.parent!==window){try{window.parent.postMessage({type:'pres:theme:request'},'*')}catch(e){}}
 
 // ── Tip & Detail data ──
 const tips={
@@ -1155,5 +1182,6 @@ document.querySelectorAll('.breadcrumb .step').forEach(btn=>{
   });
 });
 </script>
+<script src="theme-bridge.js"></script>
 </body>
 </html>
