@@ -14,8 +14,8 @@ import {
   Upload,
 } from "lucide-react";
 
-const CONTACT_ENDPOINT = "https://formsubmit.co/ajax/info@monachiltech.com";
-const APPLY_ENDPOINT = "https://formsubmit.co/hr@monachiltech.com";
+const CONTACT_ENDPOINT = "https://formsubmit.co/ajax/dataanalytics@monachilpartners.com";
+const APPLY_ENDPOINT = "https://formsubmit.co/ajax/dataanalytics@monachilpartners.com";
 const MAX_RESUME_BYTES = 10 * 1024 * 1024;
 
 type Status = "idle" | "submitting" | "success" | "error";
@@ -251,16 +251,20 @@ function ContactPane({ hidden }: { hidden: boolean }) {
       });
       const data = (await response.json().catch(() => ({}))) as {
         success?: string | boolean;
+        message?: string;
       };
-      const ok =
-        response.ok && data.success !== false && String(data.success) !== "false";
-      if (!ok) throw new Error("Submission failed");
+      // formsubmit.co /ajax returns {"success":"true"} on deliver,
+      // {"success":"false","message":"..."} on any failure (unactivated
+      // endpoint, missing origin, blocked, etc.). Treat anything other
+      // than an explicit true as a failure instead of swallowing it.
+      const ok = response.ok && (data.success === true || data.success === "true");
+      if (!ok) throw new Error(data.message || "Submission failed");
       form.reset();
       setStatus("success");
     } catch {
       setStatus("error");
       setErrorMessage(
-        "Something went wrong. Please try again or email info@monachiltech.com directly."
+        "Something went wrong. Please try again or email dataanalytics@monachilpartners.com directly."
       );
     }
   }
@@ -486,16 +490,20 @@ function CareersPane({
       });
       const data = (await response.json().catch(() => ({}))) as {
         success?: string | boolean;
+        message?: string;
       };
-      const ok =
-        response.ok && data.success !== false && String(data.success) !== "false";
-      if (!ok) throw new Error("Submission failed");
+      // formsubmit.co /ajax returns {"success":"true"} on deliver,
+      // {"success":"false","message":"..."} on any failure (unactivated
+      // endpoint, missing origin, blocked, etc.). Treat anything other
+      // than an explicit true as a failure instead of swallowing it.
+      const ok = response.ok && (data.success === true || data.success === "true");
+      if (!ok) throw new Error(data.message || "Submission failed");
       form.reset();
       setStatus("success");
     } catch {
       setStatus("error");
       setErrorMessage(
-        "Something went wrong. Please try again or email hr@monachiltech.com directly."
+        "Something went wrong. Please try again or email dataanalytics@monachilpartners.com directly."
       );
     }
   }
