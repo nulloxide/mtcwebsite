@@ -122,6 +122,17 @@ export function Connect() {
   const [activeId, setActiveId] = useState(positions[0].id);
 
   useEffect(() => {
+    // If we just came back from a successful careers submission, switch to the
+    // careers tab and scroll the section into view; the CareersPane useEffect
+    // reads the same query param to flip its local success state.
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("submitted") === "careers") {
+      setTab("careers");
+      requestAnimationFrame(() => {
+        document.getElementById("careers")?.scrollIntoView({ behavior: "smooth" });
+      });
+    }
+
     const sync = () => {
       if (window.location.hash === "#careers") setTab("careers");
       else if (window.location.hash === "#contact") setTab("contact");
@@ -455,13 +466,14 @@ function CareersPane({
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState("");
   // Use the live origin so _next works in dev and in prod, not only on monachiltech.com.
-  const [nextUrl, setNextUrl] = useState("https://monachiltech.com/?submitted=careers");
+  // Hash at the end makes the browser's own anchor-scroll land us on the careers section.
+  const [nextUrl, setNextUrl] = useState("https://monachiltech.com/?submitted=careers#careers");
   const active = positions.find((p) => p.id === activeId) ?? positions[0];
 
   // After a successful native POST, formsubmit.co redirects back to _next
   // which appends ?submitted=careers. Detect it, switch status, clean URL.
   useEffect(() => {
-    setNextUrl(window.location.origin + "/?submitted=careers");
+    setNextUrl(window.location.origin + "/?submitted=careers#careers");
     const params = new URLSearchParams(window.location.search);
     if (params.get("submitted") === "careers") {
       setStatus("success");
