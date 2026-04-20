@@ -15,7 +15,10 @@ import {
 } from "lucide-react";
 
 const CONTACT_ENDPOINT = "https://formsubmit.co/ajax/dataanalytics@monachilpartners.com";
-const APPLY_ENDPOINT = "https://formsubmit.co/ajax/dataanalytics@monachilpartners.com";
+// Careers form must use the non-AJAX endpoint — formsubmit.co's /ajax/ route
+// silently strips file attachments ("Uploaded files won't retain ... through
+// the API"). Classic POST redirects the browser to _next once mail is sent.
+const APPLY_ENDPOINT = "https://formsubmit.co/dataanalytics@monachilpartners.com";
 const MAX_RESUME_BYTES = 10 * 1024 * 1024;
 
 type Status = "idle" | "submitting" | "success" | "error";
@@ -451,61 +454,52 @@ function CareersPane({
 }) {
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  // Use the live origin so _next works in dev and in prod, not only on monachiltech.com.
+  const [nextUrl, setNextUrl] = useState("https://monachiltech.com/?submitted=careers");
   const active = positions.find((p) => p.id === activeId) ?? positions[0];
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  // After a successful native POST, formsubmit.co redirects back to _next
+  // which appends ?submitted=careers. Detect it, switch status, clean URL.
+  useEffect(() => {
+    setNextUrl(window.location.origin + "/?submitted=careers");
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("submitted") === "careers") {
+      setStatus("success");
+      params.delete("submitted");
+      const qs = params.toString();
+      const next = window.location.pathname + (qs ? "?" + qs : "") + "#careers";
+      history.replaceState(null, "", next);
+    }
+  }, []);
+
+  // Native submit — let the browser POST multipart/form-data so the resume
+  // is actually attached. Only intercept to run client-side file validation.
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     const form = event.currentTarget;
     const formData = new FormData(form);
-    if (formData.get("_honey")) return;
-
+    if (formData.get("_honey")) {
+      event.preventDefault();
+      return;
+    }
     const file = formData.get("resume");
-    if (file instanceof File) {
+    if (file instanceof File && file.size > 0) {
       const name = file.name.toLowerCase();
       if (!/\.(pdf|doc|docx)$/.test(name)) {
+        event.preventDefault();
         setStatus("error");
         setErrorMessage("Please upload a PDF, DOC, or DOCX file.");
         return;
       }
       if (file.size > MAX_RESUME_BYTES) {
+        event.preventDefault();
         setStatus("error");
         setErrorMessage("Resume is too large. Maximum size is 10MB.");
         return;
       }
     }
-
-    const email = formData.get("email");
-    if (typeof email === "string" && email.length > 0) {
-      formData.set("_replyto", email);
-    }
-
     setStatus("submitting");
     setErrorMessage("");
-
-    try {
-      const response = await fetch(APPLY_ENDPOINT, {
-        method: "POST",
-        body: formData,
-        headers: { Accept: "application/json" },
-      });
-      const data = (await response.json().catch(() => ({}))) as {
-        success?: string | boolean;
-        message?: string;
-      };
-      // formsubmit.co /ajax returns {"success":"true"} on deliver,
-      // {"success":"false","message":"..."} on any failure (unactivated
-      // endpoint, missing origin, blocked, etc.). Treat anything other
-      // than an explicit true as a failure instead of swallowing it.
-      const ok = response.ok && (data.success === true || data.success === "true");
-      if (!ok) throw new Error(data.message || "Submission failed");
-      form.reset();
-      setStatus("success");
-    } catch {
-      setStatus("error");
-      setErrorMessage(
-        "Something went wrong. Please try again or email dataanalytics@monachilpartners.com directly."
-      );
-    }
+    // Validation passed — let the browser proceed with the native POST.
   }
 
   const submitting = status === "submitting";
@@ -677,6 +671,7 @@ function CareersPane({
               />
               <input type="hidden" name="_template" value="table" />
               <input type="hidden" name="_captcha" value="false" />
+              <input type="hidden" name="_next" value={nextUrl} />
               <input type="hidden" name="position" value={active.title} />
               <input
                 type="text"
