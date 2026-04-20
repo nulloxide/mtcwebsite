@@ -176,7 +176,7 @@ const capabilities = [
     icon: Brain,
     title: "Quantitative Research & Engineering",
     description:
-      "Where the investment process lives in code. We build statistical and ML models for credit risk, pricing, and portfolio construction — plus the engineering around them: DPD logic, vintage curves, roll-rate analysis, and backtesting frameworks — all running on the Gold-layer data so every output is traceable to source.",
+      "Where the investment process lives in code. We build statistical and machine-learning models for credit risk, pricing, and portfolio construction — turning verified data into quantitative decisions.",
     tags: ["Python", "Research", "Modeling"],
     span: "md:col-span-2",
     visual: false,
