@@ -1,7 +1,6 @@
 "use client";
 
 import { ScrollReveal } from "@/components/effects/scroll-reveal";
-import { TextReveal } from "@/components/effects/text-reveal";
 import { TiltCard } from "@/components/effects/tilt-card";
 import { BarChart3, Server, ShieldCheck, Brain } from "lucide-react";
 
@@ -24,7 +23,10 @@ const VINTAGE_CURVES = [
 
 function AnalyticsVisuals() {
   return (
-    <div className="mt-6 grid grid-cols-3 gap-4" aria-hidden="true">
+    <div
+      className="analytics-visuals mt-6 grid grid-cols-3 gap-4"
+      aria-hidden="true"
+    >
       {/* Portfolio Performance — area chart with traveling dot */}
       <div className="col-span-2 overflow-hidden rounded-lg bg-background/50 p-3">
         <p className="mb-2 text-[10px] font-light uppercase tracking-widest text-text-secondary/50">
@@ -147,8 +149,8 @@ const capabilities = [
     icon: BarChart3,
     title: "Data & Analytics",
     description:
-      "Real-time portfolio monitoring, risk analysis, and performance attribution. We turn complex loan-level data into clear, actionable dashboards for investment decision-makers.",
-    tags: ["Portfolio Analytics", "Risk Modeling", "Reporting"],
+      "We independently re-derive DPD, borrowing base, and covenant calculations from raw source data and reconcile against servicer reports. Discrepancies surface in the dashboard, not in month-end. Daily, loan-level, auditable.",
+    tags: ["Independent Verification", "Portfolio Analytics", "Reconciliation"],
     span: "md:col-span-2 md:row-span-2",
     visual: true,
   },
@@ -156,8 +158,8 @@ const capabilities = [
     icon: Server,
     title: "Infrastructure",
     description:
-      "Cloud-native environments engineered for institutional-scale data workloads. Automated provisioning, high availability, and enterprise-grade reliability.",
-    tags: ["Cloud", "CI/CD", "Automation"],
+      "Cloud-native pipelines running daily reconciliation across loan servicers, multiple banks (BAI2, ACH, wire), payment processors, and market feeds (SOFR, FX). Built for scale without proportional headcount growth.",
+    tags: ["Azure", "CI/CD", "IaC"],
     span: "",
     visual: false,
   },
@@ -165,17 +167,17 @@ const capabilities = [
     icon: ShieldCheck,
     title: "Cybersecurity",
     description:
-      "Comprehensive governance, risk, and compliance frameworks protecting sensitive financial data at every layer.",
-    tags: ["GRC", "Data Protection", "Compliance"],
+      "Security and compliance engineering for an SEC-registered investment adviser. Identity, access, and data-protection controls hardened for the regulatory environment we operate in.",
+    tags: ["SEC Registered", "IAM", "Data Protection"],
     span: "",
     visual: false,
   },
   {
     icon: Brain,
-    title: "Quantitative Research",
+    title: "Enrichment & Business Logic",
     description:
-      "Machine learning models and statistical analysis powering credit assessment, pricing, and portfolio construction.",
-    tags: ["ML/AI", "Python", "Research"],
+      "The Gold layer is where the investment process lives in code — DPD buckets, borrowing base math, covenant tracking, cross-dataset joins between loan tapes, bank statements, and contracts. Every output is traceable to raw source.",
+    tags: ["Python", "Pydantic", "FastAPI"],
     span: "md:col-span-2",
     visual: false,
   },
@@ -183,7 +185,7 @@ const capabilities = [
 
 export function Capabilities() {
   return (
-    <section id="capabilities" className="relative py-32 md:py-48">
+    <section id="capabilities" className="relative overflow-hidden py-32 md:py-48">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mx-auto max-w-3xl text-center">
           <ScrollReveal>
@@ -191,12 +193,11 @@ export function Capabilities() {
               Capabilities
             </p>
           </ScrollReveal>
-          <TextReveal
-            as="h2"
-            className="mt-4 text-3xl font-light tracking-tight text-text-primary md:text-5xl lg:text-6xl"
-          >
-            Full-Stack Technology for Finance
-          </TextReveal>
+          <ScrollReveal delay={0.05}>
+            <h2 className="mt-4 text-3xl font-light tracking-tight text-text-primary md:text-5xl lg:text-6xl">
+              Full-Stack Technology for Specialty Finance
+            </h2>
+          </ScrollReveal>
         </div>
 
         {/* Bento Grid */}

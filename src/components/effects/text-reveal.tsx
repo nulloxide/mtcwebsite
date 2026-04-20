@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useEffect } from "react";
+import { loadGsapBundle } from "@/lib/gsap";
 
 const REVEAL_Y_OFFSET = 40;
 const INITIAL_ROTATE_X = -60;
@@ -37,11 +38,7 @@ export function TextReveal({
     let cancelled = false;
 
     (async () => {
-      const { gsap } = await import("gsap");
-      const { ScrollTrigger } = await import("gsap/ScrollTrigger");
-      const { SplitText } = await import("gsap/SplitText");
-
-      gsap.registerPlugin(ScrollTrigger, SplitText);
+      const { gsap, SplitText } = await loadGsapBundle();
 
       if (cancelled) return;
 
@@ -52,11 +49,13 @@ export function TextReveal({
       if (!targets || targets.length === 0) return;
 
       const yFrom = direction === "up" ? REVEAL_Y_OFFSET : -REVEAL_Y_OFFSET;
+      const isSmallScreen = window.matchMedia("(max-width: 767px)").matches;
+      const rotateFrom = isSmallScreen ? 0 : INITIAL_ROTATE_X;
 
       const gsapCtx = gsap.context(() => {
         gsap.fromTo(
           targets,
-          { opacity: 0, y: yFrom, rotateX: INITIAL_ROTATE_X, filter: `blur(${INITIAL_BLUR_PX}px)` },
+          { opacity: 0, y: yFrom, rotateX: rotateFrom, filter: `blur(${INITIAL_BLUR_PX}px)` },
           {
             opacity: 1,
             y: 0,

@@ -2,8 +2,8 @@ import { MountainIcon } from "@/components/logo";
 
 const footerLinks = [
   { label: "About", href: "#about" },
-  { label: "Platform", href: "#platform" },
   { label: "Capabilities", href: "#capabilities" },
+  { label: "Platform", href: "#platform" },
   { label: "Careers", href: "#careers" },
   { label: "Contact", href: "#contact" },
 ];
@@ -31,13 +31,19 @@ export function Footer() {
               {link.label}
             </a>
           ))}
+          <a
+            href="/demo/"
+            className="text-xs text-text-secondary transition-colors hover:text-text-primary hover:underline"
+          >
+            Investor Demo
+          </a>
         </div>
 
         {/* Copyright */}
         <p className="text-xs text-text-secondary">
           &copy; {new Date().getFullYear()} Monachil Technologies.{" "}
           <a
-            href="https://monachilpartners.com"
+            href="https://monachill.com"
             target="_blank"
             rel="noopener noreferrer"
             className="text-accent underline decoration-accent/30 underline-offset-2 hover:decoration-accent"

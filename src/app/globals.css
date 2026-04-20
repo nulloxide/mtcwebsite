@@ -76,6 +76,9 @@
 
   --particle-color: rgba(255, 255, 255, 0.5);
   --particle-line-color: rgba(255, 255, 255, 0.08);
+  --particle-size-scale: 1;
+  --particle-line-width: 0.6;
+  --particle-connection-strength: 0.18;
 
   --spotlight-color: rgba(1, 114, 189, 0.12);
   --card-shadow: none;
@@ -89,20 +92,20 @@
   --surface-elevated: #F4F5F7;
   --brand-blue: #0172BD;
   --accent: #005DA6;
-  --text-primary: #111827;
-  --text-secondary: #4B5563;
+  --text-primary: #1F2937;
+  --text-secondary: #374151;
 
-  --foreground: #111827;
+  --foreground: #1F2937;
   --card: #FFFFFF;
-  --card-foreground: #111827;
+  --card-foreground: #1F2937;
   --popover: #FFFFFF;
-  --popover-foreground: #111827;
+  --popover-foreground: #1F2937;
   --primary: #0172BD;
   --primary-foreground: #FFFFFF;
   --secondary: #F4F5F7;
-  --secondary-foreground: #111827;
+  --secondary-foreground: #1F2937;
   --muted: #F4F5F7;
-  --muted-foreground: #4B5563;
+  --muted-foreground: #374151;
   --accent-foreground: #FFFFFF;
   --destructive: #DC2626;
   --border: rgba(0, 0, 0, 0.12);
@@ -112,8 +115,11 @@
   --noise-opacity: 0.025;
   --glow-opacity: 0.06;
 
-  --particle-color: rgba(0, 0, 0, 0.25);
-  --particle-line-color: rgba(0, 0, 0, 0.06);
+  --particle-color: rgba(1, 114, 189, 0.7);
+  --particle-line-color: rgba(1, 114, 189, 1);
+  --particle-size-scale: 1.3;
+  --particle-line-width: 0.8;
+  --particle-connection-strength: 0.25;
 
   --spotlight-color: rgba(1, 114, 189, 0.08);
   --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 16px rgba(0, 0, 0, 0.04);
@@ -124,11 +130,18 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html,
+  body {
+    overflow-x: clip;
+    max-width: 100vw;
+  }
   html {
     scroll-behavior: smooth;
+    background: var(--background);
   }
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
+    background: transparent;
   }
 }
 
@@ -172,6 +185,11 @@
   box-shadow: var(--card-shadow-hover);
 }
 
+/* Soften decorative analytics chart in light mode so the body copy reads stronger */
+.light .analytics-visuals {
+  opacity: 0.7;
+}
+
 /* ─── Conic Gradient Border ─── */
 @property --border-angle {
   syntax: "<angle>";
@@ -210,31 +228,3 @@
   50% { opacity: 0.5; r: 14; }
 }
 
-/* ─── Custom cursor (desktop only) ─── */
-@media (pointer: fine) {
-  .cursor-dot {
-    width: 8px;
-    height: 8px;
-    background: var(--brand-blue);
-    border-radius: 50%;
-    position: fixed;
-    pointer-events: none;
-    z-index: 9999;
-    transition: transform 0.15s ease;
-  }
-  .cursor-ring {
-    width: 40px;
-    height: 40px;
-    border: 1.5px solid var(--accent);
-    border-radius: 50%;
-    position: fixed;
-    pointer-events: none;
-    z-index: 9998;
-    opacity: 0.5;
-    transition: opacity 0.3s ease, border-color 0.3s ease;
-  }
-  .cursor-ring.hovering {
-    opacity: 0.8;
-    border-color: var(--brand-blue);
-  }
-}
