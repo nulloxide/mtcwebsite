@@ -244,7 +244,7 @@ aside.notes { display: none; }
 </section>
 
 <!-- SLIDE 3b: FULL PIPELINE IFRAME -->
-<section data-background-iframe="investment_fund_operations_v4.html" data-background-interactive data-prevent-swipe>
+<section data-background-iframe="investment_fund_operations_v4.html" data-background-interactive>
   <div style="position:absolute; bottom:8px; right:12px; background:rgba(5,10,21,0.7); padding:4px 10px; border-radius:6px; border:1px solid rgba(100,160,255,0.12); opacity:0.6; pointer-events:none; z-index:10;">
     <span style="font-size:0.3em; color:#64748b;">Interactive: click any section for details</span>
   </div>
@@ -346,7 +346,7 @@ aside.notes { display: none; }
 </section>
 
 <!-- SLIDE 5b: ARCHITECTURE IFRAME -->
-<section data-background-iframe="data_architecture_medallion.html" data-background-interactive data-prevent-swipe>
+<section data-background-iframe="data_architecture_medallion.html" data-background-interactive>
   <div style="position:absolute; bottom:8px; right:12px; background:rgba(5,10,21,0.7); padding:4px 10px; border-radius:6px; border:1px solid rgba(100,160,255,0.12); opacity:0.6; pointer-events:none; z-index:10;">
     <span style="font-size:0.3em; color:#64748b;">Medallion Architecture — hover over stages for details</span>
   </div>
@@ -411,47 +411,47 @@ aside.notes { display: none; }
   <h2 style="font-size:1.2em;">Live Portfolio <span class="gradient-text">Analytics</span></h2>
   <p style="font-size:0.5em; color:var(--muted); margin-bottom:0.8em;">Example dashboards we use internally — across asset classes and geographies</p>
   <div class="demo-grid">
-    <div class="demo-card" onclick="Reveal.slide(8,1)" style="cursor:pointer">
+    <div class="demo-card" data-goto="1">
       <div class="demo-name">MCA Portfolio</div>
       <div class="demo-type">Merchant Cash Advance</div>
       <div class="demo-desc">139 advances, $6.7M PO, $6.2M VOR. DPD analysis, vintage curves, industry concentration, loan explorer.</div>
     </div>
-    <div class="demo-card" onclick="Reveal.slide(8,2)" style="cursor:pointer">
+    <div class="demo-card" data-goto="2">
       <div class="demo-name">Streaming Auto</div>
       <div class="demo-type">US Auto Loans</div>
       <div class="demo-desc">45 loans, $259K VOR, $254K BB. Dealer lots, collections tracking, BB waterfall, DPD analysis.</div>
     </div>
-    <div class="demo-card" onclick="Reveal.slide(8,3)" style="cursor:pointer">
+    <div class="demo-card" data-goto="3">
       <div class="demo-name">Vehicle Leasing</div>
       <div class="demo-type">Motorcycle &amp; Car Leases — Peru</div>
       <div class="demo-desc">4,439 leases, BB S/. 42.0M. Dual asset class — bikes vs cars, lessee rank tracking, factor analysis.</div>
     </div>
-    <div class="demo-card" onclick="Reveal.slide(8,4)" style="cursor:pointer">
+    <div class="demo-card" data-goto="4">
       <div class="demo-name">Consumer Lending</div>
       <div class="demo-type">Personal &amp; POS Loans — Peru</div>
       <div class="demo-desc">273K loans, BB S/. 10.5M. Personal vs POS segmentation, vintage collectability, refi distribution.</div>
     </div>
-    <div class="demo-card" onclick="Reveal.slide(8,5)" style="cursor:pointer">
+    <div class="demo-card" data-goto="5">
       <div class="demo-name">Consumer Lending</div>
       <div class="demo-type">Personal Loans — US</div>
       <div class="demo-desc">BB $15.5M. DPD comparison (servicer vs ours), multi-bank recon, loan doc verification.</div>
     </div>
-    <div class="demo-card" onclick="Reveal.slide(8,6)" style="cursor:pointer">
+    <div class="demo-card" data-goto="6">
       <div class="demo-name">Micro-Credit</div>
       <div class="demo-type">SME Lending — Colombia</div>
       <div class="demo-desc">BB COP 24.6B / $6.7M. Multiple payment channels, endorsement tracking, XIRR 18-42%.</div>
     </div>
-    <div class="demo-card" onclick="Reveal.slide(8,7)" style="cursor:pointer">
+    <div class="demo-card" data-goto="7">
       <div class="demo-name">Consumer Microloans</div>
       <div class="demo-type">Employment Loans — US</div>
       <div class="demo-desc">859 loans, $385K VOR, $211K BB. KPI tracker, channel acquisition, covenant monitoring.</div>
     </div>
-    <div class="demo-card" onclick="Reveal.slide(8,8)" style="cursor:pointer">
+    <div class="demo-card" data-goto="8">
       <div class="demo-name">Auto Loan Purchasing</div>
       <div class="demo-type">Debt Purchase — US (Joint Venture)</div>
       <div class="demo-desc">729 loans, $8.1M balance. Dealer analysis, DPD reconciliation, charge-off tracking.</div>
     </div>
-    <div class="demo-card" onclick="Reveal.slide(8,9)" style="cursor:pointer">
+    <div class="demo-card" data-goto="9">
       <div class="demo-name">Flight School Lending</div>
       <div class="demo-type">Student Pilot Loans — US (Put Option)</div>
       <div class="demo-desc">331 loans, $17M VOR. Put option economics, flight school concentration, FICO analysis.</div>
@@ -463,7 +463,7 @@ aside.notes { display: none; }
 </section>
 
 <!-- SLIDE 7a: MCA DASHBOARD -->
-<section data-background-iframe="mca_portfolio_analytics.html" data-background-interactive data-prevent-swipe>
+<section data-background-iframe="mca_portfolio_analytics.html" data-background-interactive>
   <div style="position:absolute; bottom:8px; right:12px; background:rgba(5,10,21,0.7); padding:4px 10px; border-radius:6px; border:1px solid rgba(100,160,255,0.12); opacity:0.6; pointer-events:none; z-index:10;">
     <span style="font-size:0.3em; color:#64748b;">MCA Portfolio Analytics — fully interactive</span>
   </div>
@@ -479,7 +479,7 @@ aside.notes { display: none; }
 </section>
 
 <!-- SLIDE 7b: STREAMING AUTO DASHBOARD -->
-<section data-background-iframe="streaming_auto_portfolio.html" data-background-interactive data-prevent-swipe>
+<section data-background-iframe="streaming_auto_portfolio.html" data-background-interactive>
   <div style="position:absolute; bottom:8px; right:12px; background:rgba(5,10,21,0.7); padding:4px 10px; border-radius:6px; border:1px solid rgba(100,160,255,0.12); opacity:0.6; pointer-events:none; z-index:10;">
     <span style="font-size:0.3em; color:#64748b;">Streaming Auto Loans — fully interactive</span>
   </div>
@@ -493,7 +493,7 @@ aside.notes { display: none; }
 </section>
 
 <!-- SLIDE 7c: LIMABIKES DASHBOARD -->
-<section data-background-iframe="limabikes_portfolio_analytics.html" data-background-interactive data-prevent-swipe>
+<section data-background-iframe="limabikes_portfolio_analytics.html" data-background-interactive>
   <div style="position:absolute; bottom:8px; right:12px; background:rgba(5,10,21,0.7); padding:4px 10px; border-radius:6px; border:1px solid rgba(100,160,255,0.12); opacity:0.6; pointer-events:none; z-index:10;">
     <span style="font-size:0.3em; color:#64748b;">Vehicle Lease Portfolio — fully interactive</span>
   </div>
@@ -507,7 +507,7 @@ aside.notes { display: none; }
 </section>
 
 <!-- SLIDE 7d: APURATA DASHBOARD -->
-<section data-background-iframe="apurata_portfolio_analytics.html" data-background-interactive data-prevent-swipe>
+<section data-background-iframe="apurata_portfolio_analytics.html" data-background-interactive>
   <div style="position:absolute; bottom:8px; right:12px; background:rgba(5,10,21,0.7); padding:4px 10px; border-radius:6px; border:1px solid rgba(100,160,255,0.12); opacity:0.6; pointer-events:none; z-index:10;">
     <span style="font-size:0.3em; color:#64748b;">Consumer Lending (Peru) — fully interactive</span>
   </div>
@@ -521,7 +521,7 @@ aside.notes { display: none; }
 </section>
 
 <!-- SLIDE 7e: RICE LAKE DASHBOARD -->
-<section data-background-iframe="ricelake_portfolio_analytics.html" data-background-interactive data-prevent-swipe>
+<section data-background-iframe="ricelake_portfolio_analytics.html" data-background-interactive>
   <div style="position:absolute; bottom:8px; right:12px; background:rgba(5,10,21,0.7); padding:4px 10px; border-radius:6px; border:1px solid rgba(100,160,255,0.12); opacity:0.6; pointer-events:none; z-index:10;">
     <span style="font-size:0.3em; color:#64748b;">Consumer Lending (US) — fully interactive</span>
   </div>
@@ -533,7 +533,7 @@ aside.notes { display: none; }
 </section>
 
 <!-- SLIDE 7f: CREDIMINUTO DASHBOARD -->
-<section data-background-iframe="crediminuto_portfolio_analytics.html" data-background-interactive data-prevent-swipe>
+<section data-background-iframe="crediminuto_portfolio_analytics.html" data-background-interactive>
   <div style="position:absolute; bottom:8px; right:12px; background:rgba(5,10,21,0.7); padding:4px 10px; border-radius:6px; border:1px solid rgba(100,160,255,0.12); opacity:0.6; pointer-events:none; z-index:10;">
     <span style="font-size:0.3em; color:#64748b;">Micro-Credit Colombia — fully interactive</span>
   </div>
@@ -548,7 +548,7 @@ aside.notes { display: none; }
 
 <!-- ============================================================ -->
 <!-- SLIDE 7g: BUCKSS DASHBOARD -->
-<section data-background-iframe="buckss_portfolio_analytics.html" data-background-interactive data-prevent-swipe>
+<section data-background-iframe="buckss_portfolio_analytics.html" data-background-interactive>
   <div style="position:absolute; bottom:8px; right:12px; background:rgba(5,10,21,0.7); padding:4px 10px; border-radius:6px; border:1px solid rgba(100,160,255,0.12); opacity:0.6; pointer-events:none; z-index:10;">
     <span style="font-size:0.3em; color:#64748b;">Consumer Microloans — fully interactive</span>
   </div>
@@ -562,7 +562,7 @@ aside.notes { display: none; }
 </section>
 
 <!-- SLIDE 7h: CAPM DASHBOARD -->
-<section data-background-iframe="capm_portfolio_analytics.html" data-background-interactive data-prevent-swipe>
+<section data-background-iframe="capm_portfolio_analytics.html" data-background-interactive>
   <div style="position:absolute; bottom:8px; right:12px; background:rgba(5,10,21,0.7); padding:4px 10px; border-radius:6px; border:1px solid rgba(100,160,255,0.12); opacity:0.6; pointer-events:none; z-index:10;">
     <span style="font-size:0.3em; color:#64748b;">Auto Loan Purchasing (CAPM) — fully interactive</span>
   </div>
@@ -576,7 +576,7 @@ aside.notes { display: none; }
 </section>
 
 <!-- SLIDE 7i: STRATUS DASHBOARD -->
-<section data-background-iframe="stratus_portfolio_analytics.html" data-background-interactive data-prevent-swipe>
+<section data-background-iframe="stratus_portfolio_analytics.html" data-background-interactive>
   <div style="position:absolute; bottom:8px; right:12px; background:rgba(5,10,21,0.7); padding:4px 10px; border-radius:6px; border:1px solid rgba(100,160,255,0.12); opacity:0.6; pointer-events:none; z-index:10;">
     <span style="font-size:0.3em; color:#64748b;">Flight School Lending — fully interactive</span>
   </div>
@@ -615,7 +615,7 @@ aside.notes { display: none; }
 </section>
 
 <!-- SLIDE 8b: EARLY WARNING DASHBOARD -->
-<section data-background-iframe="early_warning_dashboard.html" data-background-interactive data-prevent-swipe>
+<section data-background-iframe="early_warning_dashboard.html" data-background-interactive>
   <div style="position:absolute; bottom:8px; right:12px; background:rgba(5,10,21,0.7); padding:4px 10px; border-radius:6px; border:1px solid rgba(100,160,255,0.12); opacity:0.6; pointer-events:none; z-index:10;">
     <span style="font-size:0.3em; color:#64748b;">Early Warning System — use the timeline scrubber to see degradation</span>
   </div>
@@ -708,18 +708,15 @@ aside.notes { display: none; }
 <script>
 Reveal.initialize({
   hash: true,
-  respondToHashChanges: true,
   slideNumber: 'c/t',
-  showSlideNumber: 'speaker',
+  showSlideNumber: 'all',
   width: 1280,
   height: 720,
   margin: 0.05,
   center: true,
   transition: 'fade',
-  transitionSpeed: 'default',
   backgroundTransition: 'fade',
   navigationMode: 'grid',
-  touch: true,
   controls: 'auto',
   controlsLayout: 'bottom-right',
   controlsBackArrows: 'faded',
@@ -728,14 +725,13 @@ Reveal.initialize({
   progress: true,
   jumpToSlide: false,
   overview: true,
-  pause: true,
   controlsTutorial: false,
   autoAnimateEasing: 'ease-out',
   autoAnimateDuration: 0.8,
+  pdfMaxPagesPerSlide: 1,
   plugins: [RevealNotes, RevealMarkdown],
-  // Digit shortcuts (Shift to avoid colliding with reveal's slide-number jump)
+  // Shift+1..9 = jump to a dashboard during Q&A
   keyboard: {
-    // Shift+1..9 = jump directly to that dashboard during Q&A
     33: () => Reveal.slide(8, 1),
     64: () => Reveal.slide(8, 2),
     35: () => Reveal.slide(8, 3),
@@ -748,12 +744,14 @@ Reveal.initialize({
   }
 });
 
-// ==========================================================================
-// Unified theme system — shared across parent deck and dashboard iframes.
+document.querySelectorAll('.demo-card[data-goto]').forEach(card => {
+  card.addEventListener('click', () => Reveal.slide(8, +card.dataset.goto));
+});
+
+// Unified theme system — parent deck + dashboard iframes.
+// Wire: parent → child  postMessage { type: 'pres:theme', theme }
+//       child  → parent postMessage { type: 'pres:theme:request' }
 // Storage: localStorage['mcp-theme'].
-// Wire:    parent → child  postMessage { type: 'pres:theme', theme }
-//          child  → parent postMessage { type: 'pres:theme:request' }
-// ==========================================================================
 const THEME_KEY = 'mcp-theme';
 const ptBtn = document.getElementById('pres-theme-toggle');
 
