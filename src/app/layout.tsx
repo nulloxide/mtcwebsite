@@ -32,6 +32,7 @@ export const metadata: Metadata = {
   applicationName: "Monachil Technologies",
   authors: [{ name: "Monachil Technologies" }],
   alternates: { canonical: "/" },
+  manifest: "/manifest.webmanifest",
   openGraph: {
     title: "Monachil Technologies",
     description: "The proprietary data platform behind Monachil Capital Partners — ingestion, verification, enrichment, and analytics for asset-backed lending and specialty finance.",

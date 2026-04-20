@@ -8,6 +8,12 @@ import {
   Building2,
   TrendingUp,
   FileBarChart,
+  ShieldCheck,
+  Database,
+  Filter,
+  Sparkles,
+  BarChart2,
+  FileCheck,
 } from "lucide-react";
 
 const platformCards = [
@@ -41,22 +47,29 @@ const platformCards = [
     description:
       "Automated generation of performance reports, risk analytics, and investor communications with full data lineage and auditability.",
   },
+  {
+    icon: ShieldCheck,
+    title: "Data Quality & Observability",
+    description:
+      "Schema validation, row-level lineage, and alerts on drift or gaps. Every pipeline is instrumented; every number traces back to source.",
+  },
 ];
 
-const flowNodes = [
-  "Ingestion",
-  "Bronze",
-  "Silver",
-  "Gold",
-  "Consumption",
-  "Audit",
+// Medallion stages with metallic colors where they apply. Ingestion and
+// Consumption/Audit stay brand-blue so the Bronze/Silver/Gold story pops.
+const stages = [
+  { label: "Ingestion",   icon: Database,  fill: "var(--brand-blue)", accent: "var(--accent)" },
+  { label: "Bronze",      icon: Filter,    fill: "#CD7F32",           accent: "#E2A96D" },
+  { label: "Silver",      icon: Sparkles,  fill: "#B0B4C0",           accent: "#D8DCE4" },
+  { label: "Gold",        icon: BarChart2, fill: "#D4AF37",           accent: "#F1D271" },
+  { label: "Consumption", icon: FileBarChart, fill: "var(--brand-blue)", accent: "var(--accent)" },
+  { label: "Audit",       icon: FileCheck, fill: "var(--brand-blue)", accent: "var(--accent)" },
 ];
 
-// 6 nodes evenly at x: 80, 260, 440, 620, 800, 960
 const NODE_POSITIONS = [80, 260, 440, 620, 800, 960];
 const NODE_Y = 60;
-const PARTICLES_PER_CONN = 3;
-const PARTICLE_DUR = "2s";
+const PARTICLES_PER_CONN = 2;
+const PARTICLE_DUR = "4s";
 
 function PipelineFlowDiagram() {
   const connections = NODE_POSITIONS.slice(0, -1).map((x, i) => ({
@@ -67,19 +80,17 @@ function PipelineFlowDiagram() {
   return (
     <div className="relative mx-auto max-w-5xl">
       <svg
-        viewBox="0 0 1040 120"
+        viewBox="0 0 1040 140"
         fill="none"
-        className="w-full"
+        className="hidden w-full md:block"
         aria-hidden="true"
       >
         <defs>
-          {/* Reusable paths for animateMotion */}
           {connections.map((conn) => (
             <path key={conn.id} id={conn.id} d={conn.d} />
           ))}
         </defs>
 
-        {/* Base connection lines (dim static) */}
         {connections.map((conn) => (
           <path
             key={`base-${conn.id}`}
@@ -87,11 +98,10 @@ function PipelineFlowDiagram() {
             stroke="var(--brand-blue)"
             strokeWidth="1"
             strokeLinecap="round"
-            opacity="0.15"
+            opacity="0.18"
           />
         ))}
 
-        {/* Animated dashed flow overlay */}
         {connections.map((conn) => (
           <path
             key={`flow-${conn.id}`}
@@ -99,105 +109,88 @@ function PipelineFlowDiagram() {
             stroke="var(--brand-blue)"
             strokeWidth="1.5"
             strokeLinecap="round"
-            opacity="0.4"
+            opacity="0.35"
             strokeDasharray="6 12"
-            style={{ animation: "flow-dash 1.2s linear infinite" }}
+            style={{ animation: "flow-dash 1.8s linear infinite" }}
           />
         ))}
 
-        {/* Traveling particles per connection */}
         {connections.map((conn, connIdx) =>
           Array.from({ length: PARTICLES_PER_CONN }).map((_, pIdx) => (
             <circle
               key={`particle-${connIdx}-${pIdx}`}
               r="2"
-              fill="var(--accent)"
+              fill={stages[connIdx + 1]?.accent || "var(--accent)"}
               opacity="0"
             >
               <animateMotion
                 dur={PARTICLE_DUR}
-                begin={`${(pIdx * 2) / PARTICLES_PER_CONN + connIdx * 0.15}s`}
+                begin={`${(pIdx * 2) / PARTICLES_PER_CONN + connIdx * 0.2}s`}
                 repeatCount="indefinite"
               >
                 <mpath href={`#${conn.id}`} />
               </animateMotion>
               <animate
                 attributeName="opacity"
-                values="0;0.8;0.8;0"
+                values="0;0.85;0.85;0"
                 dur={PARTICLE_DUR}
-                begin={`${(pIdx * 2) / PARTICLES_PER_CONN + connIdx * 0.15}s`}
+                begin={`${(pIdx * 2) / PARTICLES_PER_CONN + connIdx * 0.2}s`}
                 repeatCount="indefinite"
               />
             </circle>
           ))
         )}
 
-        {/* Nodes */}
-        {NODE_POSITIONS.map((x, i) => (
-          <g key={`node-${i}`}>
-            {/* Outer pulse glow */}
-            <circle
-              cx={x}
-              cy={NODE_Y}
-              r="10"
-              fill="none"
-              stroke="var(--brand-blue)"
-              strokeWidth="1"
-              opacity="0.15"
-              style={{
-                animation: `node-pulse 3s ease-in-out ${i * 0.5}s infinite`,
-              }}
-            />
-            {/* Mid ring */}
-            <circle
-              cx={x}
-              cy={NODE_Y}
-              r="7"
-              fill="var(--brand-blue)"
-              opacity="0.12"
-            />
-            {/* Core dot */}
-            <circle
-              cx={x}
-              cy={NODE_Y}
-              r="4"
-              fill="var(--brand-blue)"
-            />
-            {/* Bright center */}
-            <circle
-              cx={x}
-              cy={NODE_Y}
-              r="2"
-              fill="var(--accent)"
-              opacity="0.8"
-            />
-          </g>
-        ))}
+        {NODE_POSITIONS.map((x, i) => {
+          const stage = stages[i];
+          return (
+            <g key={`node-${i}`}>
+              <circle
+                cx={x}
+                cy={NODE_Y}
+                r="14"
+                fill="none"
+                stroke={stage.fill}
+                strokeWidth="1"
+                opacity="0.2"
+                style={{
+                  animation: `node-pulse 3s ease-in-out ${i * 0.5}s infinite`,
+                }}
+              />
+              <circle cx={x} cy={NODE_Y} r="10" fill={stage.fill} opacity="0.18" />
+              <circle cx={x} cy={NODE_Y} r="6" fill={stage.fill} />
+              <circle cx={x} cy={NODE_Y} r="3" fill={stage.accent} opacity="0.9" />
+            </g>
+          );
+        })}
       </svg>
 
-      {/* Desktop labels */}
-      <div className="mt-3 hidden md:flex">
-        {flowNodes.map((node, i) => (
-          <div
-            key={node}
-            className="flex-1 text-center"
-            style={{ maxWidth: i === flowNodes.length - 1 ? "60px" : undefined }}
-          >
+      <div className="mt-4 hidden md:flex">
+        {stages.map((stage) => (
+          <div key={stage.label} className="flex flex-1 flex-col items-center gap-1.5">
+            <stage.icon className="h-3.5 w-3.5" style={{ color: stage.fill, opacity: 0.7 }} />
             <span className="text-[11px] font-light tracking-wide text-text-secondary">
-              {node}
+              {stage.label}
             </span>
           </div>
         ))}
       </div>
 
-      {/* Mobile stacked labels */}
-      <div className="mt-4 flex flex-col gap-2 md:hidden">
-        {flowNodes.map((node, i) => (
-          <div key={node} className="flex items-center gap-3">
-            <div className="h-2 w-2 shrink-0 rounded-full bg-brand-blue" />
-            <span className="text-xs font-light text-text-secondary">
-              {i + 1}. {node}
-            </span>
+      <div className="mt-2 flex flex-col gap-3 md:hidden">
+        {stages.map((stage, i) => (
+          <div key={stage.label} className="flex items-center gap-3">
+            <div
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
+              style={{ backgroundColor: `${stage.fill}14`, border: `1px solid ${stage.fill}40` }}
+            >
+              <stage.icon className="h-4 w-4" style={{ color: stage.fill }} />
+            </div>
+            <div>
+              <span className="text-[10px] font-light uppercase tracking-widest text-text-secondary/60">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <span className="ml-2 text-sm font-medium text-text-primary">{stage.label}</span>
+            </div>
           </div>
         ))}
       </div>
@@ -208,13 +201,12 @@ function PipelineFlowDiagram() {
 export function DataPlatform() {
   return (
     <section id="platform" className="relative overflow-hidden py-32 md:py-48">
-      {/* Subtle background glow */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div
           className="absolute left-1/2 top-1/4 h-[600px] w-[800px] -translate-x-1/2"
           style={{
             background: "radial-gradient(ellipse at center, var(--brand-blue) 0%, transparent 70%)",
-            opacity: 0.03,
+            opacity: 0.07,
             borderRadius: "50%",
           }}
         />
@@ -232,31 +224,28 @@ export function DataPlatform() {
               Medallion Architecture, Purpose-Built for Credit
             </h2>
           </ScrollReveal>
-          <ScrollReveal delay={0.2}>
+          <ScrollReveal delay={0.15}>
             <p className="mt-6 text-lg font-light leading-relaxed text-text-secondary">
-              Raw servicer tapes, bank statements, and contract PDFs enter
-              Bronze. Silver cleans, deduplicates, and validates. Gold holds
-              the enriched layer — DPD, borrowing base, covenant checks, and
-              cross-dataset joins — every number regenerable from source.
+              Raw tapes, bank statements, and contracts flow Bronze →
+              Silver → Gold. Every number is regenerable from source,
+              every transformation auditable.
             </p>
           </ScrollReveal>
         </div>
 
-        {/* Animated Data Flow Diagram */}
         <ScrollReveal>
           <div className="mt-20">
             <PipelineFlowDiagram />
           </div>
         </ScrollReveal>
 
-        {/* Platform capability cards */}
-        <div className="mt-20 grid grid-cols-1 gap-5 md:grid-cols-3">
+        <div className="mt-20 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
           {platformCards.map((card, i) => (
-            <ScrollReveal key={card.title} delay={i * 0.08}>
+            <ScrollReveal key={card.title} delay={Math.min(i * 0.08, 0.24)}>
               <MovingBorder
                 containerClassName="h-full"
                 className="card-surface h-full p-8"
-                duration={`${4 + i * 0.5}s`}
+                duration={`${5 + i * 0.5}s`}
               >
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-blue/8">
                   <card.icon className="h-5 w-5 text-brand-blue" />

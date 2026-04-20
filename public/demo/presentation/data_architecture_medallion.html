@@ -83,6 +83,16 @@ body::after{
 .theme-toggle .icon{font-size:0.85rem}
 html[data-embedded="true"] .theme-toggle{display:none !important}
 
+/* Embedded-iframe tuning — tighten chrome so the diagram claims more of
+   the 1280×720 slot and tiny SVG labels become legible. */
+html[data-embedded="true"] body { overflow: hidden; }
+html[data-embedded="true"] .page { min-width: 0; padding: 4px 8px 0; }
+html[data-embedded="true"] .hdr { margin-bottom: 4px; }
+html[data-embedded="true"] .hdr h1 { font-size: 1.05rem; margin-bottom: 0; }
+html[data-embedded="true"] .hdr .sub { font-size: 0.6rem; margin-top: 2px; }
+html[data-embedded="true"] .legend { margin-bottom: 2px; }
+html[data-embedded="true"] .legend .it { font-size: 0.52rem; }
+
 /* Legend row */
 .legend{display:flex;justify-content:center;gap:28px;margin:10px 0 8px;flex-wrap:wrap}
 .legend .it{display:flex;align-items:center;gap:6px;font-size:0.62rem;color:var(--text-muted)}

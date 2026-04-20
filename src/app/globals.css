@@ -228,3 +228,13 @@
   50% { opacity: 0.5; r: 14; }
 }
 
+@keyframes heat-breathe {
+  0%, 100% { filter: brightness(1); }
+  50%      { filter: brightness(1.25); }
+}
+
+@keyframes fi-grow {
+  from { width: 0%; }
+  to   { width: var(--fi-target, 100%); }
+}
+

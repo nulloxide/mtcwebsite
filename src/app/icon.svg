@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="mtcPeak" x1="256" y1="96" x2="256" y2="416" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0080FF"/>
+      <stop offset="1" stop-color="#0172BD"/>
+    </linearGradient>
+  </defs>
+  <!-- Rear M: wider and lower, so its outer ridges fan out like the parent's grey wings. -->
+  <path d="M32 416 L184 168 L256 288 L328 168 L480 416 L400 416 L296 240 L256 304 L216 240 L112 416 Z"
+        fill="#0172BD" fill-opacity="0.35"/>
+  <!-- Front M: taller, narrower; hero shape with gradient. -->
+  <path d="M144 400 L216 104 L256 192 L296 104 L368 400 L312 400 L276 248 L256 288 L236 248 L200 400 Z"
+        fill="url(#mtcPeak)"/>
+</svg>

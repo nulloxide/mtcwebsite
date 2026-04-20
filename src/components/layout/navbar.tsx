@@ -53,7 +53,17 @@ export function Navbar() {
       }`}
     >
       <nav className="relative mx-auto flex h-14 max-w-7xl items-center justify-between px-4 md:px-6">
-        <a href="#" aria-label="Scroll to top" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
+        <a
+          href="/"
+          aria-label="Scroll to top"
+          onClick={(e) => {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: "smooth" });
+            if (window.location.hash) {
+              history.replaceState(null, "", window.location.pathname + window.location.search);
+            }
+          }}
+        >
           <Logo compact />
         </a>
 

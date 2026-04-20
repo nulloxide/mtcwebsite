@@ -150,38 +150,174 @@ aside.notes { display: none; }
 /* Drive the slide background from --r-background-color so we don't need data-background-color on sections */
 .reveal .slide-background-content { background-color: var(--r-background-color) !important; }
 
-/* ===== LIGHT THEME ===== */
+/* ========================================================================
+   LIGHT THEME — designed as a token system, not ad-hoc overrides.
+   Background is slate-50 off-white (not pure white) to avoid glare/strain.
+   Text hierarchy: slate-900 primary > slate-600 secondary > slate-500 muted.
+   Accents use 600/700-level hues (not pastels) so every combination
+   passes WCAG AA 4.5:1 contrast against the off-white canvas.
+   ======================================================================== */
 [data-pres-theme="light"] {
-  --r-background-color: #f0f4f8;
-  --r-main-color: #1e293b;
-  --r-heading-color: #0f172a;
-  --r-link-color: #4f46e5;
-  --r-link-color-hover: #6366f1;
-  --r-selection-background-color: rgba(99,102,241,0.2);
-  --accent: #4f46e5;
-  --muted: #64748b;
-  --subtle: #cbd5e1;
+  /* Reveal-level tokens */
+  --r-background-color: #f8fafc;
+  --r-main-color:       #334155;
+  --r-heading-color:    #0f172a;
+  --r-link-color:       #4338ca;
+  --r-link-color-hover: #3730a3;
+  --r-selection-background-color: rgba(67,56,202,0.18);
+
+  /* Deck semantic tokens */
+  --accent:        #4338ca;                    /* indigo-700 brand anchor */
+  --accent-soft:   rgba(67,56,202,0.10);       /* chip/kbd bg */
+  --accent-border: rgba(67,56,202,0.22);
+  --teal:          #0f766e;                    /* teal-700 */
+  --amber:         #b45309;                    /* amber-700 */
+  --muted:         #64748b;                    /* slate-500 */
+  --subtle:        #cbd5e1;                    /* slate-300 */
+
+  /* Typographic hierarchy */
+  --text-primary:   #0f172a;                   /* slate-900 */
+  --text-secondary: #475569;                   /* slate-600 */
+  --text-tertiary:  #64748b;                   /* slate-500 */
+
+  /* Surface containers (Material-3 style: 3 depths) */
+  --surface-base:  #f8fafc;                    /* canvas */
+  --surface-card:  #ffffff;                    /* elevated */
+  --surface-muted: #f1f5f9;                    /* sunken */
+  --border-color:  rgba(15,23,42,0.08);
+  --border-strong: rgba(15,23,42,0.14);
+
+  /* Semantic status colors (all 700-level, AA on off-white) */
+  --status-red:     #b91c1c;
+  --status-red-bg:  rgba(185,28,28,0.10);
+  --status-green:   #047857;
+  --status-green-bg:rgba(4,120,87,0.10);
+  --status-blue:    #1d4ed8;
+  --status-blue-bg: rgba(29,78,216,0.10);
+  --status-violet:  #6d28d9;
+  --status-violet-bg:rgba(109,40,217,0.10);
+  --status-amber:   #b45309;
+  --status-amber-bg:rgba(180,83,9,0.10);
+  --status-teal:    #0f766e;
+  --status-teal-bg: rgba(15,118,110,0.10);
 }
-[data-pres-theme="light"] .reveal .slides { background: radial-gradient(ellipse at 20% 20%, rgba(59,130,246,0.04) 0%, transparent 50%), radial-gradient(ellipse at 80% 70%, rgba(139,92,246,0.03) 0%, transparent 50%); }
-[data-pres-theme="light"] .reveal ul li { color: #475569; }
-[data-pres-theme="light"] .reveal ul li strong { color: #0f172a; }
+
+/* Canvas + ambient background gradient — restrained so text is the hero */
+[data-pres-theme="light"] .reveal .slides {
+  background:
+    radial-gradient(ellipse at 20% 20%, rgba(67,56,202,0.035) 0%, transparent 55%),
+    radial-gradient(ellipse at 80% 80%, rgba(13,148,136,0.025) 0%, transparent 55%);
+}
+
+/* Body text hierarchy */
+[data-pres-theme="light"] .reveal ul li         { color: var(--text-secondary); }
+[data-pres-theme="light"] .reveal ul li strong  { color: var(--text-primary); }
 [data-pres-theme="light"] .reveal ul li::before { background: var(--accent); }
-[data-pres-theme="light"] .metric-card { background: rgba(241,245,249,0.8); border-color: rgba(99,102,241,0.12); }
-[data-pres-theme="light"] .source-item { background: rgba(241,245,249,0.7); border-color: rgba(99,102,241,0.1); }
-[data-pres-theme="light"] .demo-card { background: rgba(241,245,249,0.7); border-color: rgba(99,102,241,0.1); }
+
+/* Gradient headline text — indigo → violet → teal on light canvas */
+[data-pres-theme="light"] .gradient-text {
+  background: linear-gradient(135deg, #4338ca, #7c3aed, #0f766e);
+  background-size: 200% 200%;
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ── Surface containers: three elevations ───────────────────────────── */
+[data-pres-theme="light"] .metric-card,
+[data-pres-theme="light"] .source-item,
+[data-pres-theme="light"] .demo-card,
+[data-pres-theme="light"] .impact-item,
+[data-pres-theme="light"] .v-panel {
+  background: var(--surface-card);
+  border-color: var(--border-color);
+  box-shadow: 0 1px 2px rgba(15,23,42,0.04), 0 4px 16px rgba(15,23,42,0.04);
+}
 [data-pres-theme="light"] .demo-card:hover { border-color: var(--accent); }
-[data-pres-theme="light"] .impact-item { background: rgba(241,245,249,0.6); }
-[data-pres-theme="light"] .v-panel { background: rgba(241,245,249,0.7); }
-[data-pres-theme="light"] .v-panel.servicer { border-color: rgba(239,68,68,0.3); }
-[data-pres-theme="light"] .v-panel.ours { border-color: rgba(16,185,129,0.3); }
-[data-pres-theme="light"] .v-metric { color: #0f172a; }
-[data-pres-theme="light"] .slide-footer { color: rgba(71,85,105,0.5); }
-[data-pres-theme="light"] .gradient-text { background: linear-gradient(135deg, #4f46e5, #7c3aed, #0d9488); -webkit-background-clip: text; background-clip: text; }
-[data-pres-theme="light"] .medal.bronze { background: rgba(205,127,50,0.1); }
-[data-pres-theme="light"] .medal.silver { background: rgba(148,148,172,0.1); }
-[data-pres-theme="light"] .medal.gold { background: rgba(202,138,4,0.1); }
-[data-pres-theme="light"] #pres-theme-toggle { background: rgba(241,245,249,0.8); border-color: rgba(99,102,241,0.15); color: #475569; }
-[data-pres-theme="light"] .tl-dot { border-color: #f8fafc; }
+
+/* Hint pills that ride on dark rgba backgrounds in dark mode need lifting */
+[data-pres-theme="light"] .reveal section > div[style*="background:rgba(30,41,59,0.3)"] {
+  background: var(--surface-muted) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Iframe caption chips (bottom-right "fully interactive") */
+[data-pres-theme="light"] section[data-background-interactive] > div[style*="rgba(5,10,21"] {
+  background: rgba(255,255,255,0.9) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* ── Primary text tokens on every titled/captioned surface ──────────── */
+[data-pres-theme="light"] .tl-title,
+[data-pres-theme="light"] .src-title,
+[data-pres-theme="light"] .demo-name,
+[data-pres-theme="light"] .imp-title,
+[data-pres-theme="light"] .v-metric,
+[data-pres-theme="light"] .metric-card .num { color: var(--text-primary); }
+
+[data-pres-theme="light"] .tl-desc,
+[data-pres-theme="light"] .src-desc,
+[data-pres-theme="light"] .demo-desc,
+[data-pres-theme="light"] .imp-desc,
+[data-pres-theme="light"] .metric-card .label,
+[data-pres-theme="light"] .v-detail { color: var(--text-secondary); }
+
+[data-pres-theme="light"] .demo-type { color: var(--status-teal); }
+
+/* ── Timeline dots: coherent indigo→teal gradient, not random hues ── */
+[data-pres-theme="light"] .tl-dot { border-color: var(--surface-base); }
+[data-pres-theme="light"] .tl-step:nth-child(1) .tl-dot { background: #4338ca; } /* indigo-700 */
+[data-pres-theme="light"] .tl-step:nth-child(2) .tl-dot { background: #5b21b6; } /* violet-800 */
+[data-pres-theme="light"] .tl-step:nth-child(3) .tl-dot { background: #6d28d9; } /* violet-700 */
+[data-pres-theme="light"] .tl-step:nth-child(4) .tl-dot { background: #0d9488; } /* teal-600 */
+[data-pres-theme="light"] .tl-step:nth-child(5) .tl-dot { background: #047857; } /* emerald-700 */
+
+/* ── Verify-box (servicer vs ours): red vs green status ─────────────── */
+[data-pres-theme="light"] .v-panel.servicer { border-color: rgba(185,28,28,0.35); }
+[data-pres-theme="light"] .v-panel.ours     { border-color: rgba(4,120,87,0.35); }
+[data-pres-theme="light"] .v-panel.servicer .v-label { color: var(--status-red); }
+[data-pres-theme="light"] .v-panel.ours     .v-label { color: var(--status-green); }
+
+/* ── Medals: darker metallic tones for legibility on white ──────────── */
+[data-pres-theme="light"] .medal.bronze { background: rgba(146,64,14,0.10);  color: #92400e; border-color: rgba(146,64,14,0.35); }
+[data-pres-theme="light"] .medal.silver { background: rgba(71,85,105,0.10);  color: #334155; border-color: rgba(71,85,105,0.35); }
+[data-pres-theme="light"] .medal.gold   { background: rgba(161,98,7,0.10);   color: #854d0e; border-color: rgba(161,98,7,0.35); }
+
+/* ── Theme toggle + footer ──────────────────────────────────────────── */
+[data-pres-theme="light"] #pres-theme-toggle {
+  background: var(--surface-card);
+  border-color: var(--border-color);
+  color: var(--text-secondary);
+}
+[data-pres-theme="light"] #pres-theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
+[data-pres-theme="light"] .slide-footer { color: var(--text-tertiary); }
+
+/* ══════════════════════════════════════════════════════════════════════
+   Inline-hex accent remaps — the legacy deck puts color:#xxxxxx on
+   spans inside headings. Match each by attribute-substring and route
+   to the right status token. No HTML changes required.
+   ══════════════════════════════════════════════════════════════════════ */
+[data-pres-theme="light"] [style*="color:#f87171"]  { color: var(--status-red)    !important; } /* coral */
+[data-pres-theme="light"] [style*="color:#60a5fa"]  { color: var(--status-blue)   !important; } /* sky */
+[data-pres-theme="light"] [style*="color:#a78bfa"]  { color: var(--status-violet) !important; } /* lilac */
+[data-pres-theme="light"] [style*="color:#34d399"]  { color: var(--status-green)  !important; } /* mint */
+[data-pres-theme="light"] [style*="color:#14b8a6"]  { color: var(--status-teal)   !important; }
+[data-pres-theme="light"] [style*="color:#64748b"]  { color: var(--text-secondary) !important; }
+
+/* kbd hint pills */
+[data-pres-theme="light"] kbd {
+  background: var(--accent-soft) !important;
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
+}
+
+/* Press-arrow hint pills */
+[data-pres-theme="light"] kbd { background: rgba(79,70,229,0.12) !important; color: #1d4ed8; }
+
+/* Iframe caption pills (bottom-right "fully interactive") — stronger on white. */
+[data-pres-theme="light"] section[data-background-interactive] > div[style*="rgba(5,10,21"] {
+  background: rgba(248,250,252,0.85) !important;
+  border-color: rgba(79,70,229,0.2) !important;
+}
 </style>
 </head>
 <body>
@@ -193,8 +329,10 @@ aside.notes { display: none; }
 <!-- ============================================================ -->
 <!-- SLIDE 1: TITLE -->
 <!-- ============================================================ -->
-<section>
-  <img src="MCP_Logo_TRANSPARENT.png" class="logo" alt="Monachil">
+<section data-auto-animate data-transition="zoom" data-chapter="open"
+         data-bg-dark="radial-gradient(ellipse at 30% 30%, rgba(99,102,241,0.18) 0%, transparent 55%), radial-gradient(ellipse at 75% 80%, rgba(45,212,191,0.10) 0%, transparent 55%), linear-gradient(135deg, #0b1022 0%, #050a15 60%)"
+         data-bg-light="radial-gradient(ellipse at 30% 30%, rgba(99,102,241,0.10) 0%, transparent 55%), radial-gradient(ellipse at 75% 80%, rgba(15,118,110,0.08) 0%, transparent 55%), linear-gradient(135deg, #eef2ff 0%, #f8fafc 60%)">
+  <img src="MCP_Logo_TRANSPARENT.png" class="logo" alt="Monachil" data-id="mcp-logo">
   <h1 class="gradient-text" style="font-size:1.8em;">Data-Driven Asset Management</h1>
   <p class="subtitle">Proprietary Infrastructure for Risk Control, Capital Efficiency & Scalability</p>
   <aside class="notes">
@@ -207,7 +345,9 @@ aside.notes { display: none; }
 <!-- ============================================================ -->
 <!-- SLIDE 2: INDUSTRY PROBLEM -->
 <!-- ============================================================ -->
-<section data-auto-animate>
+<section data-auto-animate data-chapter="problem"
+         data-bg-dark="radial-gradient(ellipse at 80% 30%, rgba(239,68,68,0.10) 0%, transparent 60%), linear-gradient(180deg, #140608 0%, #050a15 70%)"
+         data-bg-light="radial-gradient(ellipse at 80% 30%, rgba(185,28,28,0.06) 0%, transparent 60%), linear-gradient(180deg, #fef2f2 0%, #f8fafc 70%)">
   <h2 style="font-size:1.3em;" data-id="main-heading">Why Most Asset Managers <span style="color:#f87171;">Fly Blind</span></h2>
   <ul style="margin-top:1em;">
     <li class="fragment"><strong>Fragmented data</strong> scattered across servicers, banks, and counterparties</li>
@@ -225,7 +365,9 @@ aside.notes { display: none; }
 <!-- ============================================================ -->
 <!-- SLIDE 3: PHILOSOPHY + FULL PIPELINE -->
 <!-- ============================================================ -->
-<section data-auto-animate>
+<section data-auto-animate data-chapter="philosophy"
+         data-bg-dark="radial-gradient(ellipse at 20% 30%, rgba(59,130,246,0.14) 0%, transparent 60%), linear-gradient(180deg, #071122 0%, #050a15 70%)"
+         data-bg-light="radial-gradient(ellipse at 20% 30%, rgba(29,78,216,0.07) 0%, transparent 60%), linear-gradient(180deg, #eff6ff 0%, #f8fafc 70%)">
   <h2 style="font-size:1.2em;" data-id="main-heading">Data is the Foundation — <span style="color:#60a5fa;">Not a Byproduct</span></h2>
   <ul style="margin-top:0.5em;">
     <li class="fragment"><strong>One platform</strong> — Investment, Legal, Ops, Finance, IR all connected</li>
@@ -260,7 +402,9 @@ aside.notes { display: none; }
 <!-- ============================================================ -->
 <!-- SLIDE 4: DAY ZERO + VERIFICATION -->
 <!-- ============================================================ -->
-<section>
+<section data-chapter="process"
+         data-bg-dark="radial-gradient(ellipse at 25% 80%, rgba(139,92,246,0.12) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(45,212,191,0.09) 0%, transparent 60%), linear-gradient(180deg, #0c0a1c 0%, #050a15 70%)"
+         data-bg-light="radial-gradient(ellipse at 25% 80%, rgba(124,58,237,0.06) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(15,118,110,0.05) 0%, transparent 60%), linear-gradient(180deg, #f5f3ff 0%, #f8fafc 70%)">
   <h2 style="font-size:1.1em;">In the Room from <span style="color:#a78bfa;">Day Zero</span> — and We <span style="color:#34d399;">Verify Everything</span></h2>
 
   <div class="timeline fragment">
@@ -318,7 +462,9 @@ aside.notes { display: none; }
 <!-- ============================================================ -->
 <!-- SLIDE 5: MEDALLION ARCHITECTURE -->
 <!-- ============================================================ -->
-<section>
+<section data-chapter="medallion"
+         data-bg-dark="radial-gradient(ellipse at 50% 20%, rgba(205,127,50,0.08) 0%, transparent 55%), radial-gradient(ellipse at 50% 80%, rgba(255,215,0,0.07) 0%, transparent 55%), linear-gradient(180deg, #0d0a06 0%, #050a15 70%)"
+         data-bg-light="radial-gradient(ellipse at 50% 20%, rgba(146,64,14,0.05) 0%, transparent 55%), radial-gradient(ellipse at 50% 80%, rgba(161,98,7,0.05) 0%, transparent 55%), linear-gradient(180deg, #fffbeb 0%, #f8fafc 70%)">
   <h2 style="font-size:1.2em;">How We Organize Data</h2>
   <div class="medal-row fragment">
     <span class="medal bronze">BRONZE</span>
@@ -366,7 +512,9 @@ aside.notes { display: none; }
 <!-- ============================================================ -->
 <!-- SLIDE 6: DATA COVERAGE -->
 <!-- ============================================================ -->
-<section>
+<section data-chapter="coverage"
+         data-bg-dark="radial-gradient(ellipse at 50% 30%, rgba(20,184,166,0.14) 0%, transparent 60%), linear-gradient(180deg, #0a1420 0%, #050a15 80%)"
+         data-bg-light="radial-gradient(ellipse at 50% 30%, rgba(15,118,110,0.08) 0%, transparent 60%), linear-gradient(180deg, #f0fdfa 0%, #f8fafc 70%)">
   <h2 style="font-size:1.2em;">Comprehensive, <span style="color:#14b8a6;">Multi-Source</span> Coverage</h2>
   <div class="source-grid fragment">
     <div class="source-item">
@@ -407,7 +555,9 @@ aside.notes { display: none; }
 <!-- SLIDE 7: DASHBOARDS (vertical stack — swipe down or press ↓) -->
 <!-- ============================================================ -->
 <section>
-<section>
+<section data-chapter="demos"
+         data-bg-dark="radial-gradient(ellipse at 20% 70%, rgba(45,212,191,0.12) 0%, transparent 55%), radial-gradient(ellipse at 80% 30%, rgba(99,102,241,0.10) 0%, transparent 55%), linear-gradient(180deg, #061414 0%, #050a15 70%)"
+         data-bg-light="radial-gradient(ellipse at 20% 70%, rgba(15,118,110,0.06) 0%, transparent 55%), radial-gradient(ellipse at 80% 30%, rgba(67,56,202,0.05) 0%, transparent 55%), linear-gradient(180deg, #ecfdf5 0%, #f8fafc 70%)">
   <h2 style="font-size:1.2em;">Live Portfolio <span class="gradient-text">Analytics</span></h2>
   <p style="font-size:0.5em; color:var(--muted); margin-bottom:0.8em;">Example dashboards we use internally — across asset classes and geographies</p>
   <div class="demo-grid">
@@ -593,7 +743,9 @@ aside.notes { display: none; }
 <!-- ============================================================ -->
 <!-- SLIDE 8: EARLY WARNING -->
 <!-- ============================================================ -->
-<section>
+<section data-chapter="warning"
+         data-bg-dark="radial-gradient(ellipse at 50% 30%, rgba(245,158,11,0.12) 0%, transparent 60%), radial-gradient(ellipse at 80% 80%, rgba(239,68,68,0.08) 0%, transparent 55%), linear-gradient(180deg, #140c00 0%, #050a15 70%)"
+         data-bg-light="radial-gradient(ellipse at 50% 30%, rgba(180,83,9,0.07) 0%, transparent 60%), radial-gradient(ellipse at 80% 80%, rgba(185,28,28,0.05) 0%, transparent 55%), linear-gradient(180deg, #fffbeb 0%, #f8fafc 70%)">
   <h2 style="font-size:1.2em;">Catching Problems <span style="color:#f87171;">Before</span> They Become Losses</h2>
   <ul style="margin-top:0.8em;">
     <li class="fragment"><strong>Collection shortfalls</strong> surface days before servicer reports arrive</li>
@@ -633,7 +785,9 @@ aside.notes { display: none; }
 <!-- ============================================================ -->
 <!-- SLIDE 9: COMPOUND EFFECT -->
 <!-- ============================================================ -->
-<section>
+<section data-chapter="outcome"
+         data-bg-dark="radial-gradient(ellipse at 30% 30%, rgba(99,102,241,0.14) 0%, transparent 55%), radial-gradient(ellipse at 80% 80%, rgba(45,212,191,0.10) 0%, transparent 55%), linear-gradient(135deg, #091028 0%, #050a15 70%)"
+         data-bg-light="radial-gradient(ellipse at 30% 30%, rgba(67,56,202,0.07) 0%, transparent 55%), radial-gradient(ellipse at 80% 80%, rgba(15,118,110,0.05) 0%, transparent 55%), linear-gradient(135deg, #eef2ff 0%, #f8fafc 70%)">
   <h2 style="font-size:1.2em;">Every Deal Makes the Platform <span class="gradient-text">Stronger</span></h2>
   <div class="impact-grid fragment">
     <div class="impact-item">
@@ -678,8 +832,10 @@ aside.notes { display: none; }
 <!-- ============================================================ -->
 <!-- SLIDE 10: CLOSING -->
 <!-- ============================================================ -->
-<section>
-  <img src="MCP_Logo_TRANSPARENT.png" class="logo" alt="Monachil" style="height:50px;">
+<section data-auto-animate data-transition="zoom" data-chapter="close"
+         data-bg-dark="radial-gradient(ellipse at 30% 70%, rgba(99,102,241,0.18) 0%, transparent 55%), radial-gradient(ellipse at 75% 20%, rgba(168,139,250,0.10) 0%, transparent 55%), linear-gradient(225deg, #0b1022 0%, #050a15 60%)"
+         data-bg-light="radial-gradient(ellipse at 30% 70%, rgba(99,102,241,0.10) 0%, transparent 55%), radial-gradient(ellipse at 75% 20%, rgba(124,58,237,0.08) 0%, transparent 55%), linear-gradient(225deg, #eef2ff 0%, #f8fafc 60%)">
+  <img src="MCP_Logo_TRANSPARENT.png" class="logo" alt="Monachil" style="height:50px;" data-id="mcp-logo">
   <h2 style="font-size:1.3em;">Data as a <span class="gradient-text">Compounding Strategic Asset</span></h2>
   <ul style="margin-top:1em;">
     <li class="fragment"><strong>Proprietary</strong> — built in-house, not licensed</li>
@@ -726,8 +882,9 @@ Reveal.initialize({
   jumpToSlide: false,
   overview: true,
   controlsTutorial: false,
-  autoAnimateEasing: 'ease-out',
-  autoAnimateDuration: 0.8,
+  autoAnimateEasing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+  autoAnimateDuration: 0.9,
+  autoAnimateUnmatched: true,
   pdfMaxPagesPerSlide: 1,
   plugins: [RevealNotes, RevealMarkdown],
   // Shift+1..9 = jump to a dashboard during Q&A
@@ -797,6 +954,28 @@ window.addEventListener('message', e => {
 // Re-broadcast when slides show — covers iframes reveal.js rebuilds on nav
 Reveal.on('ready', () => broadcastTheme(currentTheme()));
 Reveal.on('slidechanged', () => broadcastTheme(currentTheme()));
+
+// Chapter-divider gradient backgrounds: apply per-slide data-bg-dark / data-bg-light.
+// Reveal's .slide-background-content gets an inline background-image via CSS here,
+// and we flip the value whenever the theme changes or a chaptered slide becomes current.
+function applyChapterBackgrounds() {
+  const theme = currentTheme();
+  document.querySelectorAll('.slides section[data-chapter]').forEach(section => {
+    const idx = Array.from(section.parentNode.children).indexOf(section);
+    const bgWrap = document.querySelectorAll('.backgrounds > .slide-background')[idx];
+    const inner = bgWrap?.querySelector('.slide-background-content');
+    if (!inner) return;
+    const grad = theme === 'light'
+      ? section.getAttribute('data-bg-light')
+      : section.getAttribute('data-bg-dark');
+    if (grad) inner.style.backgroundImage = grad;
+  });
+}
+Reveal.on('ready', applyChapterBackgrounds);
+Reveal.on('slidechanged', applyChapterBackgrounds);
+// Watch data-pres-theme for changes so a toggle re-applies the chapter gradients
+new MutationObserver(applyChapterBackgrounds)
+  .observe(document.documentElement, { attributes: true, attributeFilter: ['data-pres-theme'] });
 
 // Cross-tab sync
 window.addEventListener('storage', e => {

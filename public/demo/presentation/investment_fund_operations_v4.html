@@ -69,6 +69,19 @@ body::after{
 .theme-toggle .icon{font-size:0.85rem}
 html[data-embedded="true"] .theme-toggle{display:none !important}
 
+/* When embedded as an iframe background in the reveal deck the viewport
+   is 1280×720 and the tiny SVG label sizes (5.5–12 in SVG user units)
+   become unreadable. Tighten the page padding + trim the header so the
+   diagram itself claims more vertical space inside the 720-tall iframe,
+   which lets the browser render the SVG at a larger natural scale. */
+html[data-embedded="true"] body { overflow: hidden; }
+html[data-embedded="true"] .pg  { min-width: 0; padding: 4px 8px 0; }
+html[data-embedded="true"] .hd  { margin-bottom: 4px; }
+html[data-embedded="true"] .hd h1 { font-size: 1rem; margin-bottom: 0; }
+html[data-embedded="true"] .hd p  { font-size: 0.58rem; margin-top: 1px; }
+html[data-embedded="true"] .lg  { margin-bottom: 2px; gap: 10px; }
+html[data-embedded="true"] .lg .i { font-size: 0.48rem; }
+
 .lg{display:flex;justify-content:center;gap:14px;margin-bottom:6px;flex-wrap:wrap}
 .lg .i{display:flex;align-items:center;gap:4px;font-size:0.56rem;color:var(--text-legend)}
 .lg .d{width:7px;height:7px;border-radius:2px}

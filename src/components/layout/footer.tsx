@@ -14,7 +14,7 @@ export function Footer() {
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 px-6 py-8 md:flex-row">
         {/* Logo */}
         <div className="flex items-center gap-2">
-          <MountainIcon className="h-5 w-5 text-brand-blue" />
+          <MountainIcon className="h-5 w-5" />
           <span className="text-xs font-light tracking-[0.2em] text-text-secondary">
             MONACHIL TECHNOLOGIES
           </span>
