@@ -174,10 +174,10 @@ const capabilities = [
   },
   {
     icon: Brain,
-    title: "Enrichment & Business Logic",
+    title: "Quantitative Research & Engineering",
     description:
-      "The Gold layer is where the investment process lives in code — DPD buckets, borrowing base math, covenant tracking, cross-dataset joins between loan tapes, bank statements, and contracts. Every output is traceable to raw source.",
-    tags: ["Python", "Pydantic", "FastAPI"],
+      "Where the investment process lives in code. We build statistical and ML models for credit risk, pricing, and portfolio construction — plus the engineering around them: DPD logic, vintage curves, roll-rate analysis, and backtesting frameworks — all running on the Gold-layer data so every output is traceable to source.",
+    tags: ["Python", "Research", "Modeling"],
     span: "md:col-span-2",
     visual: false,
   },
